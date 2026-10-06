@@ -71,7 +71,7 @@ const SAND = { at: [118, 212], up: 3.4, fov: 40, light: 'evening', lift: 'rgba(2
 // Turning to the boat at the water's edge: over this stretch, to put it this far across. The
 // eye comes up a little as it does (from 1.6 m above the swash a breaking wave stands as high
 // as the horizon and hides the hull each time it rears), and the lens closes in.
-const BOAT_PAN = [4.72, 4.985], BOAT_X = { wide: 0.66, tall: 0.6 }, BOAT_RISE = 1.9, BOAT_LENS = 11;
+const BOAT_PAN = [4.72, 4.985], BOAT_X = { wide: 0.64, tall: 0.58 }, BOAT_RISE = 2.3, BOAT_LENS = 16;
 
 const clamp01 = (x) => Math.min(Math.max(x, 0), 1);
 const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };

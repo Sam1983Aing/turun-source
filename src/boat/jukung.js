@@ -814,8 +814,10 @@ export function createJukung({ renderer, water, lightUniforms = {}, gradeUniform
   // clear of the white water at the rock's foot: bearing 252 degrees and 74 m from where the
   // walk ends. Bow to the swell.
   const given = place ? String(place).split(',').map(Number) : [];
-  const east = Number.isFinite(given[0]) ? given[0] : 29;
-  const north = Number.isFinite(given[1]) ? given[1] : 141;
+  // (Moored 52 m from where the walk ends, just outside the foam: Sam asked for it closer
+  // than the first mooring at [29, 141], 74 m out, where it was 95 px long in the last frame.)
+  const east = Number.isFinite(given[0]) ? given[0] : 49.6;
+  const north = Number.isFinite(given[1]) ? given[1] : 147.7;
   const heading = Number.isFinite(given[2]) ? given[2] : 220;
 
   const uniforms = {
