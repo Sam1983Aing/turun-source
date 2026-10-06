@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 2121dd6. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
+  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit d45c21b. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Turun · The walk down to Kelingking Beach</title>
@@ -74,7 +74,7 @@ html.lenis, html.lenis body { height: auto; }
 
 html.scroll.loading { overflow: hidden; }
 .track { position: relative; width: 1px; pointer-events: none; }
-.notext .words, .notext .hud, .notext .rail, .notext .scene-controls, .notext .cover { display: none !important; }
+.notext .words, .notext .hud, .notext .rail, .notext .scene-controls, .notext .cover, .notext .sp { display: none !important; }
 
 .label { margin: 0; font: 500 11px/1.3 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; }
 .display { margin: 0; font: 400 clamp(2.5rem, 1.4rem + 3.6vw, 5.4rem)/0.98 var(--serif); letter-spacing: -0.014em; text-wrap: balance; }
@@ -120,15 +120,17 @@ html.scroll.at-hero #stage { cursor: pointer; }
 /* The paper and its shadow: the picture's rectangle plus the border, sized once (postcard.js
    sets --cw, --ch, --b, --bb) and scaled about the middle of the picture as the window opens. */
 .card__paper, .card__shadow { position: absolute; left: calc(50% - var(--cw) / 2 - var(--b)); top: calc(50% - var(--ch) / 2 - var(--b)); width: calc(var(--cw) + 2 * var(--b)); height: calc(var(--ch) + var(--b) + var(--bb)); border-radius: calc(var(--cw) * 0.005); transform-origin: 50% calc(var(--b) + var(--ch) / 2); }
-.card__paper { background: var(--tooth), linear-gradient(135deg, #fffefa 0%, #fdf9ef 55%, #f6efdf 100%); background-size: calc(var(--cw) * 0.16) auto, auto;
-  box-shadow: inset 0 0 0 calc(var(--cw) * 0.0011) rgba(255, 255, 255, 0.9), inset 0 0 calc(var(--cw) * 0.03) rgba(120, 92, 52, 0.07),
-    calc(var(--cw) * 0.0014) calc(var(--cw) * 0.0026) 0 #d9cdb6; }
+.card__paper { background: var(--tooth), linear-gradient(135deg, #fffefa 0%, #fdf9ef 55%, #f6efdf 100%); background-size: calc(var(--cw) * 0.11) auto, auto;
+  box-shadow: inset 0 0 calc(var(--cw) * 0.03) rgba(120, 92, 52, 0.06),
+    calc(var(--cw) * 0.0009) calc(var(--cw) * 0.0018) 0 #e4dac6; }
 /* Noon sun, almost overhead, from the top left: a tight shadow under the edge, a soft one
    beyond it, and the sand a shade darker all round. The far corner sits a little proud. */
-.card__shadow { transform: rotate(0.55deg); background: rgba(58, 36, 14, 0.55);
-  box-shadow: calc(var(--cw) * 0.003) calc(var(--cw) * 0.006) calc(var(--cw) * 0.007) rgba(58, 36, 14, 0.62),
-    calc(var(--cw) * 0.016) calc(var(--cw) * 0.034) calc(var(--cw) * 0.045) rgba(58, 36, 14, 0.42),
-    calc(var(--cw) * 0.03) calc(var(--cw) * 0.06) calc(var(--cw) * 0.16) rgba(58, 36, 14, 0.26); }
+/* (The shadow's own box is clear and sits square under the paper: with a fill and a slight
+   turn, as it first had, it showed as a dark lip along the card's top and right edges.) */
+.card__shadow {
+  box-shadow: calc(var(--cw) * 0.004) calc(var(--cw) * 0.007) calc(var(--cw) * 0.008) calc(var(--cw) * -0.003) rgba(58, 36, 14, 0.6),
+    calc(var(--cw) * 0.018) calc(var(--cw) * 0.036) calc(var(--cw) * 0.045) calc(var(--cw) * -0.012) rgba(58, 36, 14, 0.44),
+    calc(var(--cw) * 0.035) calc(var(--cw) * 0.07) calc(var(--cw) * 0.16) calc(var(--cw) * -0.02) rgba(58, 36, 14, 0.3); }
 .card__caption { position: absolute; left: var(--b); right: var(--b); bottom: 0; height: var(--bb); margin: 0; display: flex; align-items: center; justify-content: space-between;
   font: 500 calc(var(--cw) * 0.0152)/1 var(--sans); letter-spacing: 0.24em; text-transform: uppercase; color: #3b342a; text-shadow: 0 calc(var(--cw) * 0.0008) 0 rgba(255, 255, 255, 0.8); }
 .card__caption span:last-child { font-variant-numeric: tabular-nums; color: #6d6252; }
@@ -137,8 +139,8 @@ html.scroll.at-hero #stage { cursor: pointer; }
 .card__finish { position: absolute; left: calc(50% - var(--cw) / 2); top: calc(50% - var(--ch) / 2); width: var(--cw); height: var(--ch); pointer-events: none; 
   background: linear-gradient(104deg, rgba(255,255,255,0) 42%, rgba(255,255,255,0.16) 48%, rgba(255,255,255,0.04) 52%, rgba(255,255,255,0) 58%) var(--sheen, 50%) 0 / 300% 100% no-repeat,
     radial-gradient(130% 120% at 28% 18%, rgba(255, 244, 222, 0.03), rgba(70, 48, 22, 0.04));
-  box-shadow: inset 0 0 0 calc(var(--cw) * 0.0009) rgba(50, 36, 18, 0.28), inset 0 0 calc(var(--cw) * 0.03) rgba(50, 36, 18, 0.1); }
-.card__finish::after { content: ""; position: absolute; inset: 0; background: var(--grain); background-size: calc(var(--cw) * 0.14) auto; opacity: 0.2; }
+  box-shadow: inset 0 0 0 calc(var(--cw) * 0.0006) rgba(50, 36, 18, 0.16), inset 0 0 calc(var(--cw) * 0.03) rgba(50, 36, 18, 0.08); }
+.card__finish::after { content: ""; position: absolute; inset: 0; background: var(--grain); background-size: calc(var(--cw) * 0.1) auto; opacity: 0.16; }
 /* The light on the whole still life: warm from the top left, falling away to the far corner. */
 .table__light { position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(58% 78% at 20% 46%, rgba(255, 238, 206, 0.5), rgba(255, 238, 206, 0.22) 45%, rgba(255, 238, 206, 0) 78%), radial-gradient(130% 120% at 28% 18%, rgba(0, 0, 0, 0) 58%, rgba(64, 40, 14, 0.24) 100%); }
@@ -197,14 +199,47 @@ html.scroll.at-hero #stage { cursor: pointer; }
 .loader.failed .loader__fail { display: block; }
 .loader.failed .loader__step, .loader.failed .loader__bar { display: none; }
 
-/* ------------------------------------------------------------ the blank beat, and the curtain */
+/* ------------------------------------------------------------ the curtain, and the spreads */
 
-.cover { position: fixed; inset: 0; z-index: 6; visibility: hidden; opacity: 0; pointer-events: none; display: grid; place-content: center; justify-items: center; gap: 26px; text-align: center; padding: 0 var(--gutter); color: var(--ink);
-  background: radial-gradient(120% 90% at 50% 108%, #f0c296 0%, #f4dcbc 34%, #f5ecdc 70%); }
-.cover .label { color: var(--ink-dim); }
-.cover .display { font-size: clamp(3rem, 1.2rem + 7.4vw, 9.4rem); line-height: 0.9; letter-spacing: -0.022em; }
-.cover .display em { color: var(--accent-deep); }
+.cover { position: fixed; inset: 0; z-index: 7; visibility: hidden; opacity: 0; pointer-events: none;
+  background: radial-gradient(110% 90% at 20% 0%, #fbf6ea 0%, #f4ead7 60%, #ecdcc0 100%); }
 
+/* A spread (spreads.js): the page turned to paper while the scroll holds the camera. Its words
+   come in once the paper is nearly solid (GSAP, in spreads.js). */
+.sp { position: fixed; inset: 0; z-index: 6; visibility: hidden; opacity: 0; box-sizing: border-box; padding: clamp(84px, 13vh, 150px) var(--gutter) clamp(40px, 8vh, 90px); display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); align-items: center; gap: clamp(28px, 6vw, 110px); color: var(--ink);
+  background: var(--tooth), radial-gradient(110% 90% at 20% 0%, #fbf6ea 0%, #f4ead7 60%, #ecdcc0 100%); background-size: 130px auto, auto; pointer-events: none; }
+.sp.is-on a { pointer-events: auto; }
+.sp__text { display: grid; gap: clamp(18px, 3vh, 34px); }
+.sp__label { display: flex; align-items: baseline; gap: 16px; color: var(--ink-dim); }
+.sp__label b { font-weight: 500; color: var(--ink); }
+.sp__head { font-size: clamp(3rem, 0.6rem + 7.2vw, 9.6rem); line-height: 0.88; letter-spacing: -0.028em; margin-left: -0.04em; }
+.sp__head em { color: var(--accent-deep); }
+.sp__mask { display: block; overflow: clip; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.sp__ln { display: block; }
+/* The rule draws itself across under the headline. */
+.sp__rule { display: block; height: 1px; background: var(--accent-deep); transform-origin: 0 50%; }
+.sp__rows { margin: 0; display: grid; gap: 0; max-width: 40rem; }
+.sp__rows div { display: grid; grid-template-columns: 8.5rem 1fr; align-items: baseline; padding: 13px 0; border-bottom: 1px solid rgba(20, 18, 14, 0.16); }
+.sp__rows dt { font: 500 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-deep); font-variant-numeric: tabular-nums; }
+.sp__rows dd { margin: 0; font: 400 clamp(1.25rem, 1rem + 0.8vw, 1.7rem)/1.15 var(--serif); }
+.sp__price { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; font: 400 0.98rem/1.3 var(--sans); color: var(--ink-dim); }
+.sp__price b { font: 400 2.1rem/1 var(--serif); color: var(--ink); margin-right: -14px; }
+/* A postcard of the view just left, lying on the spread. */
+.sp__card { margin: 0; justify-self: center; width: min(100%, 30rem); padding: 4.2% 4.2% 0; box-sizing: border-box; background: var(--tooth), linear-gradient(135deg, #fffefa 0%, #fdf9ef 55%, #f6efdf 100%); background-size: 120px auto, auto;
+  box-shadow: 2px 4px 5px -1px rgba(58, 36, 14, 0.4), 14px 26px 48px -6px rgba(58, 36, 14, 0.3), 0 0 90px rgba(58, 36, 14, 0.14); }
+.sp__card canvas { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; background: #12110e; }
+.sp__card figcaption { display: flex; justify-content: space-between; align-items: center; height: 3.4rem; font: 500 9px/1 var(--sans); letter-spacing: 0.24em; text-transform: uppercase; color: #3b342a; }
+.sp__card figcaption span:last-child { color: #6d6252; }
+@media (max-width: 860px), (max-aspect-ratio: 85/100) {
+  .sp { grid-template-columns: 1fr; align-content: center; gap: 22px; padding-top: 84px; }
+  .sp__card { order: -1; width: min(62%, 17rem); justify-self: start; margin-left: 4%; }
+  .sp__card figcaption { height: 2.2rem; font-size: 7.5px; }
+  .sp__card figcaption span:last-child { display: none; }
+  .sp__head { font-size: clamp(2.7rem, 13.4vw, 5rem); }
+  .sp__rows div { grid-template-columns: 5.6rem 1fr; padding: 10px 0; }
+  .sp__rows dd { font-size: 1.12rem; }
+  .sp__price b { font-size: 1.7rem; }
+}
 /* ------------------------------------------------------------ the frame around the scene */
 
 .hud { position: fixed; z-index: 10; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 44px; padding: max(18px, env(safe-area-inset-top)) var(--gutter) 0; pointer-events: none; color: var(--cream); text-shadow: var(--shadow); opacity: 0; transition: color 0.9s var(--ease), text-shadow 0.9s var(--ease); }
@@ -267,8 +302,11 @@ html.scroll.at-hero #stage { cursor: pointer; }
 /* A soft dark patch behind each, so the words read over sky, sea and scrub alike. */
 .note::before { content: ""; position: absolute; inset: -24% -18%; z-index: -1; background: radial-gradient(closest-side, rgba(12, 11, 9, 0.5), rgba(12, 11, 9, 0.22) 55%, rgba(12, 11, 9, 0)); opacity: 0; transition: opacity 1.2s var(--ease); pointer-events: none; }
 .note.is-on::before { opacity: 1; }
+/* (Over the sand, with its bright ripples, a deeper one.) */
+.note.on-light::before { inset: -34% -10%; background: radial-gradient(closest-side, rgba(12, 11, 9, 0.7), rgba(12, 11, 9, 0.38) 60%, rgba(12, 11, 9, 0)); }
+.note.on-light .body { color: var(--cream); }
 .note .label { display: flex; align-items: baseline; gap: 14px; color: var(--cream); }
-.note .label b { position: relative; font-weight: 500; padding-left: 20px; }
+.note .label b { position: relative; font-weight: 500; padding-left: 20px; font-variant-numeric: tabular-nums; }
 .note .label b::before { content: ""; position: absolute; left: 0; top: 50%; width: 12px; height: 1px; background: var(--accent); }
 .note .label span { opacity: 0.86; }
 .note--xl .display { font-size: clamp(3rem, 0.8rem + 7.6vw, 10.2rem); line-height: 0.86; letter-spacing: -0.028em; margin-left: -0.04em; }
@@ -278,20 +316,15 @@ html.scroll.at-hero #stage { cursor: pointer; }
 .at-r { right: calc(var(--gutter) + 72px); top: 50%; translate: 0 -50%; width: min(24rem, 30vw); padding-left: 22px; border-left: 1px solid rgba(243, 239, 230, 0.5); }
 .at-c { left: 50%; translate: -50% 0; bottom: clamp(44px, 12vh, 150px); width: min(64rem, calc(100vw - 2 * var(--gutter))); justify-items: center; text-align: center; }
 .at-c .display { margin-left: 0; }
-/* Over bright sand: dark ink, no veil (the light-surface side of the page). */
-.note.on-light { color: var(--ink); text-shadow: none; }
-.note.on-light::before { display: none; }
-.note.on-light .label { color: var(--ink-dim); }
-.note.on-light .label b { color: var(--ink); }
-.note.on-light .label b::before { background: var(--accent-deep); }
-.note.on-light .display em { color: var(--accent-deep); }
-.note.on-light .body { color: var(--ink-dim); }
-.dim-light .note.on-light { color: var(--cream); text-shadow: var(--shadow); }
-.dim-light .note.on-light::before { display: block; }
-.dim-light .note.on-light .label { color: var(--cream); }
-.dim-light .note.on-light .body { color: var(--cream-dim); }
-.dim-light .note.on-light .label b { color: var(--cream); }
-.dim-light .note.on-light .display em { color: var(--accent); }
+/* Over the sand at noon (a light picked by hand on the beach): dark ink, no veil. In the
+   page's own evening, and in any other light, the sand is dark enough for cream. */
+.bright-light .note.on-light { color: var(--ink); text-shadow: none; }
+.bright-light .note.on-light::before { display: none; }
+.bright-light .note.on-light .label { color: var(--ink-dim); }
+.bright-light .note.on-light .label b { color: var(--ink); }
+.bright-light .note.on-light .label b::before { background: var(--accent-deep); }
+.bright-light .note.on-light .display em { color: var(--accent-deep); }
+.bright-light .note.on-light .body { color: var(--ink-dim); }
 
 /* The foot of the page, on the sand under the card's back. */
 .foot { left: var(--gutter); right: var(--gutter); bottom: max(20px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: 1fr 1.25fr auto; align-items: end; gap: clamp(18px, 4vw, 64px); color: rgba(20, 18, 14, 0.86); font: 400 11.5px/1.55 var(--sans); }
@@ -448,12 +481,39 @@ html.scroll.at-hero #stage { cursor: pointer; }
       <p class="loader__fail">This needs WebGL 2 and a reasonably recent graphics chip, and this browser could not start it. It runs best in Chrome or Safari on a laptop.</p>
     </div>
 
-    <!-- The blank beat on the sand (the day passing: the light changes behind it), and the
-         curtain for the jumps from the menu. -->
-    <div class="cover" aria-hidden="true">
-      <p class="label cover__label">Ten hours of nothing</p>
-      <p class="display cover__line" data-lines>Stay until the light <em>turns</em>.</p>
-    </div>
+    <!-- The curtain: blank paper over everything for a jump from the menu. -->
+    <div class="cover" aria-hidden="true"></div>
+
+    <!-- The spreads: twice on the way down the scroll holds the camera and the page turns to
+         paper (src/scroll/spreads.js; where, in SPREADS in scroll.js). The postcard on each is
+         a snapshot of the view the visitor is leaving. -->
+    <section class="sp sp--walk" data-hold="walk" aria-label="The walk">
+      <div class="sp__text">
+        <p class="label sp__label"><b>The walk</b><span>06:10</span></p>
+        <h2 class="display sp__head"><span class="sp__mask"><span class="sp__ln">Six walkers.</span></span><span class="sp__mask"><span class="sp__ln">One <em>guide</em>.</span></span></h2>
+        <i class="sp__rule"></i>
+        <dl class="sp__rows">
+          <div><dt>Leaves</dt><dd>06:10, from the railing</dd></div>
+          <div><dt>Down</dt><dd>150 m, about 400 steps, fifty minutes</dd></div>
+          <div><dt>You carry</dt><dd>Water. We carry the rest.</dd></div>
+        </dl>
+      </div>
+      <figure class="sp__card"><canvas width="900" height="600"></canvas><figcaption><span>From the steps, 120 m</span><span>Kelingking</span></figcaption></figure>
+    </section>
+    <section class="sp sp--beach" data-hold="beach" aria-label="The beach">
+      <div class="sp__text">
+        <p class="label sp__label"><b>The beach</b><span>07:10 to 17:40</span></p>
+        <h2 class="display sp__head"><span class="sp__mask"><span class="sp__ln">Then a whole day</span></span><span class="sp__mask"><span class="sp__ln">of <em>nothing</em>.</span></span></h2>
+        <i class="sp__rule"></i>
+        <dl class="sp__rows">
+          <div><dt>07:10</dt><dd>Breakfast on the sand</dd></div>
+          <div><dt>All day</dt><dd>Shade under the overhang, and nobody else</dd></div>
+          <div><dt>17:40</dt><dd>The jukung, round the head and home</dd></div>
+        </dl>
+        <p class="sp__price"><b>US$ 240</b> a walker, April to October <a class="button" href="#reserve">Reserve a morning</a></p>
+      </div>
+      <figure class="sp__card"><canvas width="900" height="600"></canvas><figcaption><span>Above the beach, 55 m</span><span>Kelingking</span></figcaption></figure>
+    </section>
 
     <header class="hud">
       <a class="hud__mark" href="#" data-top>Turun<span>Guided descents</span></a>
@@ -511,22 +571,29 @@ html.scroll.at-hero #stage { cursor: pointer; }
         <p class="body">The photo gets taken from this platform. Then it's the car park and the fast boat home. You're going the other way.</p>
       </section>
 
-      <section class="note note--m at-r" data-tau="1.32,1.98">
+      <section class="note note--m at-r" data-tau="1.4,1.98">
         <p class="label"><b>06:20</b><span>The ridge · 95 m</span></p>
         <h2 class="display" data-lines>We leave at first <em>light</em>.</h2>
         <p class="body">Before the day boats land and the heat sets in. Six walkers, and a guide who has done this a thousand times.</p>
       </section>
 
+      <!-- The day's time lapse: the camera holds here and the scroll turns the sun (LAPSE). -->
+      <section class="note note--xl at-bl" data-tau="2.17,2.235">
+        <p class="label"><b class="clock">07:10</b><span>One day in the cove</span></p>
+        <h2 class="display" data-lines>Stay until the light <em>turns</em>.</h2>
+        <p class="body">Keep scrolling. You're turning the sun.</p>
+      </section>
+
       <section class="note note--xl at-bl" data-tau="2.32,3.02">
-        <p class="label"><b>06:45</b><span>The switchbacks · 55 m</span></p>
+        <p class="label"><b>The switchbacks</b><span>55 m</span></p>
         <h2 class="display" data-lines>Then it gets <em>steep</em>.</h2>
         <p class="body">Packed earth and bamboo rails, about four hundred steps of it. This is the part that keeps the beach empty.</p>
       </section>
 
       <section class="note note--xl at-c on-light" data-tau="3.99,4.5">
-        <p class="label"><b>07:10</b><span>The sand · 2 m</span></p>
+        <p class="label"><b>The sand</b><span>2 m</span></p>
         <h2 class="display" data-lines>Nobody else is <em>here</em>.</h2>
-        <p class="body">Shade under the overhang, breakfast on the sand, and the surf doing the talking. Nobody swims, the break is too heavy. You came for the quiet.</p>
+        <p class="body">No sunbeds, no speakers, no day trippers. Just the surf doing the talking. Nobody swims, the break is too heavy. You came for the quiet.</p>
       </section>
 
       <section class="note note--xl at-bl" id="boat" data-tau="4.9,5.01">
@@ -95700,28 +95767,40 @@ const BORDER = 0.042, FOOT = 0.108;
 // How far the eye is from the card for the tilt and the flip, in screen pixels.
 const EYE = 1900;
 
-// A tile of fine noise as a picture: specks of one colour, their alpha `gain` times a random
-// number plus `bias` (so most of the tile is clear). Two sizes of speck, so it is not TV static.
-function noiseTile(size, rgb, gain, bias, seed) {
+// A tile of noise as a picture: specks of one colour, their alpha `gain` times a random number
+// plus `bias` (so most of the tile is clear). Two sizes of speck, so it is not TV static.
+// soft: the tile is made at a third of the size and drawn up smooth, which gives the faint
+// mottling of card stock (and nothing fine enough to sparkle when the card is drawn small).
+function noiseTile(size, rgb, gain, bias, seed, soft = false) {
+  const n = soft ? Math.round(size / 3) : size;
   const c = document.createElement('canvas');
-  c.width = c.height = size;
-  const ctx = c.getContext('2d'), img = ctx.createImageData(size, size), d = img.data;
+  c.width = c.height = n;
+  const ctx = c.getContext('2d'), img = ctx.createImageData(n, n), d = img.data;
   let s = seed >>> 0;
   const rnd = () => ((s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296);
-  const half = size >> 1, coarse = Float32Array.from({ length: half * half }, rnd);
-  for (let y = 0, i = 0; y < size; y++) for (let x = 0; x < size; x++, i += 4) {
-    const n = 0.62 * rnd() + 0.38 * coarse[(y >> 1) * half + (x >> 1)];
+  const half = n >> 1, coarse = Float32Array.from({ length: half * half }, rnd);
+  for (let y = 0, i = 0; y < n; y++) for (let x = 0; x < n; x++, i += 4) {
+    const v = 0.62 * rnd() + 0.38 * coarse[(y >> 1) * half + (x >> 1)];
     d[i] = rgb[0]; d[i + 1] = rgb[1]; d[i + 2] = rgb[2];
-    d[i + 3] = Math.min(255, Math.max(0, n * gain + bias) * 255);
+    d[i + 3] = Math.min(255, Math.max(0, v * gain + bias) * 255);
   }
   ctx.putImageData(img, 0, 0);
-  return `url(${c.toDataURL('image/png')})`;
+  if (!soft) return `url(${c.toDataURL('image/png')})`;
+  // Drawn up three times, wrapped at the edges so the tile still repeats without a seam.
+  const big = document.createElement('canvas');
+  big.width = big.height = n * 3;
+  const g = big.getContext('2d');
+  g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+  for (const ox of [-1, 0, 1]) for (const oy of [-1, 0, 1]) g.drawImage(c, ox * n * 3, oy * n * 3, n * 3, n * 3);
+  return `url(${big.toDataURL('image/png')})`;
 }
 
 function createPostcard({ reduced = false } = {}) {
   const $ = (s) => document.querySelector(s);
   const html = document.documentElement;
-  html.style.setProperty('--tooth', noiseTile(128, [128, 104, 70], 0.3, -0.17, 7));
+  // (Soft and faint. As fine specks it sparkled at the card's resting size and read as
+  // speckled stone once the card was two or three times that.)
+  html.style.setProperty('--tooth', noiseTile(240, [128, 104, 70], 0.22, -0.075, 7, true));
   html.style.setProperty('--grain', noiseTile(128, [86, 64, 38], 0.9, -0.5, 19));
   const table = $('.table'), world = $('.world'), ground = $('.ground'), card = $('.card'), flipEl = $('.card__flip');
   const finish = $('.card__finish'), light = $('.table__light'), stage = $('#stage'), back = $('.back');
@@ -95838,7 +95917,7 @@ function createPostcard({ reduced = false } = {}) {
     // The shadow on the sand narrows with the card as it turns and slides out a little as it
     // lifts. Once turned, the back brings its own.
     const far = (lift - 1) * cw;
-    shadow.style.transform = `translate(${(far * 0.5).toFixed(1)}px, ${far.toFixed(1)}px) rotate(0.55deg) scale(${(sx * Math.abs(Math.cos(Math.PI * flip))).toFixed(5)}, ${sy.toFixed(5)})`;
+    shadow.style.transform = `translate(${(far * 0.5).toFixed(1)}px, ${far.toFixed(1)}px) scale(${(sx * Math.abs(Math.cos(Math.PI * flip))).toFixed(5)}, ${sy.toFixed(5)})`;
     shadow.style.opacity = turned ? '0' : (1 - 3 * (lift - 1)).toFixed(3);
   }
 
@@ -95871,224 +95950,87 @@ function createPostcard({ reduced = false } = {}) {
 
 return { "createPostcard": createPostcard };
 })();
-// src/scroll/middle-options.js
-__m["src/scroll/middle-options.js"] = (function () {
+// src/scroll/spreads.js
+__m["src/scroll/spreads.js"] = (function () {
 "use strict";
-// Options for the middle of the page (demo, 6 October 2026): three ways for the walk down,
-// between the railing and the sand, to carry the offer instead of going quiet. Behind a URL
-// switch; without it none of this runs and the page is exactly as it was.
+// The spreads (v35): twice on the way down the scroll holds the camera and the page turns to
+// paper for a magazine spread (index.html, .sp). It is where the offer is spelled out: who
+// goes, how far, what the day holds, what it costs. The walk itself stays a walk.
 //
-//   ?middle=notes      Field Notes: small notes pinned to real things in the scene (the boat,
-//                      the beach, the steps ahead), each on a hairline, riding along as the
-//                      camera moves.
-//   ?middle=bookmark   Bookmark: the altimeter becomes a strip of the postcard's paper down the
-//                      right edge, and the day prints itself onto it line by line as you descend.
-//   ?middle=spreads    Spreads: twice on the way down the scroll holds and the page turns to
-//                      blank paper for a magazine spread, with a postcard of the view you just
-//                      left lying on it.
-//
-// One file: the shared pieces first, then each option as a short score. The scene is not
-// touched. Still demo quality: see "rough edges" in teach/journal.md.
+// A spread fades over the scene just before its hold and off just after it. Its words come in
+// once the paper is nearly solid, on GSAP's clock like every other reveal on the page (so the
+// frame-by-frame recorder sees them as a visitor does). The postcard lying on it is a snapshot
+// of the live canvas, taken as the paper starts to come over, so it shows the view the visitor
+// is leaving, in the light of that moment.
+
+const { gsap } = __m["global:gsap"];
 
 const clamp01 = (x) => Math.min(Math.max(x, 0), 1);
 const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
-const el = (tag, cls, html = '') => { const e = document.createElement(tag); e.className = cls; e.innerHTML = html; return e; };
 
-// Where the scroll holds the camera still for an option (scroll.js builds the page from these).
-const MIDDLE_HOLDS = {
-  spreads: [{ id: 'walk', tau: 2.02, len: 1.15 }, { id: 'beach', tau: 3.02, len: 1.15 }],
-};
+// How many screens the paper takes to come over (and to lift).
+const FADE = 0.3;
+const EASE = 'expo.out';
 
-function createMiddle(kind, ctx) {
-  const make = { notes: fieldNotes, bookmark: bookmark, spreads: spreads }[kind];
-  if (!make) return null;
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = new URL('./middle-options.css', location.href).href;
-  document.head.append(link);
-  ctx.html.classList.add(`middle-${kind}`);
-  return make(ctx);
-}
+// holds: the page's holds ({ id, y, len }, scroll.js). app: the scene.
+function createSpreads({ app, holds, onReserve, reduced = false }) {
+  const list = [...document.querySelectorAll('.sp[data-hold]')].map((node) => {
+    const h = holds.find((x) => x.id === node.dataset.hold);
+    if (!h) return null;
+    node.querySelectorAll('a[href="#reserve"]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); onReserve(); }));
+    const q = (sel) => [...node.querySelectorAll(sel)];
+    const s = { h, node, canvas: node.querySelector('canvas'), a: -1, on: false, shot: false, tl: null,
+      lines: q('.sp__ln'), rule: q('.sp__rule'), small: q('.sp__label, .sp__rows div, .sp__price'), card: q('.sp__card'),
+      turn: node.classList.contains('sp--beach') ? -1 : 1 };
+    rest(s);
+    return s;
+  }).filter(Boolean);
 
-// ---------------------------------------------------------------- 01 Field Notes
-
-function fieldNotes(ctx) {
-  const { app, cam } = ctx;
-  const v = new app.THREE.Vector3();
-  const layer = el('div', 'fn');
-  document.querySelector('.page').append(layer);
-  const ALL = new URLSearchParams(location.search).get('pins') === 'all';
-
-  // A point on the path: where the eye will be `ahead` metres further down from where it is
-  // at `tau`, `drop` metres lower (1.6 is the ground), `side` metres to the right.
-  const onPath = (tau, ahead = 0, drop = 1.5, side = 0) => {
-    const d = ctx.descent();
-    if (!d) return null;
-    const p = d.poseAt(ahead ? d.tauAtW(d.wAt(Math.max(tau, 1)) + ahead) : tau), yaw = (p.yaw * Math.PI) / 180;
-    return [p.pos[0] + Math.cos(yaw) * side, p.pos[1] - Math.sin(yaw) * side, p.pos[2] - drop];
-  };
-  const ground = (e, n, up = 0) => [e, n, app.groundAt(e, n) + up];
-  const boat = () => (app.boat ? [app.boat.east, app.boat.north, 1.2] : null);
-
-  // Each note: what it is pinned to (east, north, height), over which stretch of the way down
-  // it shows, and which way its tag goes (r: up to the right, l: up to the left). One fact of
-  // the offer each. They keep clear of the page's own lines (bottom left, and right middle on
-  // the ridge) by where they are pinned and when.
-  const PINS = [
-    // At the railing, while the camera waits: the day laid out on the place itself.
-    { id: 'head', at: () => ground(0, 0, 4), a: 0.989, b: 1.04, side: 'r', k: 'The head', t: 'You sail round it at dusk' },
-    { id: 'jukung', at: boat, a: 0.993, b: 1.05, side: 'r', k: '17:40', t: 'The jukung waits here' },
-    { id: 'beach', at: () => ground(96, 160, 0.5), a: 0.997, b: 1.05, side: 'd', k: '07:10', t: 'The beach, yours all day' },
-    // The ridge: the guide, a few metres ahead of you all the way along it and through the
-    // pause at its end.
-    { id: 'guide', at: () => onPath(cam.tau, 5.5, 0.25), a: 1.38, b: 2.035, side: 'auto', k: 'Wayan goes first', t: 'Six of you behind', live: true },
-    // The switchbacks (the page's line is bottom left: these stay right of it).
-    { id: 'steps', at: () => onPath(cam.tau, 5, 1.55), a: 2.36, b: 2.6, side: 'l', k: '400 steps', t: 'Packed earth and logs', live: true },
-    { id: 'rail', at: () => onPath(2.86, 0, 0.75, 0.85), a: 2.64, b: 2.88, side: 'r', k: 'Bamboo rail', t: 'Rebuilt every dry season' },
-    // The pause above the beach: what is waiting down there.
-    { id: 'out', at: boat, a: 2.9, b: 3.06, side: 'auto', k: 'No climb back', t: 'The jukung takes you out' },
-    { id: 'breakfast', at: () => ground(104, 176, 0.5), a: 2.915, b: 3.06, side: 'auto', k: 'Breakfast', t: 'Carried down ahead of you' },
-    { id: 'foot', at: () => onPath(3.985, 0, 1.55), a: 2.93, b: 3.06, side: 'auto', k: 'The last step', t: 'Fifty minutes from the railing' },
-    // The long last stretch, where the page said nothing.
-    { id: 'shade', at: () => ground(115, 205, 0.6), a: 3.09, b: 3.22, side: 'auto', k: 'Shade until two', t: 'Under the overhang' },
-    { id: 'pace', at: () => onPath(cam.tau, 5, 1.55), a: 3.3, b: 3.5, side: 'auto', k: 'Take your time', t: 'The beach is not going anywhere', live: true },
-    { id: 'barefoot', at: () => ground(96, 160, 0.5), a: 3.56, b: 3.74, side: 'auto', k: 'Barefoot by seven', t: 'Shoes stay at the foot of the path' },
-  ];
-  for (const p of PINS) {
-    p.el = el('div', `fn__pin fn--${p.side === 'auto' ? 'r' : p.side}`, `<i class="fn__dot"></i><i class="fn__line"></i><p class="fn__text"><b>${p.k}</b><span>${p.t}${ALL ? ` (${p.id})` : ''}</span></p>`);
-    p.on = false; p.pos = null;
-    layer.append(p.el);
+  // Before its words come in: the lines under their masks, the rule undrawn, the card off the
+  // paper and turned.
+  function rest(s) {
+    gsap.set(s.lines, { yPercent: 108 });
+    gsap.set(s.rule, { scaleX: 0 });
+    gsap.set(s.small, { autoAlpha: 0, y: 12 });
+    gsap.set(s.card, { autoAlpha: 0, y: 46, rotation: 9 * s.turn, scale: 1.06 });
+  }
+  function show(s) {
+    s.tl?.kill();
+    const d = reduced ? 0 : 1.1, t = (s.tl = gsap.timeline());
+    t.to(s.lines, { yPercent: 0, duration: d, ease: EASE, stagger: 0.09 }, 0);
+    t.to(s.rule, { scaleX: 1, duration: d * 1.3, ease: EASE }, reduced ? 0 : 0.25);
+    t.to(s.small, { autoAlpha: 1, y: 0, duration: d * 0.9, ease: EASE, stagger: 0.07 }, reduced ? 0 : 0.3);
+    // The card is dropped onto the page: it lands a little turned.
+    t.to(s.card, { autoAlpha: 1, duration: d * 0.5, ease: 'power2.out' }, reduced ? 0 : 0.15);
+    t.to(s.card, { y: 0, rotation: 3.8 * s.turn, scale: 1, duration: d * 1.35, ease: EASE }, reduced ? 0 : 0.15);
+  }
+  function hide(s) {
+    s.tl?.kill();
+    const t = (s.tl = gsap.timeline());
+    t.to([...s.small, ...s.card], { autoAlpha: 0, duration: reduced ? 0 : 0.35, ease: 'power2.out' }, 0);
+    t.add(() => rest(s));
   }
 
-  return {
-    cover: 0,
-    tick(dt, s) {
-      const W = innerWidth, H = innerHeight;
-      for (const p of PINS) {
-        const inRange = ALL ? ctx.inScene() : !s.quiet && ctx.inScene() && s.veil < 0.4 && cam.tau >= p.a && cam.tau <= p.b;
-        let on = false;
-        if (inRange) {
-          if (!p.pos || p.live) p.pos = p.at();
-          if (p.pos) {
-            v.set(p.pos[0], p.pos[2], -p.pos[1]).project(app.camera);
-            const x = (v.x * 0.5 + 0.5) * W, y = (-v.y * 0.5 + 0.5) * H;
-            on = v.z > -1 && v.z < 1 && x > 40 && x < W - 40 && y > 90 && y < H - 40;
-            if (on) p.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
-            // On a narrow screen the tag sits above its dot, slid sideways to stay on the screen.
-            if (on && W < 720) { const w = (p.w ??= p.el.lastElementChild.offsetWidth); p.el.style.setProperty('--tx', `${(Math.min(Math.max(x - w / 2, 12), W - w - 12) - x).toFixed(0)}px`); }
-            // (A tag with no side of its own goes toward the middle of the screen, chosen as it comes on.)
-            // On a narrow screen every tag does, so none runs off the edge.
-            if (on && !p.on && (p.side === 'auto' || W < 720)) { const left = x > (W < 720 ? 0.5 : 0.56) * W; p.el.classList.remove('fn--d'); p.el.classList.toggle('fn--l', left); p.el.classList.toggle('fn--r', !left); }
-          }
-        }
-        if (on !== p.on) { p.on = on; p.el.classList.toggle('is-on', on); }
-      }
-    },
-  };
-}
-
-// ---------------------------------------------------------------- 02 Bookmark
-
-function bookmark(ctx) {
-  const { cam } = ctx;
-  const TOP = 150;   // metres at the head of the strip
-  // What prints at which height on the way down.
-  const LINES = [
-    { h: 150, k: '06:10', t: 'The railing. Coffee, and the briefing.' },
-    { h: 122, k: '', t: 'Six walkers. One guide.' },
-    { h: 96, k: '06:20', t: 'The ridge, a drop either side.' },
-    { h: 68, k: '', t: 'Four hundred steps. Bamboo rails.' },
-    { h: 40, k: '', t: 'We carry breakfast and the shade.' },
-    { h: 12, k: '07:10', t: 'The sand. Yours all day.' },
-    { h: 0, k: '17:40', t: 'The jukung home.', tau: 4.75 },
-  ];
-  const strip = el('aside', 'bm', `
-    <p class="bm__head">Turun <span>the way down</span></p>
-    <div class="bm__scale">
-      ${[150, 125, 100, 75, 50, 25, 0].map((m) => `<i class="bm__tick" style="top:${((TOP - m) / TOP) * 100}%"><span>${m}</span></i>`).join('')}
-      <div class="bm__mark"><span></span></div>
-      ${LINES.map((l) => `<p class="bm__line" style="top:${((TOP - l.h) / TOP) * 100}%">${l.k ? `<b>${l.k}</b>` : ''}<span>${l.t}</span></p>`).join('')}
-    </div>
-    <p class="bm__foot"><b>US$ 240</b> a walker <a href="#reserve">Reserve</a></p>`);
-  document.querySelector('.page').append(strip);
-  strip.querySelector('a').addEventListener('click', (e) => { e.preventDefault(); ctx.travel('reserve'); });
-  const lines = [...strip.querySelectorAll('.bm__line')], mark = strip.querySelector('.bm__mark'), markText = mark.querySelector('span');
-  const scale = strip.querySelector('.bm__scale');
-  let shown = null, last = -1;
-
-  return {
-    cover: 0,
-    tick(dt, s) {
-      const on = !s.quiet && ctx.inScene() && cam.tau > 0.95 && s.veil < 0.4;
-      if (on !== shown) { shown = on; strip.classList.toggle('is-on', on); }
-      if (!cam.pose) return;
-      const h = Math.min(TOP, Math.max(0, cam.pose.pos[2] - 1.6));
-      mark.style.transform = `translateY(${(((TOP - h) / TOP) * scale.clientHeight).toFixed(1)}px)`;
-      const m = Math.round(h);
-      if (m !== last) { last = m; markText.textContent = `${m} m`; }
-      let current = -1;
-      LINES.forEach((l, i) => { const passed = cam.tau >= 0.99 && (l.tau ? cam.tau >= l.tau : h <= l.h + 2.5); lines[i].classList.toggle('is-on', passed); if (passed) current = i; });
-      lines.forEach((e, i) => e.classList.toggle('is-current', i === current));
-      strip.classList.toggle('is-done', cam.tau >= 3.99);
-    },
-  };
-}
-
-// ---------------------------------------------------------------- 03 Spreads
-
-function spreads(ctx) {
-  const { app, cam, page } = ctx;
-  const FADE = 0.3;
-  const DEFS = {
-    walk: {
-      label: 'The walk', when: '06:10',
-      head: ['Six walkers.', 'One <em>guide</em>.'],
-      rows: [['Leaves', '06:10, from the railing'], ['Down', '150 m, about 400 steps, fifty minutes'], ['You carry', 'Water. We carry the rest.']],
-      card: 'From the ridge, 95 m',
-    },
-    beach: {
-      label: 'The beach', when: '07:10 to 17:40',
-      head: ['Then a whole day', 'of <em>nothing</em>.'],
-      rows: [['07:10', 'Breakfast on the sand'], ['All day', 'Shade under the overhang, and nobody else'], ['17:40', 'The jukung, round the head and home']],
-      card: 'Above the beach, 55 m',
-      price: true,
-    },
-  };
-  const list = page.holds.filter((h) => DEFS[h.id]).map((h) => {
-    const d = DEFS[h.id];
-    const node = el('section', `sp sp--${h.id}`, `
-      <div class="sp__text">
-        <p class="label sp__label"><b>${d.label}</b><span>${d.when}</span></p>
-        <h2 class="display sp__head">${d.head.map((l) => `<span class="sp__mask"><span class="sp__ln">${l}</span></span>`).join('')}</h2>
-        <i class="sp__rule"></i>
-        <dl class="sp__rows">${d.rows.map(([k, t]) => `<div><dt>${k}</dt><dd>${t}</dd></div>`).join('')}</dl>
-        ${d.price ? '<p class="sp__price"><b>US$ 240</b> a walker, April to October <a class="button" href="#reserve">Reserve a morning</a></p>' : ''}
-      </div>
-      <figure class="sp__card"><canvas></canvas><figcaption><span>${d.card}</span><span>Kelingking</span></figcaption></figure>`);
-    document.querySelector('.page').append(node);
-    node.querySelector('a')?.addEventListener('click', (e) => { e.preventDefault(); ctx.travel('reserve'); });
-    return { h, node, canvas: node.querySelector('canvas'), a: -1, on: false, shot: false };
-  });
-
-  // The postcard on the spread: the frame the visitor was just looking at, taken as the paper
-  // starts to come over. (Near-black under it: the canvas is part see-through, see page.css.)
+  // (Near-black under the snapshot: the canvas is part see-through, see page.css.)
   function shoot(s) {
     app.renderFrame();
     const src = app.renderer.domElement, c = s.canvas;
-    const w = 900, hgt = 600, k = Math.max(w / src.width, hgt / src.height);
-    c.width = w; c.height = hgt;
+    const w = 900, h = 600, k = Math.max(w / src.width, h / src.height);
+    c.width = w; c.height = h;
     const g = c.getContext('2d');
-    g.fillStyle = '#12110e'; g.fillRect(0, 0, w, hgt);
-    g.drawImage(src, (w - src.width * k) / 2, (hgt - src.height * k) / 2, src.width * k, src.height * k);
+    g.fillStyle = '#12110e'; g.fillRect(0, 0, w, h);
+    g.drawImage(src, (w - src.width * k) / 2, (h - src.height * k) / 2, src.width * k, src.height * k);
   }
 
   const api = {
+    // How much of the scene is under paper, 0 to 1.
     cover: 0,
-    tick(dt, st) {
+    // y: the page's place in screens. quiet: nothing may show (a rewind, a jump from the menu).
+    update(y, quiet) {
       let cover = 0;
       for (const s of list) {
         const y0 = s.h.y, y1 = s.h.y + s.h.len;
-        const a = st.quiet ? 0 : smooth(y0 - FADE, y0, cam.y) * (1 - smooth(y1, y1 + FADE, cam.y));
+        const a = quiet ? 0 : smooth(y0 - FADE, y0, y) * (1 - smooth(y1, y1 + FADE, y));
         if (a > 0.001 && !s.shot) { s.shot = true; shoot(s); }
         if (a <= 0.001) s.shot = false;
         if (a !== s.a) {
@@ -96097,16 +96039,17 @@ function spreads(ctx) {
           s.node.style.visibility = a > 0.002 ? 'visible' : 'hidden';
         }
         const on = a > 0.88;
-        if (on !== s.on) { s.on = on; s.node.classList.toggle('is-on', on); }
+        if (on !== s.on) { s.on = on; s.node.classList.toggle('is-on', on); s.node.inert = !on; on ? show(s) : hide(s); }
         cover = Math.max(cover, a);
       }
       api.cover = cover;
     },
   };
+  for (const s of list) s.node.inert = true;
   return api;
 }
 
-return { "MIDDLE_HOLDS": MIDDLE_HOLDS, "createMiddle": createMiddle };
+return { "createSpreads": createSpreads };
 })();
 // src/scroll/scroll.js
 __m["src/scroll/scroll.js"] = (function () {
@@ -96123,11 +96066,13 @@ __m["src/scroll/scroll.js"] = (function () {
 // drag of the scrollbar still glides).
 //
 // The page, in screens of scroll (`page` below):
-//   the dive        the card comes up. For the first part the camera is locked and the sea's
-//                   clock is stopped: a picture. Then the sea starts, then the camera.
+//   the dive        the card comes up. At rest the camera is locked and the sea's clock is
+//                   stopped: a picture. From the first scroll the sea starts and the camera
+//                   sets off, so the scene moves inside the card well before it is full screen.
 //   the descent     path.js, from TAU0 (the card's picture) to 5 (the water's edge)
-//   the beat        at BEAT_TAU the screen goes to blank sand for a moment and the light behind
-//                   it goes from noon to evening (the day on the beach)
+//   the spreads     twice the scroll holds the camera under a paper spread (spreads.js)
+//   the day         at LAPSE.tau it holds it again, over the cove from 88 m, and the scroll
+//                   turns the sun instead: morning through noon to evening
 //   the ending      the frame goes back to being a card on the sand, and turns over
 //
 // URL switches (the scene's own are in app.js):
@@ -96138,8 +96083,6 @@ __m["src/scroll/scroll.js"] = (function () {
 //   record             the recorder drives the page frame by frame (tools/scroll-clip.mjs)
 //   pr=1               pixel ratio pinned (else it is picked while loading, then governed)
 //   lighting=, hour=   as in app.js, and the page then leaves the light alone
-//   middle=notes|bookmark|spreads   (demo) an option for the middle of the page, see
-//                      middle-options.js. Without it the page is as it was.
 //
 // Looking around (v9): drag the scene to turn the head away from the path's view; let go and it
 // eases back on the stairs. On the beach the chosen heading stays until reset. The scroll
@@ -96155,7 +96098,7 @@ const { ORIGIN } = __m["src/terrain/geo.js"];
 const { walkLine } = __m["src/trail/route.js"];
 const { buildDescent, makePace, STOPS } = __m["src/scroll/path.js"];
 const { createPostcard } = __m["src/scroll/postcard.js"];
-const { createMiddle, MIDDLE_HOLDS } = __m["src/scroll/middle-options.js"];
+const { createSpreads } = __m["src/scroll/spreads.js"];
 
 gsap.registerPlugin(SplitText);
 
@@ -96169,14 +96112,28 @@ const FOLLOW = 9;
 // it then turns back (a critically damped spring, per second: most of the way in a second).
 const LOOK_HOLD = 0.6, LOOK_BACK = 3.2;
 
-// The card's picture: this far down the flight (the headland reads as the T-Rex from here).
-const TAU0 = 0.76;
-// The dive, in screens of scroll, and the share of it after which the camera starts down.
-const HERO = 1.6, CAM_START = 0.6;
+// The card's picture: this far down the flight (high over the bay, the whole headland in it).
+const TAU0 = 0.5;
+// The dive, in screens of scroll. The camera sets off this share of the way into it and eases
+// up to the scroll's speed over CAM_EASE screens: from the first touch, in other words. (The
+// first iteration held it for 60% of the dive, and Sam's note was that he scrolled and scrolled
+// and nothing moved until the picture was the screen. The card itself still grows slowly at
+// first, so the scene is seen turning while it is plainly still a card.)
+const HERO = 1.7, CAM_START = 0, CAM_EASE = 0.05;
 // The sea wakes over this stretch of the dive (0 a still picture, 1 its own clock).
-const WAKE = [0.2, 0.58];
-// The day on the beach: where the blank beat is, how long it holds, how long it fades.
-const BEAT_TAU = 4.66, BEAT = 0.8, BEAT_FADE = 0.32;
+const WAKE = [0.015, 0.22];
+// The day. The page opens in morning light: about ten on the photo's day, the first hour the
+// beach is out of the headland's shadow (the scene's own Morning, eight o'clock, leaves the whole
+// bay dark: it faces west under 150 m of cliff). `ev`: exposure compensation in stops at the
+// start, at noon and at the end (the end is the scene's Evening preset). `clock`: what the
+// page's clock reads over the time lapse. That is the story's day (on the sand at 07:10, the
+// boat at 17:40), not the sun's hours: the light is a picture of a day, not a simulation of it.
+const DAY = { from: 10.3, noon: 12, to: 17, ev: [0.15, 0, 0.5], clock: [7 + 10 / 60, 17 + 40 / 60] };
+// Where the scroll holds the camera and turns the sun through that day instead, and for how
+// many screens (the cove from 88 m, at the top of the switchbacks).
+const LAPSE = { tau: 2.2, len: 1.8 };
+// Where it holds under a paper spread (spreads.js), and for how many screens.
+const SPREADS = [{ id: 'walk', tau: 1.32, len: 1.15 }, { id: 'beach', tau: 3.02, len: 1.15 }];
 // The ending, in screens, and the shares of it for the frame going back to a card, and the
 // card turning over.
 const OUTRO = 2.6, OUT_CARD = [0, 0.46], OUT_FLIP = [0.5, 0.8], OUT_WORDS = 0.6, OUT_STAMP = 0.79;
@@ -96197,7 +96154,6 @@ function startScroll({ params }) {
   const RECORD = params.has('record');
   const DEBUG = params.has('debug');
   const BARE = params.has('notext') || params.has('bare');
-  const MIDDLE = BARE ? null : params.get('middle');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const html = document.documentElement;
   if (params.has('notext')) html.classList.add('notext');
@@ -96226,30 +96182,35 @@ function startScroll({ params }) {
   // ---------------------------------------------------------------- the page in screens
 
   const pace = makePace();
-  const sStart = BARE ? 0 : pace.screensAt(TAU0), sBeat = pace.screensAt(BEAT_TAU), sEnd = pace.screens;
-  const heroLen = BARE ? 0 : HERO, lead = heroLen * CAM_START, beatLen = BARE ? 0 : BEAT, outLen = BARE ? 0 : OUTRO;
-  // Where the scroll holds the camera still: the beat on the beach, and any an option for the
-  // middle asks for. s: where on the path, len: for how many screens, y: where on the page.
-  const holds = [{ id: 'beat', s: sBeat, len: beatLen }, ...((MIDDLE && MIDDLE_HOLDS[MIDDLE]) || []).map((h) => ({ id: h.id, s: pace.screensAt(h.tau), len: h.len }))]
-    .filter((h) => h.len > 0).sort((a, b) => a.s - b.s);
-  holds.reduce((before, h) => { h.y = lead + (h.s - sStart) + before; return before + h.len; }, 0);
+  const sStart = BARE ? 0 : pace.screensAt(TAU0), sEnd = pace.screens;
+  const heroLen = BARE ? 0 : HERO, lead = heroLen * CAM_START, outLen = BARE ? 0 : OUTRO;
+  // The camera's start: its way along the path for scroll `d` past `lead`. It eases up to the
+  // scroll's own speed (a start from rest inside the card), and ends up CAM_EASE behind it.
+  const ease = BARE ? 0 : CAM_EASE;
+  const run = (d) => (ease ? d - ease * (1 - Math.exp(-d / ease)) : d);
+  const runBack = (r) => { let lo = r, hi = r + ease; for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; if (run(m) < r) lo = m; else hi = m; } return (lo + hi) / 2; };
+  // Where the scroll holds the camera still: under each paper spread, and for the day's time
+  // lapse. s: where on the path, len: for how many screens, y: where on the page.
+  const holds = (BARE ? [] : [...SPREADS, { id: 'lapse', ...LAPSE }]).map((h) => ({ id: h.id, s: pace.screensAt(h.tau), len: h.len })).sort((a, b) => a.s - b.s);
+  holds.reduce((before, h) => { h.y = lead + runBack(h.s - sStart) + before; return before + h.len; }, 0);
   const held = holds.reduce((a, h) => a + h.len, 0);
-  const yBeat = holds.find((h) => h.id === 'beat')?.y ?? 0, yOut = lead + (sEnd - sStart) + held;
+  const yOut = lead + runBack(sEnd - sStart) + held;
+  const lapse = holds.find((h) => h.id === 'lapse') ?? null;
   const page = {
     screens: yOut + outLen,
     holds,
     // The camera's place (in path.js's screens) for a place on the page, and back.
     camAt(y) {
-      let s = sStart + (y - lead);
-      if (s <= sStart) return sStart;
+      if (y <= lead) return sStart;
+      let before = 0;
       for (const h of holds) {
-        if (s <= h.s) break;
-        if (s <= h.s + h.len) return h.s;
-        s -= h.len;
+        if (y <= h.y) break;
+        if (y <= h.y + h.len) return h.s;
+        before += h.len;
       }
-      return Math.min(sEnd, s);
+      return Math.min(sEnd, sStart + run(y - lead - before));
     },
-    yAt(s) { return s <= sStart ? 0 : lead + (s - sStart) + holds.reduce((a, h) => a + (s > h.s + 1e-6 ? h.len : 0), 0); },
+    yAt(s) { return s <= sStart ? 0 : lead + runBack(Math.min(s, sEnd) - sStart) + holds.reduce((a, h) => a + (s > h.s + 1e-6 ? h.len : 0), 0); },
     tauAt(y) { return pace.tauAt(this.camAt(y)); },
     screensAt(tau) { return this.yAt(pace.screensAt(tau)); },
   };
@@ -96257,24 +96218,25 @@ function startScroll({ params }) {
   // ---------------------------------------------------------------- time of day
 
   const lightInputs = [...document.querySelectorAll('input[name="lighting"]')];
-  // The page sets the light itself (noon, then evening after the beat) unless the URL fixed it.
+  // The page sets the light itself (the morning, the day's time lapse, the evening after it)
+  // unless the URL fixed it.
   const fixedLight = BARE || ['lighting', 'hour', 'sun'].some((k) => params.has(k));
-  let manual = null, manualSide = false;
+  // A light picked by hand on the beach, until the beach is left.
+  let manual = null;
   let dissolve = null, dissolveAnimation = null;
   function stopDissolve() {
     dissolveAnimation?.cancel(); dissolveAnimation = null;
     dissolve?.remove(); dissolve = null;
   }
   function syncLighting() {
-    html.classList.toggle('dim-light', ['morning', 'night'].includes(app.state.lighting));
+    html.classList.toggle('bright-light', app.state.lighting === 'noon');
     lightInputs.forEach((input) => { input.checked = input.value === app.state.lighting; });
   }
   syncLighting();
-  // withDissolve: the frame as it was fades out over the new light (when nothing covers it).
-  function setLight(id, withDissolve) {
-    if (id === app.state.lighting) return;
+  // A change of light with nothing covering it: the frame as it was fades out over the new one.
+  function dissolved(change, on) {
     stopDissolve();
-    if (withDissolve) {
+    if (on) {
       app.renderFrame();
       const previous = document.createElement('canvas');
       previous.className = 'lighting-dissolve'; previous.setAttribute('aria-hidden', 'true');
@@ -96283,7 +96245,7 @@ function startScroll({ params }) {
       $('.page').prepend(previous);
       dissolve = previous;
     }
-    app.setLighting(id);
+    change();
     syncLighting();
     app.advance(0); app.renderFrame();
     dirty = 2;
@@ -96295,9 +96257,30 @@ function startScroll({ params }) {
   }
   function chooseLighting(id) {
     if (id === app.state.lighting || !started) return;
-    manual = id; manualSide = cam.y > yBeat + beatLen / 2;
-    setLight(id, !reduced && !RECORD);
+    manual = id;
+    dissolved(() => app.setLighting(id), !reduced && !RECORD);
   }
+
+  // The page's own light: an hour of the photo's day. The scene has setHour (made for clips of
+  // the sun going round); the exposure that goes with each hour is laid on top of it here. From
+  // DAY.to on it is the scene's Evening preset, the same sun and exposure.
+  const evAt = (h) => (h <= DAY.noon ? DAY.ev[0] + (DAY.ev[1] - DAY.ev[0]) * smooth(DAY.from, DAY.noon, h) : DAY.ev[1] + (DAY.ev[2] - DAY.ev[1]) * smooth(DAY.noon, DAY.to, h));
+  let sunNow = null;   // the hour now set (null: not the page's light)
+  function setSun(h) {
+    if (h >= DAY.to) { if (app.state.lighting !== 'evening') app.setLighting('evening'); }
+    else {
+      app.setHour(h);
+      app.grade.params.compensation += evAt(h);
+      app.grade.apply();
+    }
+    sunNow = h;
+    dirty = 2;
+  }
+  // The hour for a place on the page: morning down to the time lapse, which the scroll turns
+  // (a little slack at each end of its hold), evening after it.
+  const lapseU = (y) => (lapse ? clamp01((y - lapse.y - 0.12) / (lapse.len - 0.24)) : 0);
+  const hourAt = (y) => { const u = lapseU(y); return DAY.from + (DAY.to - DAY.from) * (u * u * (3 - 2 * u)); };
+  if (!fixedLight) { setSun(DAY.from); syncLighting(); }
   lightInputs.forEach((input) => input.addEventListener('change', () => chooseLighting(input.value)));
   addEventListener('wheel', stopDissolve, { passive: true });
   stage.addEventListener('pointerdown', stopDissolve, { passive: true });
@@ -96353,8 +96336,7 @@ function startScroll({ params }) {
     renderer.setPixelRatio(pr); app.setSize(w, h);
     const [x, y] = (params.get('sandAt') ?? '').includes(',') ? params.get('sandAt').split(',').map(Number) : SAND.at;
     const up = +(params.get('sandUp') ?? SAND.up);
-    const was = app.state.lighting, light = fixedLight ? was : (params.get('sandLight') ?? SAND.light);
-    if (light !== was) app.setLighting(light);
+    if (!fixedLight) app.setLighting(params.get('sandLight') ?? SAND.light);
     app.setPose([x, y, app.groundAt(x, y) + up], app.state.sunAz + 45, -89.9, 0, SAND.fov);
     app.advance(0); app.renderFrame(); app.renderFrame();
     const c = renderer.domElement;
@@ -96363,7 +96345,8 @@ function startScroll({ params }) {
     // The low sun's shadows lifted a little, so small ink type can cross them.
     groundCtx.fillStyle = SAND.lift;
     groundCtx.fillRect(0, 0, c.width, c.height);
-    if (light !== was) { app.setLighting(was); app.advance(0); }
+    // Back to the page's own light (or the one picked by hand).
+    if (!fixedLight) { if (manual) app.setLighting(manual); else setSun(hourAt(cam.y)); syncLighting(); app.advance(0); }
     renderer.setPixelRatio(pr0); app.setSize(w, h);
     camera.position.copy(keep.p); camera.rotation.copy(keep.r);
     camera.fov = keep.fov; camera.updateProjectionMatrix();
@@ -96539,11 +96522,13 @@ function startScroll({ params }) {
   // ---------------------------------------------------------------- the card, the sea's clock, the light
 
   const coverEl = $('.cover');
-  // The curtain: the same blank sand, drawn over the page for a jump from the menu.
+  // The curtain: blank paper drawn over the page for a jump from the menu.
   const curtain = { a: 0 };
-  let traveling = false, coverShown = -1, beatA = 0;
-  // How much of the scene is under blank paper: the beat's, or an option's spread.
-  const veil = () => Math.max(beatA, middle?.cover ?? 0);
+  let traveling = false, coverShown = -1, tickNo = 0;
+  // How much of the scene is under a paper spread.
+  const veil = () => spreads?.cover ?? 0;
+  const clockEl = $('.clock');
+  let clockShown = '';
   function updateStory() {
     if (BARE) return;
     post.set({
@@ -96557,31 +96542,35 @@ function startScroll({ params }) {
     app.timeCtl.paused = wake <= 0;
     app.timeCtl.speed = wake;
 
-    beatA = smooth(yBeat - BEAT_FADE, yBeat, cam.y) * (1 - smooth(yBeat + beatLen, yBeat + beatLen + BEAT_FADE, cam.y));
-    const a = Math.max(beatA, curtain.a);
-    if (a !== coverShown) {
-      coverShown = a;
-      coverEl.style.opacity = a.toFixed(3);
-      coverEl.style.visibility = a > 0.002 ? 'visible' : 'hidden';
-    }
-    // The day: noon on the way down, evening after the beat. It changes behind the blank sand,
-    // or (the beat jumped over) with a dissolve. A light picked by hand on the beach stays
-    // until the beat is crossed or the beach is left.
+    // The day. The sun follows the page's place: while the scroll is inside the time lapse it
+    // moves with it (every other frame is plenty for light, and moving it costs about half a
+    // frame), and a jump lands on the right hour at once. A light picked by hand on the beach
+    // stays until the beach is left.
+    tickNo++;
     if (!fixedLight) {
-      const side = cam.y > yBeat + beatLen / 2;
-      if (manual && (side !== manualSide || cam.tau < 4)) manual = null;
-      const want = manual ?? (side ? 'evening' : 'noon');
-      if (want !== app.state.lighting) {
-        if (a > 0.985) setLight(want, false);
-        else if (beatA < 0.02 && curtain.a < 0.02) setLight(want, !reduced && !RECORD);
+      if (manual && cam.tau < 4) { manual = null; dissolved(() => setSun(hourAt(cam.y)), !reduced && !RECORD && curtain.a < 0.5 && veil() < 0.5); }
+      if (!manual) {
+        const h = hourAt(cam.y), far = sunNow === null ? 9 : Math.abs(h - sunNow);
+        if (far > 1e-4 && (far > 0.5 || tickNo % 2 === 0 || h === DAY.from || h === DAY.to)) { setSun(h); syncLighting(); }
+      }
+      // The clock on the time lapse's line.
+      if (clockEl) {
+        const u = lapseU(cam.y), m = Math.round((DAY.clock[0] + (DAY.clock[1] - DAY.clock[0]) * (u * u * (3 - 2 * u))) * 12) * 5;
+        const t = `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+        if (t !== clockShown) { clockShown = t; clockEl.textContent = t; }
       }
     }
-    // The sand again after a resize, whenever it is about to show.
-    if (!groundLight && (cam.hero < 1 || cam.out > 0 || a > 0.985)) captureGround();
+    spreads?.update(cam.y, !wordsOn || rewinding || traveling);
+    if (curtain.a !== coverShown) {
+      coverShown = curtain.a;
+      coverEl.style.opacity = curtain.a.toFixed(3);
+      coverEl.style.visibility = curtain.a > 0.002 ? 'visible' : 'hidden';
+    }
+    // The sand under the card again after a resize, whenever it is about to show.
+    if (!groundLight && (cam.hero < 1 || cam.out > 0 || curtain.a > 0.985)) captureGround();
   }
-  // Nothing in the picture changes while the card rests in the hero and for the first of its
-  // way up (the camera locked, the sea not yet running), or once it is on its back.
-  const still = () => !BARE && ((cam.out <= 0 && cam.hero <= WAKE[0]) || post.turned || (cam.out > 0 && app.timeCtl.paused));
+  // Nothing in the picture changes while the card rests in the hero, or once it is on its back.
+  const still = () => !BARE && ((cam.out <= 0 && cam.hero <= 0) || post.turned || (cam.out > 0 && app.timeCtl.paused));
 
   // A jump from the menu: the blank sand comes over, the page moves under it, it lifts.
   function travel(y) {
@@ -96595,6 +96584,7 @@ function startScroll({ params }) {
     } });
   }
   const places = { walk: () => page.screensAt(1), boat: () => page.screensAt(4.97), reserve: () => page.screens };
+  const spreads = BARE ? null : createSpreads({ app, holds, reduced, onReserve: () => travel(places.reserve()) });
   document.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', (e) => {
     e.preventDefault();
     travel(places[el.dataset.go]());
@@ -96611,10 +96601,9 @@ function startScroll({ params }) {
   // ---------------------------------------------------------------- words
 
   // Every block shows while the page is inside its range: data-hero (how far the card is up),
-  // data-tau (the camera's place on the way down), data-end (how far into the ending). The
-  // cover's line shows while the beat is fully up.
-  const blocks = [...document.querySelectorAll('.words > *, .cover')].map((el) => {
-    const kind = 'hero' in el.dataset ? 'hero' : 'tau' in el.dataset ? 'tau' : 'end' in el.dataset ? 'end' : 'cover';
+  // data-tau (the camera's place on the way down), data-end (how far into the ending).
+  const blocks = [...document.querySelectorAll('.words > *')].map((el) => {
+    const kind = 'hero' in el.dataset ? 'hero' : 'tau' in el.dataset ? 'tau' : 'end';
     const [a, b] = (el.dataset[kind] ?? '0,0').split(',').map(Number);
     const after = [...el.querySelectorAll('.label, .body, .hero__actions, .facts > div, .foot > *')];
     const k = { el, kind, a, b, lines: [], byEl: new Map(), after, drift: kind === 'tau' ? el.querySelector('.display') : null, on: false, tl: null };
@@ -96678,8 +96667,7 @@ function startScroll({ params }) {
     const d = reduced ? 0 : 0.7;
     if (k.lines.length) t.to(k.lines, { yPercent: -105, duration: d, ease: EASE, stagger: 0.04 }, 0);
     t.to(k.after, { autoAlpha: 0, y: -8, duration: d * 0.8, ease: EASE }, 0);
-    // (The cover's own visibility follows its opacity, in updateStory.)
-    if (k.kind !== 'cover') t.set(k.el, { visibility: 'hidden' });
+    t.set(k.el, { visibility: 'hidden' });
     if (k.lines.length) t.set(k.lines, { yPercent: 105 });
     t.set(k.after, { y: 14 });
   }
@@ -96691,8 +96679,7 @@ function startScroll({ params }) {
       const on = !quiet && (
         k.kind === 'hero' ? cam.out <= 0 && cam.hero >= k.a && cam.hero <= k.b
         : k.kind === 'tau' ? inScene() && cam.tau >= k.a && cam.tau <= k.b && veil() < 0.4
-        : k.kind === 'end' ? cam.out >= k.a && cam.out <= k.b
-        : beatA > 0.9 && curtain.a < 0.05);
+        : cam.out >= k.a && cam.out <= k.b);
       if (on !== k.on) { k.on = on; on ? show(k) : hide(k); }
       // The line drifts across a little while it is up.
       if (on && k.drift && !reduced) {
@@ -96865,9 +96852,6 @@ function startScroll({ params }) {
     lenis.scrollTo(0, { duration: Math.min(9, 2.5 + cam.y * 0.4), easing: inOut, onComplete: () => { rewinding = false; } });
   }));
 
-  // (Demo: an option for the middle of the page, if the URL asks for one.)
-  const middle = MIDDLE ? createMiddle(MIDDLE, { app, cam, page, html, reduced, inScene, descent: () => descent, travel: (k) => travel(places[k]()) }) : null;
-
   resize(true);
   addEventListener('resize', () => resize());
 
@@ -96885,7 +96869,6 @@ function startScroll({ params }) {
     updateStory();
     updateWords();
     updateFrame();
-    middle?.tick(dt, { quiet: !wordsOn || rewinding || traveling, veil: beatA });
     post.tick(dt);
     // (At rest the picture is a picture: no frame is drawn until something in it changes.)
     if (dirty > 0 || !still()) { dirty = Math.max(0, dirty - 1); app.frame(dt); }

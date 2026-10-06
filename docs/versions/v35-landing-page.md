@@ -20,6 +20,7 @@ be the scene we built, not a copy of it, and the change has to be seamless.
 - **Headline: "Most people stop at the railing."** It was already on the page, buried in the
   second chapter.
 - **One change of light.** Noon on the way down, evening once the day on the beach has passed.
+  (Changed on 6 October, see below.)
 - **The boat is the offer.** Walk down, sail out, no climb back. One jukung at anchor past the
   break. This is invented (boats do not land at Kelingking and swimming is banned), so the
   outfitter is fictional and the page says so at its foot.
@@ -43,6 +44,21 @@ scene, `src/boat/`. Not the terrain, the water, the plants, the light or the cam
 down (`path.js`). No downloads: the boat is built in code, the sand under the card is the
 scene's own beach photographed from above, the fonts stay Instrument Serif and Inter (they
 are already in `vendor/fonts/` for the standalone file).
+
+## Round 2 and 3 (6 October 2026, from Sam's notes on the first iteration)
+
+- The colours looked washed out against v34. They were: the canvas is part see-through and
+  the page behind it had become sand-coloured. Near-black behind it again.
+- The boat closer: moored 52 m from the last camera, a longer lens on it.
+- The middle: three options were built and recorded (Field Notes, Bookmark, Spreads). Sam
+  picked **Spreads**: two held paper spreads that carry the offer.
+- "We scroll, we scroll, nothing moves. The movement only happens when it feels full screen."
+  The scene has to move inside the postcard from the start, for the depth to read.
+- Morning light at the top (the words say first light), and another shot for the card, more
+  of an overview.
+- A time lapse at the view over the cove from 88 m, ending in evening: Sam loves the light and
+  the water there.
+- The card's edges did not convince (a dark lip along two sides, speckled paper).
 
 ## Found by other versions
 

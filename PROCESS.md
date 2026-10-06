@@ -3489,3 +3489,114 @@ It is moored at `[29, 141]`, heading 220: 74 m from the last camera, in 4.4 m of
 - Fonts are unchanged (Instrument Serif, Inter). A change means adding files to
   `vendor/fonts/` for the single file, which needs Sam's go-ahead.
 - Not checked on a real phone or in Safari, only in headless Chrome at phone size.
+
+## v35, rounds 2 and 3: Sam's notes on the first iteration (2026-10-06)
+
+Sam: "The first iteration is good." Then four things.
+
+### The colour (see "The whole scene went pale" above)
+
+Fixed first, with a before and after sent to him.
+
+### The boat, and options for the middle
+
+The boat moved from 74 m to 52 m off the last camera, just outside the foam, and the lens
+closes in by 16 degrees. It went from about 95 px long to about 135 px at 1512 wide.
+
+For the middle he asked for options, and his rule is demos, not lists. Three were built into
+the real page behind `?middle=` and recorded next to the page as it was, on one scroll plan,
+desktop and phone (`demo/middle/`, the code in commit `d45c21b`):
+
+- **Field Notes.** Paper tags pinned to real things in the scene (a 3D point projected to the
+  screen every frame), one fact of the trip each.
+- **Bookmark.** The altimeter as a strip of the postcard's paper, the day printing onto it
+  line by line as the camera loses height.
+- **Spreads.** Twice the scroll holds the camera and the page turns to paper for a magazine
+  spread, with a postcard of the view just left.
+
+I would have picked Field Notes. Sam picked Spreads. It is now part of the page
+(`src/scroll/spreads.js`, the markup in `index.html`), the other two and the switch are gone.
+Its reveals moved from CSS transitions to GSAP, on the page's one clock, so the frame-by-frame
+recorder shows them as a visitor sees them.
+
+### "We scroll, we scroll, nothing moves"
+
+His note on the hero: "The flat static effect to the 3D doesn't feel as convincing, because
+when we scroll from the postcard state, nothing moves. The movement only happens when it
+feels full screen. The scene inside the postcard should start moving before it reaches full
+width. That way it creates that nice depth effect."
+
+He was describing exactly what I had built. The camera was held for 60% of the dive and the
+sea woke between 20% and 58%, so for most of it the card was a growing still.
+
+Now the camera sets off at the first touch (`CAM_START = 0`, easing up to the scroll's speed
+over 0.05 screens) and the sea wakes in the first fifth. The card's own growth still starts
+slowly (a cubic ease on an exponential zoom), so for the first half screen the card barely
+grows while the scene inside it tilts from straight down toward the horizon. One wheel notch
+(88 px) takes `tau` from 0.5 to 0.52. The camera reaches `tau` 0.95 as the picture becomes
+the screen, just before the railing's line.
+
+The page's mapping from scroll to path gained an eased start (`run`, and its inverse by
+bisection for placing the holds), and a general list of holds.
+
+### Morning, and the card's new shot
+
+The card's picture is now `tau` 0.5: 700 m up, nearly straight down, the whole headland and
+both bays. The light is ten past ten on the photo's day, with 0.15 stops more exposure.
+
+- The scene's own Morning preset (eight o'clock) does not work from the air: the bay faces
+  west under 150 m of cliff and is entirely in shadow, navy and dull. I rendered the overview,
+  the railing and the 88 m view at 8.75, 9.5, 10.25 and 11 h. At 10.25 the beach is just out
+  of the headland's shadow and the shadows are still long. That is the earliest hour that
+  makes a postcard.
+- So "morning" here is an hour of the sun (`app.setHour`, which the tools already had for
+  clips) with the exposure laid on top by the page, not a preset.
+
+### The time lapse
+
+At `tau` 2.2 (the cove from 88 m, the frame in Sam's screenshot) the scroll holds the camera
+for 1.8 screens and turns the sun instead: 10.3 h to 17 h, eased, exposure following. It is
+evening from there down, which is where the old blank beat used to change the light (the
+beat is gone, and its line, "Stay until the light turns.", moved here).
+
+- Cost, measured before building it: moving the sun rebakes the island's shadow and relights,
+  about 6 ms on the CPU and 10 ms more for the frame. So the sun moves every other frame
+  while the scroll is inside the hold. On the page's own clock: 379 frames through the lapse,
+  0 to 7 of them over 25 ms, both directions.
+- A jump lands on the right hour at once (a difference of more than half an hour is not
+  stepped).
+- The clock on that line reads 07:10 to 17:40, the story's day. The sun's hours are 10:20 to
+  17:00. The light is a picture of a day, not a simulation of one, and the code says so.
+- The time stamps on the notes below the lapse are gone (the switchbacks and the sand are in
+  evening light now, and "06:45" over a golden sea read as a mistake).
+- A light picked by hand on the beach is given back when the beach is left.
+
+### The card's edges
+
+Two things in his close-up. A dark lip along the top and right edges: the shadow element had
+a fill and was turned half a degree against the paper, so its corners showed. It is now
+clear, square under the paper, and its shadows are pulled in with negative spread. And the
+paper looked like speckled stone when the card was large: the noise tile is now made at a
+third of the size and drawn up smooth, fainter, and the white inner line is gone.
+
+### Checked
+
+- Driven for real: one wheel notch moves the picture and starts the sea, 0 frames drawn at
+  rest, the time lapse forwards and backwards, a spread entered from below, the spread's
+  Reserve button, the three menu jumps (each lands in its own light), a light picked by hand
+  and given back, the rewind to the morning. Console clean.
+- Pacing at 1512 x 945: the dive 285 frames, 0 to 2 over 25 ms. Spreads none.
+- `?notext` is untouched by all of this (the scene alone, from `tau` 0, in the scene's noon).
+- `kelingking.html` rebuilt (61 modules, same assets tag), opened from `file://`: no errors.
+- Phone size: hero, dive, both spreads, the lapse, the sand, the back of the card.
+
+### Still weak
+
+- The lower half of the walk is in evening light, so the story's clock and the light part
+  ways there. The spreads carry the times now.
+- The second half of the dive is where the card grows fastest. A slow scroller sees the
+  scene turn inside a small card for a long while, a fast one mostly sees the zoom.
+- The sand under the card is evening sand under a morning picture.
+- Reduced motion: the spreads' reveals are instant, the time lapse still follows the scroll.
+  Not tried with a screen reader.
+- Still not checked on a real phone or in Safari.

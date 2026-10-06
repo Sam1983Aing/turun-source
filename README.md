@@ -95,9 +95,9 @@ or start a module worker from `file://`). `kelingking.html` is the same page bui
 without one. Nothing to install: the source page loads three.js, GSAP and Lenis from jsDelivr
 and the fonts from Google Fonts, and the standalone file carries its own copies (`vendor/`).
 
-The page sets the light itself: noon on the way down, evening after the day on the beach
-(v35). On the beach a line at the foot of the screen switches between Morning, Noon, Evening
-and Night until you scroll on. A light in the URL (`?at=4.35&lighting=evening`) stays for the
+The page sets the light itself: morning at the top, a scroll-driven time lapse over the cove,
+evening from there on (v35). On the beach a line at the foot of the screen switches between
+Morning, Noon, Evening and Night until you leave the beach. A light in the URL (`?at=4.35&lighting=evening`) stays for the
 whole page. Daylight uses the photo date's sun; Night is an authored moonlit view. Once off
 the stairs, the camera opens up across the cove. Drag to choose a view; it stays while you scroll along
 the beach. “Reset view” returns to the composed camera. Left/right arrow keys work when
@@ -154,14 +154,24 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   the canvas lands where the picture should be, clipped to a postcard's shape. Scrolling takes
   that transform back to nothing, so at the end of the dive the page is a plain full-screen
   canvas again. Nothing is cross-faded. At rest the camera is locked and the sea's clock is
-  stopped, so the page draws no frames at all. On the way in the print finish lifts, the sea
-  starts, then the camera sets off from `tau` 0.76 (the flight before that is no longer on
+  stopped, so the page draws no frames at all. From the first touch of the scroll the sea
+  starts and the camera sets off from `tau` 0.5, while the card is still small: you see the
+  scene turn inside the picture before it grows (the flight before `tau` 0.5 is no longer on
   the page). The sand is the scene's own beach, drawn once from straight above in evening
   light while the page loads. At the end the same thing runs backwards and the card turns
   over: its back is a second, unscaled element laid over the first, so its type stays sharp.
-- **The page in screens** (`page` in `scroll.js`). The dive (1.6 screens), the descent
-  (`path.js`, about 15.5), a blank beat on the beach (0.8, the light changes from noon to
-  evening behind it) and the ending (2.6). `?notext` gives the scene alone as before v35, from
+- **The day** (v35). The page sets the sun from where the scroll is (`DAY`, `LAPSE` in
+  `scroll.js`). It opens in morning light. At `tau` 2.2, over the cove from 88 m, the scroll
+  holds the camera for 1.8 screens and turns the sun instead, from morning through noon to
+  evening, and it is evening from there to the end. The sun moves every other frame, which
+  costs little, and it runs backwards with the scroll. The clock on that line reads the
+  story's day (07:10 to 17:40), not the sun's hours.
+- **The spreads** (v35, `spreads.js`). Twice on the way down the scroll holds the camera and
+  the page turns to paper for a magazine spread: who goes and how far, then the day and the
+  price. The postcard on each is a snapshot of the live canvas, taken as the paper comes over.
+- **The page in screens** (`page` in `scroll.js`). The dive (1.7 screens, the camera already
+  moving), the descent (`path.js`), three holds (two spreads of 1.15 and the day's 1.8) and
+  the ending (2.6): about 23 screens. `?notext` gives the scene alone as before v35, from
   `tau` 0, for the tools that judge the scene.
 
 ```bash

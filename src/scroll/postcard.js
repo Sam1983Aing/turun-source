@@ -32,28 +32,40 @@ const BORDER = 0.042, FOOT = 0.108;
 // How far the eye is from the card for the tilt and the flip, in screen pixels.
 const EYE = 1900;
 
-// A tile of fine noise as a picture: specks of one colour, their alpha `gain` times a random
-// number plus `bias` (so most of the tile is clear). Two sizes of speck, so it is not TV static.
-function noiseTile(size, rgb, gain, bias, seed) {
+// A tile of noise as a picture: specks of one colour, their alpha `gain` times a random number
+// plus `bias` (so most of the tile is clear). Two sizes of speck, so it is not TV static.
+// soft: the tile is made at a third of the size and drawn up smooth, which gives the faint
+// mottling of card stock (and nothing fine enough to sparkle when the card is drawn small).
+function noiseTile(size, rgb, gain, bias, seed, soft = false) {
+  const n = soft ? Math.round(size / 3) : size;
   const c = document.createElement('canvas');
-  c.width = c.height = size;
-  const ctx = c.getContext('2d'), img = ctx.createImageData(size, size), d = img.data;
+  c.width = c.height = n;
+  const ctx = c.getContext('2d'), img = ctx.createImageData(n, n), d = img.data;
   let s = seed >>> 0;
   const rnd = () => ((s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296);
-  const half = size >> 1, coarse = Float32Array.from({ length: half * half }, rnd);
-  for (let y = 0, i = 0; y < size; y++) for (let x = 0; x < size; x++, i += 4) {
-    const n = 0.62 * rnd() + 0.38 * coarse[(y >> 1) * half + (x >> 1)];
+  const half = n >> 1, coarse = Float32Array.from({ length: half * half }, rnd);
+  for (let y = 0, i = 0; y < n; y++) for (let x = 0; x < n; x++, i += 4) {
+    const v = 0.62 * rnd() + 0.38 * coarse[(y >> 1) * half + (x >> 1)];
     d[i] = rgb[0]; d[i + 1] = rgb[1]; d[i + 2] = rgb[2];
-    d[i + 3] = Math.min(255, Math.max(0, n * gain + bias) * 255);
+    d[i + 3] = Math.min(255, Math.max(0, v * gain + bias) * 255);
   }
   ctx.putImageData(img, 0, 0);
-  return `url(${c.toDataURL('image/png')})`;
+  if (!soft) return `url(${c.toDataURL('image/png')})`;
+  // Drawn up three times, wrapped at the edges so the tile still repeats without a seam.
+  const big = document.createElement('canvas');
+  big.width = big.height = n * 3;
+  const g = big.getContext('2d');
+  g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+  for (const ox of [-1, 0, 1]) for (const oy of [-1, 0, 1]) g.drawImage(c, ox * n * 3, oy * n * 3, n * 3, n * 3);
+  return `url(${big.toDataURL('image/png')})`;
 }
 
 export function createPostcard({ reduced = false } = {}) {
   const $ = (s) => document.querySelector(s);
   const html = document.documentElement;
-  html.style.setProperty('--tooth', noiseTile(128, [128, 104, 70], 0.3, -0.17, 7));
+  // (Soft and faint. As fine specks it sparkled at the card's resting size and read as
+  // speckled stone once the card was two or three times that.)
+  html.style.setProperty('--tooth', noiseTile(240, [128, 104, 70], 0.22, -0.075, 7, true));
   html.style.setProperty('--grain', noiseTile(128, [86, 64, 38], 0.9, -0.5, 19));
   const table = $('.table'), world = $('.world'), ground = $('.ground'), card = $('.card'), flipEl = $('.card__flip');
   const finish = $('.card__finish'), light = $('.table__light'), stage = $('#stage'), back = $('.back');
@@ -170,7 +182,7 @@ export function createPostcard({ reduced = false } = {}) {
     // The shadow on the sand narrows with the card as it turns and slides out a little as it
     // lifts. Once turned, the back brings its own.
     const far = (lift - 1) * cw;
-    shadow.style.transform = `translate(${(far * 0.5).toFixed(1)}px, ${far.toFixed(1)}px) rotate(0.55deg) scale(${(sx * Math.abs(Math.cos(Math.PI * flip))).toFixed(5)}, ${sy.toFixed(5)})`;
+    shadow.style.transform = `translate(${(far * 0.5).toFixed(1)}px, ${far.toFixed(1)}px) scale(${(sx * Math.abs(Math.cos(Math.PI * flip))).toFixed(5)}, ${sy.toFixed(5)})`;
     shadow.style.opacity = turned ? '0' : (1 - 3 * (lift - 1)).toFixed(3);
   }
 

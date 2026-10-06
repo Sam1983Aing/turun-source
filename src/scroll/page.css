@@ -59,7 +59,7 @@ html.lenis, html.lenis body { height: auto; }
 
 html.scroll.loading { overflow: hidden; }
 .track { position: relative; width: 1px; pointer-events: none; }
-.notext .words, .notext .hud, .notext .rail, .notext .scene-controls, .notext .cover { display: none !important; }
+.notext .words, .notext .hud, .notext .rail, .notext .scene-controls, .notext .cover, .notext .sp { display: none !important; }
 
 .label { margin: 0; font: 500 11px/1.3 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; }
 .display { margin: 0; font: 400 clamp(2.5rem, 1.4rem + 3.6vw, 5.4rem)/0.98 var(--serif); letter-spacing: -0.014em; text-wrap: balance; }
@@ -105,15 +105,17 @@ html.scroll.at-hero #stage { cursor: pointer; }
 /* The paper and its shadow: the picture's rectangle plus the border, sized once (postcard.js
    sets --cw, --ch, --b, --bb) and scaled about the middle of the picture as the window opens. */
 .card__paper, .card__shadow { position: absolute; left: calc(50% - var(--cw) / 2 - var(--b)); top: calc(50% - var(--ch) / 2 - var(--b)); width: calc(var(--cw) + 2 * var(--b)); height: calc(var(--ch) + var(--b) + var(--bb)); border-radius: calc(var(--cw) * 0.005); transform-origin: 50% calc(var(--b) + var(--ch) / 2); }
-.card__paper { background: var(--tooth), linear-gradient(135deg, #fffefa 0%, #fdf9ef 55%, #f6efdf 100%); background-size: calc(var(--cw) * 0.16) auto, auto;
-  box-shadow: inset 0 0 0 calc(var(--cw) * 0.0011) rgba(255, 255, 255, 0.9), inset 0 0 calc(var(--cw) * 0.03) rgba(120, 92, 52, 0.07),
-    calc(var(--cw) * 0.0014) calc(var(--cw) * 0.0026) 0 #d9cdb6; }
+.card__paper { background: var(--tooth), linear-gradient(135deg, #fffefa 0%, #fdf9ef 55%, #f6efdf 100%); background-size: calc(var(--cw) * 0.11) auto, auto;
+  box-shadow: inset 0 0 calc(var(--cw) * 0.03) rgba(120, 92, 52, 0.06),
+    calc(var(--cw) * 0.0009) calc(var(--cw) * 0.0018) 0 #e4dac6; }
 /* Noon sun, almost overhead, from the top left: a tight shadow under the edge, a soft one
    beyond it, and the sand a shade darker all round. The far corner sits a little proud. */
-.card__shadow { transform: rotate(0.55deg); background: rgba(58, 36, 14, 0.55);
-  box-shadow: calc(var(--cw) * 0.003) calc(var(--cw) * 0.006) calc(var(--cw) * 0.007) rgba(58, 36, 14, 0.62),
-    calc(var(--cw) * 0.016) calc(var(--cw) * 0.034) calc(var(--cw) * 0.045) rgba(58, 36, 14, 0.42),
-    calc(var(--cw) * 0.03) calc(var(--cw) * 0.06) calc(var(--cw) * 0.16) rgba(58, 36, 14, 0.26); }
+/* (The shadow's own box is clear and sits square under the paper: with a fill and a slight
+   turn, as it first had, it showed as a dark lip along the card's top and right edges.) */
+.card__shadow {
+  box-shadow: calc(var(--cw) * 0.004) calc(var(--cw) * 0.007) calc(var(--cw) * 0.008) calc(var(--cw) * -0.003) rgba(58, 36, 14, 0.6),
+    calc(var(--cw) * 0.018) calc(var(--cw) * 0.036) calc(var(--cw) * 0.045) calc(var(--cw) * -0.012) rgba(58, 36, 14, 0.44),
+    calc(var(--cw) * 0.035) calc(var(--cw) * 0.07) calc(var(--cw) * 0.16) calc(var(--cw) * -0.02) rgba(58, 36, 14, 0.3); }
 .card__caption { position: absolute; left: var(--b); right: var(--b); bottom: 0; height: var(--bb); margin: 0; display: flex; align-items: center; justify-content: space-between;
   font: 500 calc(var(--cw) * 0.0152)/1 var(--sans); letter-spacing: 0.24em; text-transform: uppercase; color: #3b342a; text-shadow: 0 calc(var(--cw) * 0.0008) 0 rgba(255, 255, 255, 0.8); }
 .card__caption span:last-child { font-variant-numeric: tabular-nums; color: #6d6252; }
@@ -122,8 +124,8 @@ html.scroll.at-hero #stage { cursor: pointer; }
 .card__finish { position: absolute; left: calc(50% - var(--cw) / 2); top: calc(50% - var(--ch) / 2); width: var(--cw); height: var(--ch); pointer-events: none; 
   background: linear-gradient(104deg, rgba(255,255,255,0) 42%, rgba(255,255,255,0.16) 48%, rgba(255,255,255,0.04) 52%, rgba(255,255,255,0) 58%) var(--sheen, 50%) 0 / 300% 100% no-repeat,
     radial-gradient(130% 120% at 28% 18%, rgba(255, 244, 222, 0.03), rgba(70, 48, 22, 0.04));
-  box-shadow: inset 0 0 0 calc(var(--cw) * 0.0009) rgba(50, 36, 18, 0.28), inset 0 0 calc(var(--cw) * 0.03) rgba(50, 36, 18, 0.1); }
-.card__finish::after { content: ""; position: absolute; inset: 0; background: var(--grain); background-size: calc(var(--cw) * 0.14) auto; opacity: 0.2; }
+  box-shadow: inset 0 0 0 calc(var(--cw) * 0.0006) rgba(50, 36, 18, 0.16), inset 0 0 calc(var(--cw) * 0.03) rgba(50, 36, 18, 0.08); }
+.card__finish::after { content: ""; position: absolute; inset: 0; background: var(--grain); background-size: calc(var(--cw) * 0.1) auto; opacity: 0.16; }
 /* The light on the whole still life: warm from the top left, falling away to the far corner. */
 .table__light { position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(58% 78% at 20% 46%, rgba(255, 238, 206, 0.5), rgba(255, 238, 206, 0.22) 45%, rgba(255, 238, 206, 0) 78%), radial-gradient(130% 120% at 28% 18%, rgba(0, 0, 0, 0) 58%, rgba(64, 40, 14, 0.24) 100%); }
@@ -182,14 +184,47 @@ html.scroll.at-hero #stage { cursor: pointer; }
 .loader.failed .loader__fail { display: block; }
 .loader.failed .loader__step, .loader.failed .loader__bar { display: none; }
 
-/* ------------------------------------------------------------ the blank beat, and the curtain */
+/* ------------------------------------------------------------ the curtain, and the spreads */
 
-.cover { position: fixed; inset: 0; z-index: 6; visibility: hidden; opacity: 0; pointer-events: none; display: grid; place-content: center; justify-items: center; gap: 26px; text-align: center; padding: 0 var(--gutter); color: var(--ink);
-  background: radial-gradient(120% 90% at 50% 108%, #f0c296 0%, #f4dcbc 34%, #f5ecdc 70%); }
-.cover .label { color: var(--ink-dim); }
-.cover .display { font-size: clamp(3rem, 1.2rem + 7.4vw, 9.4rem); line-height: 0.9; letter-spacing: -0.022em; }
-.cover .display em { color: var(--accent-deep); }
+.cover { position: fixed; inset: 0; z-index: 7; visibility: hidden; opacity: 0; pointer-events: none;
+  background: radial-gradient(110% 90% at 20% 0%, #fbf6ea 0%, #f4ead7 60%, #ecdcc0 100%); }
 
+/* A spread (spreads.js): the page turned to paper while the scroll holds the camera. Its words
+   come in once the paper is nearly solid (GSAP, in spreads.js). */
+.sp { position: fixed; inset: 0; z-index: 6; visibility: hidden; opacity: 0; box-sizing: border-box; padding: clamp(84px, 13vh, 150px) var(--gutter) clamp(40px, 8vh, 90px); display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); align-items: center; gap: clamp(28px, 6vw, 110px); color: var(--ink);
+  background: var(--tooth), radial-gradient(110% 90% at 20% 0%, #fbf6ea 0%, #f4ead7 60%, #ecdcc0 100%); background-size: 130px auto, auto; pointer-events: none; }
+.sp.is-on a { pointer-events: auto; }
+.sp__text { display: grid; gap: clamp(18px, 3vh, 34px); }
+.sp__label { display: flex; align-items: baseline; gap: 16px; color: var(--ink-dim); }
+.sp__label b { font-weight: 500; color: var(--ink); }
+.sp__head { font-size: clamp(3rem, 0.6rem + 7.2vw, 9.6rem); line-height: 0.88; letter-spacing: -0.028em; margin-left: -0.04em; }
+.sp__head em { color: var(--accent-deep); }
+.sp__mask { display: block; overflow: clip; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.sp__ln { display: block; }
+/* The rule draws itself across under the headline. */
+.sp__rule { display: block; height: 1px; background: var(--accent-deep); transform-origin: 0 50%; }
+.sp__rows { margin: 0; display: grid; gap: 0; max-width: 40rem; }
+.sp__rows div { display: grid; grid-template-columns: 8.5rem 1fr; align-items: baseline; padding: 13px 0; border-bottom: 1px solid rgba(20, 18, 14, 0.16); }
+.sp__rows dt { font: 500 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-deep); font-variant-numeric: tabular-nums; }
+.sp__rows dd { margin: 0; font: 400 clamp(1.25rem, 1rem + 0.8vw, 1.7rem)/1.15 var(--serif); }
+.sp__price { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; font: 400 0.98rem/1.3 var(--sans); color: var(--ink-dim); }
+.sp__price b { font: 400 2.1rem/1 var(--serif); color: var(--ink); margin-right: -14px; }
+/* A postcard of the view just left, lying on the spread. */
+.sp__card { margin: 0; justify-self: center; width: min(100%, 30rem); padding: 4.2% 4.2% 0; box-sizing: border-box; background: var(--tooth), linear-gradient(135deg, #fffefa 0%, #fdf9ef 55%, #f6efdf 100%); background-size: 120px auto, auto;
+  box-shadow: 2px 4px 5px -1px rgba(58, 36, 14, 0.4), 14px 26px 48px -6px rgba(58, 36, 14, 0.3), 0 0 90px rgba(58, 36, 14, 0.14); }
+.sp__card canvas { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; background: #12110e; }
+.sp__card figcaption { display: flex; justify-content: space-between; align-items: center; height: 3.4rem; font: 500 9px/1 var(--sans); letter-spacing: 0.24em; text-transform: uppercase; color: #3b342a; }
+.sp__card figcaption span:last-child { color: #6d6252; }
+@media (max-width: 860px), (max-aspect-ratio: 85/100) {
+  .sp { grid-template-columns: 1fr; align-content: center; gap: 22px; padding-top: 84px; }
+  .sp__card { order: -1; width: min(62%, 17rem); justify-self: start; margin-left: 4%; }
+  .sp__card figcaption { height: 2.2rem; font-size: 7.5px; }
+  .sp__card figcaption span:last-child { display: none; }
+  .sp__head { font-size: clamp(2.7rem, 13.4vw, 5rem); }
+  .sp__rows div { grid-template-columns: 5.6rem 1fr; padding: 10px 0; }
+  .sp__rows dd { font-size: 1.12rem; }
+  .sp__price b { font-size: 1.7rem; }
+}
 /* ------------------------------------------------------------ the frame around the scene */
 
 .hud { position: fixed; z-index: 10; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 44px; padding: max(18px, env(safe-area-inset-top)) var(--gutter) 0; pointer-events: none; color: var(--cream); text-shadow: var(--shadow); opacity: 0; transition: color 0.9s var(--ease), text-shadow 0.9s var(--ease); }
@@ -252,8 +287,11 @@ html.scroll.at-hero #stage { cursor: pointer; }
 /* A soft dark patch behind each, so the words read over sky, sea and scrub alike. */
 .note::before { content: ""; position: absolute; inset: -24% -18%; z-index: -1; background: radial-gradient(closest-side, rgba(12, 11, 9, 0.5), rgba(12, 11, 9, 0.22) 55%, rgba(12, 11, 9, 0)); opacity: 0; transition: opacity 1.2s var(--ease); pointer-events: none; }
 .note.is-on::before { opacity: 1; }
+/* (Over the sand, with its bright ripples, a deeper one.) */
+.note.on-light::before { inset: -34% -10%; background: radial-gradient(closest-side, rgba(12, 11, 9, 0.7), rgba(12, 11, 9, 0.38) 60%, rgba(12, 11, 9, 0)); }
+.note.on-light .body { color: var(--cream); }
 .note .label { display: flex; align-items: baseline; gap: 14px; color: var(--cream); }
-.note .label b { position: relative; font-weight: 500; padding-left: 20px; }
+.note .label b { position: relative; font-weight: 500; padding-left: 20px; font-variant-numeric: tabular-nums; }
 .note .label b::before { content: ""; position: absolute; left: 0; top: 50%; width: 12px; height: 1px; background: var(--accent); }
 .note .label span { opacity: 0.86; }
 .note--xl .display { font-size: clamp(3rem, 0.8rem + 7.6vw, 10.2rem); line-height: 0.86; letter-spacing: -0.028em; margin-left: -0.04em; }
@@ -263,20 +301,15 @@ html.scroll.at-hero #stage { cursor: pointer; }
 .at-r { right: calc(var(--gutter) + 72px); top: 50%; translate: 0 -50%; width: min(24rem, 30vw); padding-left: 22px; border-left: 1px solid rgba(243, 239, 230, 0.5); }
 .at-c { left: 50%; translate: -50% 0; bottom: clamp(44px, 12vh, 150px); width: min(64rem, calc(100vw - 2 * var(--gutter))); justify-items: center; text-align: center; }
 .at-c .display { margin-left: 0; }
-/* Over bright sand: dark ink, no veil (the light-surface side of the page). */
-.note.on-light { color: var(--ink); text-shadow: none; }
-.note.on-light::before { display: none; }
-.note.on-light .label { color: var(--ink-dim); }
-.note.on-light .label b { color: var(--ink); }
-.note.on-light .label b::before { background: var(--accent-deep); }
-.note.on-light .display em { color: var(--accent-deep); }
-.note.on-light .body { color: var(--ink-dim); }
-.dim-light .note.on-light { color: var(--cream); text-shadow: var(--shadow); }
-.dim-light .note.on-light::before { display: block; }
-.dim-light .note.on-light .label { color: var(--cream); }
-.dim-light .note.on-light .body { color: var(--cream-dim); }
-.dim-light .note.on-light .label b { color: var(--cream); }
-.dim-light .note.on-light .display em { color: var(--accent); }
+/* Over the sand at noon (a light picked by hand on the beach): dark ink, no veil. In the
+   page's own evening, and in any other light, the sand is dark enough for cream. */
+.bright-light .note.on-light { color: var(--ink); text-shadow: none; }
+.bright-light .note.on-light::before { display: none; }
+.bright-light .note.on-light .label { color: var(--ink-dim); }
+.bright-light .note.on-light .label b { color: var(--ink); }
+.bright-light .note.on-light .label b::before { background: var(--accent-deep); }
+.bright-light .note.on-light .display em { color: var(--accent-deep); }
+.bright-light .note.on-light .body { color: var(--ink-dim); }
 
 /* The foot of the page, on the sand under the card's back. */
 .foot { left: var(--gutter); right: var(--gutter); bottom: max(20px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: 1fr 1.25fr auto; align-items: end; gap: clamp(18px, 4vw, 64px); color: rgba(20, 18, 14, 0.86); font: 400 11.5px/1.55 var(--sans); }

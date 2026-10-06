@@ -90,12 +90,39 @@
       <p class="loader__fail">This needs WebGL 2 and a reasonably recent graphics chip, and this browser could not start it. It runs best in Chrome or Safari on a laptop.</p>
     </div>
 
-    <!-- The blank beat on the sand (the day passing: the light changes behind it), and the
-         curtain for the jumps from the menu. -->
-    <div class="cover" aria-hidden="true">
-      <p class="label cover__label">Ten hours of nothing</p>
-      <p class="display cover__line" data-lines>Stay until the light <em>turns</em>.</p>
-    </div>
+    <!-- The curtain: blank paper over everything for a jump from the menu. -->
+    <div class="cover" aria-hidden="true"></div>
+
+    <!-- The spreads: twice on the way down the scroll holds the camera and the page turns to
+         paper (src/scroll/spreads.js; where, in SPREADS in scroll.js). The postcard on each is
+         a snapshot of the view the visitor is leaving. -->
+    <section class="sp sp--walk" data-hold="walk" aria-label="The walk">
+      <div class="sp__text">
+        <p class="label sp__label"><b>The walk</b><span>06:10</span></p>
+        <h2 class="display sp__head"><span class="sp__mask"><span class="sp__ln">Six walkers.</span></span><span class="sp__mask"><span class="sp__ln">One <em>guide</em>.</span></span></h2>
+        <i class="sp__rule"></i>
+        <dl class="sp__rows">
+          <div><dt>Leaves</dt><dd>06:10, from the railing</dd></div>
+          <div><dt>Down</dt><dd>150 m, about 400 steps, fifty minutes</dd></div>
+          <div><dt>You carry</dt><dd>Water. We carry the rest.</dd></div>
+        </dl>
+      </div>
+      <figure class="sp__card"><canvas width="900" height="600"></canvas><figcaption><span>From the steps, 120 m</span><span>Kelingking</span></figcaption></figure>
+    </section>
+    <section class="sp sp--beach" data-hold="beach" aria-label="The beach">
+      <div class="sp__text">
+        <p class="label sp__label"><b>The beach</b><span>07:10 to 17:40</span></p>
+        <h2 class="display sp__head"><span class="sp__mask"><span class="sp__ln">Then a whole day</span></span><span class="sp__mask"><span class="sp__ln">of <em>nothing</em>.</span></span></h2>
+        <i class="sp__rule"></i>
+        <dl class="sp__rows">
+          <div><dt>07:10</dt><dd>Breakfast on the sand</dd></div>
+          <div><dt>All day</dt><dd>Shade under the overhang, and nobody else</dd></div>
+          <div><dt>17:40</dt><dd>The jukung, round the head and home</dd></div>
+        </dl>
+        <p class="sp__price"><b>US$ 240</b> a walker, April to October <a class="button" href="#reserve">Reserve a morning</a></p>
+      </div>
+      <figure class="sp__card"><canvas width="900" height="600"></canvas><figcaption><span>Above the beach, 55 m</span><span>Kelingking</span></figcaption></figure>
+    </section>
 
     <header class="hud">
       <a class="hud__mark" href="#" data-top>Turun<span>Guided descents</span></a>
@@ -153,22 +180,29 @@
         <p class="body">The photo gets taken from this platform. Then it's the car park and the fast boat home. You're going the other way.</p>
       </section>
 
-      <section class="note note--m at-r" data-tau="1.32,1.98">
+      <section class="note note--m at-r" data-tau="1.4,1.98">
         <p class="label"><b>06:20</b><span>The ridge · 95 m</span></p>
         <h2 class="display" data-lines>We leave at first <em>light</em>.</h2>
         <p class="body">Before the day boats land and the heat sets in. Six walkers, and a guide who has done this a thousand times.</p>
       </section>
 
+      <!-- The day's time lapse: the camera holds here and the scroll turns the sun (LAPSE). -->
+      <section class="note note--xl at-bl" data-tau="2.17,2.235">
+        <p class="label"><b class="clock">07:10</b><span>One day in the cove</span></p>
+        <h2 class="display" data-lines>Stay until the light <em>turns</em>.</h2>
+        <p class="body">Keep scrolling. You're turning the sun.</p>
+      </section>
+
       <section class="note note--xl at-bl" data-tau="2.32,3.02">
-        <p class="label"><b>06:45</b><span>The switchbacks · 55 m</span></p>
+        <p class="label"><b>The switchbacks</b><span>55 m</span></p>
         <h2 class="display" data-lines>Then it gets <em>steep</em>.</h2>
         <p class="body">Packed earth and bamboo rails, about four hundred steps of it. This is the part that keeps the beach empty.</p>
       </section>
 
       <section class="note note--xl at-c on-light" data-tau="3.99,4.5">
-        <p class="label"><b>07:10</b><span>The sand · 2 m</span></p>
+        <p class="label"><b>The sand</b><span>2 m</span></p>
         <h2 class="display" data-lines>Nobody else is <em>here</em>.</h2>
-        <p class="body">Shade under the overhang, breakfast on the sand, and the surf doing the talking. Nobody swims, the break is too heavy. You came for the quiet.</p>
+        <p class="body">No sunbeds, no speakers, no day trippers. Just the surf doing the talking. Nobody swims, the break is too heavy. You came for the quiet.</p>
       </section>
 
       <section class="note note--xl at-bl" id="boat" data-tau="4.9,5.01">

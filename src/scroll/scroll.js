@@ -10,11 +10,13 @@
 // drag of the scrollbar still glides).
 //
 // The page, in screens of scroll (`page` below):
-//   the dive        the card comes up. For the first part the camera is locked and the sea's
-//                   clock is stopped: a picture. Then the sea starts, then the camera.
+//   the dive        the card comes up. At rest the camera is locked and the sea's clock is
+//                   stopped: a picture. From the first scroll the sea starts and the camera
+//                   sets off, so the scene moves inside the card well before it is full screen.
 //   the descent     path.js, from TAU0 (the card's picture) to 5 (the water's edge)
-//   the beat        at BEAT_TAU the screen goes to blank sand for a moment and the light behind
-//                   it goes from noon to evening (the day on the beach)
+//   the spreads     twice the scroll holds the camera under a paper spread (spreads.js)
+//   the day         at LAPSE.tau it holds it again, over the cove from 88 m, and the scroll
+//                   turns the sun instead: morning through noon to evening
 //   the ending      the frame goes back to being a card on the sand, and turns over
 //
 // URL switches (the scene's own are in app.js):
@@ -25,8 +27,6 @@
 //   record             the recorder drives the page frame by frame (tools/scroll-clip.mjs)
 //   pr=1               pixel ratio pinned (else it is picked while loading, then governed)
 //   lighting=, hour=   as in app.js, and the page then leaves the light alone
-//   middle=notes|bookmark|spreads   (demo) an option for the middle of the page, see
-//                      middle-options.js. Without it the page is as it was.
 //
 // Looking around (v9): drag the scene to turn the head away from the path's view; let go and it
 // eases back on the stairs. On the beach the chosen heading stays until reset. The scroll
@@ -42,7 +42,7 @@ import { ORIGIN } from '../terrain/geo.js';
 import { walkLine } from '../trail/route.js';
 import { buildDescent, makePace, STOPS } from './path.js';
 import { createPostcard } from './postcard.js';
-import { createMiddle, MIDDLE_HOLDS } from './middle-options.js';
+import { createSpreads } from './spreads.js';
 
 gsap.registerPlugin(SplitText);
 
@@ -56,14 +56,28 @@ const FOLLOW = 9;
 // it then turns back (a critically damped spring, per second: most of the way in a second).
 const LOOK_HOLD = 0.6, LOOK_BACK = 3.2;
 
-// The card's picture: this far down the flight (the headland reads as the T-Rex from here).
-const TAU0 = 0.76;
-// The dive, in screens of scroll, and the share of it after which the camera starts down.
-const HERO = 1.6, CAM_START = 0.6;
+// The card's picture: this far down the flight (high over the bay, the whole headland in it).
+const TAU0 = 0.5;
+// The dive, in screens of scroll. The camera sets off this share of the way into it and eases
+// up to the scroll's speed over CAM_EASE screens: from the first touch, in other words. (The
+// first iteration held it for 60% of the dive, and Sam's note was that he scrolled and scrolled
+// and nothing moved until the picture was the screen. The card itself still grows slowly at
+// first, so the scene is seen turning while it is plainly still a card.)
+const HERO = 1.7, CAM_START = 0, CAM_EASE = 0.05;
 // The sea wakes over this stretch of the dive (0 a still picture, 1 its own clock).
-const WAKE = [0.2, 0.58];
-// The day on the beach: where the blank beat is, how long it holds, how long it fades.
-const BEAT_TAU = 4.66, BEAT = 0.8, BEAT_FADE = 0.32;
+const WAKE = [0.015, 0.22];
+// The day. The page opens in morning light: about ten on the photo's day, the first hour the
+// beach is out of the headland's shadow (the scene's own Morning, eight o'clock, leaves the whole
+// bay dark: it faces west under 150 m of cliff). `ev`: exposure compensation in stops at the
+// start, at noon and at the end (the end is the scene's Evening preset). `clock`: what the
+// page's clock reads over the time lapse. That is the story's day (on the sand at 07:10, the
+// boat at 17:40), not the sun's hours: the light is a picture of a day, not a simulation of it.
+const DAY = { from: 10.3, noon: 12, to: 17, ev: [0.15, 0, 0.5], clock: [7 + 10 / 60, 17 + 40 / 60] };
+// Where the scroll holds the camera and turns the sun through that day instead, and for how
+// many screens (the cove from 88 m, at the top of the switchbacks).
+const LAPSE = { tau: 2.2, len: 1.8 };
+// Where it holds under a paper spread (spreads.js), and for how many screens.
+const SPREADS = [{ id: 'walk', tau: 1.32, len: 1.15 }, { id: 'beach', tau: 3.02, len: 1.15 }];
 // The ending, in screens, and the shares of it for the frame going back to a card, and the
 // card turning over.
 const OUTRO = 2.6, OUT_CARD = [0, 0.46], OUT_FLIP = [0.5, 0.8], OUT_WORDS = 0.6, OUT_STAMP = 0.79;
@@ -84,7 +98,6 @@ export function startScroll({ params }) {
   const RECORD = params.has('record');
   const DEBUG = params.has('debug');
   const BARE = params.has('notext') || params.has('bare');
-  const MIDDLE = BARE ? null : params.get('middle');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const html = document.documentElement;
   if (params.has('notext')) html.classList.add('notext');
@@ -113,30 +126,35 @@ export function startScroll({ params }) {
   // ---------------------------------------------------------------- the page in screens
 
   const pace = makePace();
-  const sStart = BARE ? 0 : pace.screensAt(TAU0), sBeat = pace.screensAt(BEAT_TAU), sEnd = pace.screens;
-  const heroLen = BARE ? 0 : HERO, lead = heroLen * CAM_START, beatLen = BARE ? 0 : BEAT, outLen = BARE ? 0 : OUTRO;
-  // Where the scroll holds the camera still: the beat on the beach, and any an option for the
-  // middle asks for. s: where on the path, len: for how many screens, y: where on the page.
-  const holds = [{ id: 'beat', s: sBeat, len: beatLen }, ...((MIDDLE && MIDDLE_HOLDS[MIDDLE]) || []).map((h) => ({ id: h.id, s: pace.screensAt(h.tau), len: h.len }))]
-    .filter((h) => h.len > 0).sort((a, b) => a.s - b.s);
-  holds.reduce((before, h) => { h.y = lead + (h.s - sStart) + before; return before + h.len; }, 0);
+  const sStart = BARE ? 0 : pace.screensAt(TAU0), sEnd = pace.screens;
+  const heroLen = BARE ? 0 : HERO, lead = heroLen * CAM_START, outLen = BARE ? 0 : OUTRO;
+  // The camera's start: its way along the path for scroll `d` past `lead`. It eases up to the
+  // scroll's own speed (a start from rest inside the card), and ends up CAM_EASE behind it.
+  const ease = BARE ? 0 : CAM_EASE;
+  const run = (d) => (ease ? d - ease * (1 - Math.exp(-d / ease)) : d);
+  const runBack = (r) => { let lo = r, hi = r + ease; for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; if (run(m) < r) lo = m; else hi = m; } return (lo + hi) / 2; };
+  // Where the scroll holds the camera still: under each paper spread, and for the day's time
+  // lapse. s: where on the path, len: for how many screens, y: where on the page.
+  const holds = (BARE ? [] : [...SPREADS, { id: 'lapse', ...LAPSE }]).map((h) => ({ id: h.id, s: pace.screensAt(h.tau), len: h.len })).sort((a, b) => a.s - b.s);
+  holds.reduce((before, h) => { h.y = lead + runBack(h.s - sStart) + before; return before + h.len; }, 0);
   const held = holds.reduce((a, h) => a + h.len, 0);
-  const yBeat = holds.find((h) => h.id === 'beat')?.y ?? 0, yOut = lead + (sEnd - sStart) + held;
+  const yOut = lead + runBack(sEnd - sStart) + held;
+  const lapse = holds.find((h) => h.id === 'lapse') ?? null;
   const page = {
     screens: yOut + outLen,
     holds,
     // The camera's place (in path.js's screens) for a place on the page, and back.
     camAt(y) {
-      let s = sStart + (y - lead);
-      if (s <= sStart) return sStart;
+      if (y <= lead) return sStart;
+      let before = 0;
       for (const h of holds) {
-        if (s <= h.s) break;
-        if (s <= h.s + h.len) return h.s;
-        s -= h.len;
+        if (y <= h.y) break;
+        if (y <= h.y + h.len) return h.s;
+        before += h.len;
       }
-      return Math.min(sEnd, s);
+      return Math.min(sEnd, sStart + run(y - lead - before));
     },
-    yAt(s) { return s <= sStart ? 0 : lead + (s - sStart) + holds.reduce((a, h) => a + (s > h.s + 1e-6 ? h.len : 0), 0); },
+    yAt(s) { return s <= sStart ? 0 : lead + runBack(Math.min(s, sEnd) - sStart) + holds.reduce((a, h) => a + (s > h.s + 1e-6 ? h.len : 0), 0); },
     tauAt(y) { return pace.tauAt(this.camAt(y)); },
     screensAt(tau) { return this.yAt(pace.screensAt(tau)); },
   };
@@ -144,24 +162,25 @@ export function startScroll({ params }) {
   // ---------------------------------------------------------------- time of day
 
   const lightInputs = [...document.querySelectorAll('input[name="lighting"]')];
-  // The page sets the light itself (noon, then evening after the beat) unless the URL fixed it.
+  // The page sets the light itself (the morning, the day's time lapse, the evening after it)
+  // unless the URL fixed it.
   const fixedLight = BARE || ['lighting', 'hour', 'sun'].some((k) => params.has(k));
-  let manual = null, manualSide = false;
+  // A light picked by hand on the beach, until the beach is left.
+  let manual = null;
   let dissolve = null, dissolveAnimation = null;
   function stopDissolve() {
     dissolveAnimation?.cancel(); dissolveAnimation = null;
     dissolve?.remove(); dissolve = null;
   }
   function syncLighting() {
-    html.classList.toggle('dim-light', ['morning', 'night'].includes(app.state.lighting));
+    html.classList.toggle('bright-light', app.state.lighting === 'noon');
     lightInputs.forEach((input) => { input.checked = input.value === app.state.lighting; });
   }
   syncLighting();
-  // withDissolve: the frame as it was fades out over the new light (when nothing covers it).
-  function setLight(id, withDissolve) {
-    if (id === app.state.lighting) return;
+  // A change of light with nothing covering it: the frame as it was fades out over the new one.
+  function dissolved(change, on) {
     stopDissolve();
-    if (withDissolve) {
+    if (on) {
       app.renderFrame();
       const previous = document.createElement('canvas');
       previous.className = 'lighting-dissolve'; previous.setAttribute('aria-hidden', 'true');
@@ -170,7 +189,7 @@ export function startScroll({ params }) {
       $('.page').prepend(previous);
       dissolve = previous;
     }
-    app.setLighting(id);
+    change();
     syncLighting();
     app.advance(0); app.renderFrame();
     dirty = 2;
@@ -182,9 +201,30 @@ export function startScroll({ params }) {
   }
   function chooseLighting(id) {
     if (id === app.state.lighting || !started) return;
-    manual = id; manualSide = cam.y > yBeat + beatLen / 2;
-    setLight(id, !reduced && !RECORD);
+    manual = id;
+    dissolved(() => app.setLighting(id), !reduced && !RECORD);
   }
+
+  // The page's own light: an hour of the photo's day. The scene has setHour (made for clips of
+  // the sun going round); the exposure that goes with each hour is laid on top of it here. From
+  // DAY.to on it is the scene's Evening preset, the same sun and exposure.
+  const evAt = (h) => (h <= DAY.noon ? DAY.ev[0] + (DAY.ev[1] - DAY.ev[0]) * smooth(DAY.from, DAY.noon, h) : DAY.ev[1] + (DAY.ev[2] - DAY.ev[1]) * smooth(DAY.noon, DAY.to, h));
+  let sunNow = null;   // the hour now set (null: not the page's light)
+  function setSun(h) {
+    if (h >= DAY.to) { if (app.state.lighting !== 'evening') app.setLighting('evening'); }
+    else {
+      app.setHour(h);
+      app.grade.params.compensation += evAt(h);
+      app.grade.apply();
+    }
+    sunNow = h;
+    dirty = 2;
+  }
+  // The hour for a place on the page: morning down to the time lapse, which the scroll turns
+  // (a little slack at each end of its hold), evening after it.
+  const lapseU = (y) => (lapse ? clamp01((y - lapse.y - 0.12) / (lapse.len - 0.24)) : 0);
+  const hourAt = (y) => { const u = lapseU(y); return DAY.from + (DAY.to - DAY.from) * (u * u * (3 - 2 * u)); };
+  if (!fixedLight) { setSun(DAY.from); syncLighting(); }
   lightInputs.forEach((input) => input.addEventListener('change', () => chooseLighting(input.value)));
   addEventListener('wheel', stopDissolve, { passive: true });
   stage.addEventListener('pointerdown', stopDissolve, { passive: true });
@@ -240,8 +280,7 @@ export function startScroll({ params }) {
     renderer.setPixelRatio(pr); app.setSize(w, h);
     const [x, y] = (params.get('sandAt') ?? '').includes(',') ? params.get('sandAt').split(',').map(Number) : SAND.at;
     const up = +(params.get('sandUp') ?? SAND.up);
-    const was = app.state.lighting, light = fixedLight ? was : (params.get('sandLight') ?? SAND.light);
-    if (light !== was) app.setLighting(light);
+    if (!fixedLight) app.setLighting(params.get('sandLight') ?? SAND.light);
     app.setPose([x, y, app.groundAt(x, y) + up], app.state.sunAz + 45, -89.9, 0, SAND.fov);
     app.advance(0); app.renderFrame(); app.renderFrame();
     const c = renderer.domElement;
@@ -250,7 +289,8 @@ export function startScroll({ params }) {
     // The low sun's shadows lifted a little, so small ink type can cross them.
     groundCtx.fillStyle = SAND.lift;
     groundCtx.fillRect(0, 0, c.width, c.height);
-    if (light !== was) { app.setLighting(was); app.advance(0); }
+    // Back to the page's own light (or the one picked by hand).
+    if (!fixedLight) { if (manual) app.setLighting(manual); else setSun(hourAt(cam.y)); syncLighting(); app.advance(0); }
     renderer.setPixelRatio(pr0); app.setSize(w, h);
     camera.position.copy(keep.p); camera.rotation.copy(keep.r);
     camera.fov = keep.fov; camera.updateProjectionMatrix();
@@ -426,11 +466,13 @@ export function startScroll({ params }) {
   // ---------------------------------------------------------------- the card, the sea's clock, the light
 
   const coverEl = $('.cover');
-  // The curtain: the same blank sand, drawn over the page for a jump from the menu.
+  // The curtain: blank paper drawn over the page for a jump from the menu.
   const curtain = { a: 0 };
-  let traveling = false, coverShown = -1, beatA = 0;
-  // How much of the scene is under blank paper: the beat's, or an option's spread.
-  const veil = () => Math.max(beatA, middle?.cover ?? 0);
+  let traveling = false, coverShown = -1, tickNo = 0;
+  // How much of the scene is under a paper spread.
+  const veil = () => spreads?.cover ?? 0;
+  const clockEl = $('.clock');
+  let clockShown = '';
   function updateStory() {
     if (BARE) return;
     post.set({
@@ -444,31 +486,35 @@ export function startScroll({ params }) {
     app.timeCtl.paused = wake <= 0;
     app.timeCtl.speed = wake;
 
-    beatA = smooth(yBeat - BEAT_FADE, yBeat, cam.y) * (1 - smooth(yBeat + beatLen, yBeat + beatLen + BEAT_FADE, cam.y));
-    const a = Math.max(beatA, curtain.a);
-    if (a !== coverShown) {
-      coverShown = a;
-      coverEl.style.opacity = a.toFixed(3);
-      coverEl.style.visibility = a > 0.002 ? 'visible' : 'hidden';
-    }
-    // The day: noon on the way down, evening after the beat. It changes behind the blank sand,
-    // or (the beat jumped over) with a dissolve. A light picked by hand on the beach stays
-    // until the beat is crossed or the beach is left.
+    // The day. The sun follows the page's place: while the scroll is inside the time lapse it
+    // moves with it (every other frame is plenty for light, and moving it costs about half a
+    // frame), and a jump lands on the right hour at once. A light picked by hand on the beach
+    // stays until the beach is left.
+    tickNo++;
     if (!fixedLight) {
-      const side = cam.y > yBeat + beatLen / 2;
-      if (manual && (side !== manualSide || cam.tau < 4)) manual = null;
-      const want = manual ?? (side ? 'evening' : 'noon');
-      if (want !== app.state.lighting) {
-        if (a > 0.985) setLight(want, false);
-        else if (beatA < 0.02 && curtain.a < 0.02) setLight(want, !reduced && !RECORD);
+      if (manual && cam.tau < 4) { manual = null; dissolved(() => setSun(hourAt(cam.y)), !reduced && !RECORD && curtain.a < 0.5 && veil() < 0.5); }
+      if (!manual) {
+        const h = hourAt(cam.y), far = sunNow === null ? 9 : Math.abs(h - sunNow);
+        if (far > 1e-4 && (far > 0.5 || tickNo % 2 === 0 || h === DAY.from || h === DAY.to)) { setSun(h); syncLighting(); }
+      }
+      // The clock on the time lapse's line.
+      if (clockEl) {
+        const u = lapseU(cam.y), m = Math.round((DAY.clock[0] + (DAY.clock[1] - DAY.clock[0]) * (u * u * (3 - 2 * u))) * 12) * 5;
+        const t = `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+        if (t !== clockShown) { clockShown = t; clockEl.textContent = t; }
       }
     }
-    // The sand again after a resize, whenever it is about to show.
-    if (!groundLight && (cam.hero < 1 || cam.out > 0 || a > 0.985)) captureGround();
+    spreads?.update(cam.y, !wordsOn || rewinding || traveling);
+    if (curtain.a !== coverShown) {
+      coverShown = curtain.a;
+      coverEl.style.opacity = curtain.a.toFixed(3);
+      coverEl.style.visibility = curtain.a > 0.002 ? 'visible' : 'hidden';
+    }
+    // The sand under the card again after a resize, whenever it is about to show.
+    if (!groundLight && (cam.hero < 1 || cam.out > 0 || curtain.a > 0.985)) captureGround();
   }
-  // Nothing in the picture changes while the card rests in the hero and for the first of its
-  // way up (the camera locked, the sea not yet running), or once it is on its back.
-  const still = () => !BARE && ((cam.out <= 0 && cam.hero <= WAKE[0]) || post.turned || (cam.out > 0 && app.timeCtl.paused));
+  // Nothing in the picture changes while the card rests in the hero, or once it is on its back.
+  const still = () => !BARE && ((cam.out <= 0 && cam.hero <= 0) || post.turned || (cam.out > 0 && app.timeCtl.paused));
 
   // A jump from the menu: the blank sand comes over, the page moves under it, it lifts.
   function travel(y) {
@@ -482,6 +528,7 @@ export function startScroll({ params }) {
     } });
   }
   const places = { walk: () => page.screensAt(1), boat: () => page.screensAt(4.97), reserve: () => page.screens };
+  const spreads = BARE ? null : createSpreads({ app, holds, reduced, onReserve: () => travel(places.reserve()) });
   document.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', (e) => {
     e.preventDefault();
     travel(places[el.dataset.go]());
@@ -498,10 +545,9 @@ export function startScroll({ params }) {
   // ---------------------------------------------------------------- words
 
   // Every block shows while the page is inside its range: data-hero (how far the card is up),
-  // data-tau (the camera's place on the way down), data-end (how far into the ending). The
-  // cover's line shows while the beat is fully up.
-  const blocks = [...document.querySelectorAll('.words > *, .cover')].map((el) => {
-    const kind = 'hero' in el.dataset ? 'hero' : 'tau' in el.dataset ? 'tau' : 'end' in el.dataset ? 'end' : 'cover';
+  // data-tau (the camera's place on the way down), data-end (how far into the ending).
+  const blocks = [...document.querySelectorAll('.words > *')].map((el) => {
+    const kind = 'hero' in el.dataset ? 'hero' : 'tau' in el.dataset ? 'tau' : 'end';
     const [a, b] = (el.dataset[kind] ?? '0,0').split(',').map(Number);
     const after = [...el.querySelectorAll('.label, .body, .hero__actions, .facts > div, .foot > *')];
     const k = { el, kind, a, b, lines: [], byEl: new Map(), after, drift: kind === 'tau' ? el.querySelector('.display') : null, on: false, tl: null };
@@ -565,8 +611,7 @@ export function startScroll({ params }) {
     const d = reduced ? 0 : 0.7;
     if (k.lines.length) t.to(k.lines, { yPercent: -105, duration: d, ease: EASE, stagger: 0.04 }, 0);
     t.to(k.after, { autoAlpha: 0, y: -8, duration: d * 0.8, ease: EASE }, 0);
-    // (The cover's own visibility follows its opacity, in updateStory.)
-    if (k.kind !== 'cover') t.set(k.el, { visibility: 'hidden' });
+    t.set(k.el, { visibility: 'hidden' });
     if (k.lines.length) t.set(k.lines, { yPercent: 105 });
     t.set(k.after, { y: 14 });
   }
@@ -578,8 +623,7 @@ export function startScroll({ params }) {
       const on = !quiet && (
         k.kind === 'hero' ? cam.out <= 0 && cam.hero >= k.a && cam.hero <= k.b
         : k.kind === 'tau' ? inScene() && cam.tau >= k.a && cam.tau <= k.b && veil() < 0.4
-        : k.kind === 'end' ? cam.out >= k.a && cam.out <= k.b
-        : beatA > 0.9 && curtain.a < 0.05);
+        : cam.out >= k.a && cam.out <= k.b);
       if (on !== k.on) { k.on = on; on ? show(k) : hide(k); }
       // The line drifts across a little while it is up.
       if (on && k.drift && !reduced) {
@@ -752,9 +796,6 @@ export function startScroll({ params }) {
     lenis.scrollTo(0, { duration: Math.min(9, 2.5 + cam.y * 0.4), easing: inOut, onComplete: () => { rewinding = false; } });
   }));
 
-  // (Demo: an option for the middle of the page, if the URL asks for one.)
-  const middle = MIDDLE ? createMiddle(MIDDLE, { app, cam, page, html, reduced, inScene, descent: () => descent, travel: (k) => travel(places[k]()) }) : null;
-
   resize(true);
   addEventListener('resize', () => resize());
 
@@ -772,7 +813,6 @@ export function startScroll({ params }) {
     updateStory();
     updateWords();
     updateFrame();
-    middle?.tick(dt, { quiet: !wordsOn || rewinding || traveling, veil: beatA });
     post.tick(dt);
     // (At rest the picture is a picture: no frame is drawn until something in it changes.)
     if (dirty > 0 || !still()) { dirty = Math.max(0, dirty - 1); app.frame(dt); }
