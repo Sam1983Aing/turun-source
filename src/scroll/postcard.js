@@ -1,5 +1,5 @@
-// The postcard (v35): the page opens on the beach's sand seen from straight above, with a
-// postcard lying on it, and ends on the back of the same card.
+// The postcard (v35): the page opens on sand in the shade of a palm, with a postcard lying on
+// it. Twice on the way down the frame goes back to being that card, and the page ends on its back.
 //
 // The picture on the card is not a picture. It is the live canvas (#stage), the size of the
 // screen as always, sitting inside a "world" that is scaled down, turned and moved so the
@@ -7,13 +7,19 @@
 // shadow and print finish are plain elements in the same world. Bringing the card up is then
 // one transform going back to nothing: at the end of the dive the world has no transform, the
 // clip is gone, and the page is exactly what it was before v35, a full-screen canvas. Nothing
-// is cross-faded, so there is no seam.
+// is cross-faded, so there is no seam. Putting it down again is the same thing backwards.
 //
-// The sand is in the world too, so it grows with the card, as it would for a camera coming
-// down onto a table. What sells "flat" at rest is done by the caller (scroll.js): the camera
-// is locked and the sea's clock is stopped.
+// The card has several places to rest (POSES): the hero, one for each spread, the ending. The
+// caller (scroll.js) says which, and how far up the card is from it (`up`: 0 at rest, 1 the
+// picture is the screen). It changes pose only while the picture is the screen.
 //
-// Everything here is DOM and CSS. The scene is not touched.
+// The sand is in the world too, so it grows and turns with the card, as it would for a camera
+// coming down onto a table. It is a photograph composed for the screen (a palm's tip in one
+// corner, a shell in another), so it is laid in the world undoing the world's own resting
+// transform: at rest, in every pose, it fills the screen exactly as it was made.
+//
+// What sells "flat" at rest is done by the caller: the camera is stopped and so is the sea's
+// clock. Everything here is DOM and CSS. The scene is not touched.
 
 const clamp01 = (x) => Math.min(Math.max(x, 0), 1);
 const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
@@ -21,16 +27,32 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 // The card's shape and where it rests, as shares of the screen. x, y: the middle of the paper.
-// w: the picture's width. rz: its turn on the sand, in degrees.
-const REST = {
-  wide: { shape: 1.5, hero: { x: 0.705, y: 0.5, w: 0.4, h: 0.52, rz: -6 }, end: { x: 0.5, y: 0.492, rz: -2 } },
-  tall: { shape: 0.66, hero: { x: 0.52, y: 0.672, w: 0.56, h: 0.5, rz: -4.5 }, end: { x: 0.5, y: 0.46, rz: -1.5 } },
+// w, h: the most of the screen its picture may take. rz: its turn on the sand, in degrees.
+const POSES = {
+  wide: {
+    shape: 1.5,
+    hero: { x: 0.705, y: 0.5, w: 0.4, h: 0.52, rz: -6 },
+    walk: { x: 0.71, y: 0.5, w: 0.39, h: 0.5, rz: 3.5 },      // the first spread: card right, words left
+    beach: { x: 0.29, y: 0.5, w: 0.39, h: 0.5, rz: 5 },       // the second: card left, words right
+    end: { x: 0.5, y: 0.492, rz: -2 },
+  },
+  tall: {
+    shape: 0.66,
+    hero: { x: 0.52, y: 0.672, w: 0.56, h: 0.5, rz: -4.5 },
+    walk: { x: 0.5, y: 0.74, w: 0.6, h: 0.3, rz: 3.5 },       // card low, words above
+    beach: { x: 0.5, y: 0.275, w: 0.6, h: 0.29, rz: -3.5 },   // card high, words below
+    end: { x: 0.5, y: 0.46, rz: -1.5 },
+  },
 };
 // The white border as a share of the picture's width: sides and top, and the wider foot that
 // carries the caption.
 const BORDER = 0.042, FOOT = 0.108;
 // How far the eye is from the card for the tilt and the flip, in screen pixels.
 const EYE = 1900;
+// The sand is laid a little larger than the screen at rest: on the way up the card's world
+// turns and slides against it, and an edge of the photograph must never come into view. How
+// much larger is worked out for each pose and screen (sandOver), plus this much to spare.
+const SAND_SPARE = 1.015;
 
 // A tile of noise as a picture: specks of one colour, their alpha `gain` times a random number
 // plus `bias` (so most of the tile is clear). Two sizes of speck, so it is not TV static.
@@ -60,7 +82,9 @@ function noiseTile(size, rgb, gain, bias, seed, soft = false) {
   return `url(${big.toDataURL('image/png')})`;
 }
 
-export function createPostcard({ reduced = false } = {}) {
+// captions: what is printed under the picture in each pose, { pose: [left, right] } (the hero's
+// is in the page's markup and stands for any pose not named).
+export function createPostcard({ reduced = false, captions = {} } = {}) {
   const $ = (s) => document.querySelector(s);
   const html = document.documentElement;
   // (Soft and faint. As fine specks it sparkled at the card's resting size and read as
@@ -70,67 +94,103 @@ export function createPostcard({ reduced = false } = {}) {
   const table = $('.table'), world = $('.world'), ground = $('.ground'), card = $('.card'), flipEl = $('.card__flip');
   const finish = $('.card__finish'), light = $('.table__light'), stage = $('#stage'), back = $('.back');
   const paper = $('.card__paper'), shadow = $('.card__shadow'), caption = $('.card__caption');
-  let L = null, last = '';
+  const captionEls = [...caption.querySelectorAll('span')], captionOwn = captionEls.map((e) => e.textContent);
+  let L = null, last = '', posed = null;
   const tilt = { x: 0, y: 0, tx: 0, ty: 0, nx: 0, tnx: 0, live: 0 };
-  const state = { dive: 0, out: 0, flip: 0, settle: 1 };
+  const state = { pose: 'hero', up: 0, flip: 0, settle: 1 };
 
   function layout() {
     const vw = table.clientWidth, vh = table.clientHeight, tall = vw / vh < 0.85;
-    const R = tall ? REST.tall : REST.wide;
+    const R = tall ? POSES.tall : POSES.wide;
     // The picture: the middle of the frame, cut to a postcard's shape.
     const shape = tall ? R.shape : Math.min(vw / vh, R.shape);
     const cw = Math.min(vw, vh * shape), ch = cw / shape;
     const b = cw * BORDER, bb = cw * FOOT;
     const pw = cw + 2 * b, ph = ch + b + bb;
-    const A = { ...R.hero, s: Math.min((R.hero.w * vw) / cw, (R.hero.h * vh) / ch) };
-    // At the end the card is as big as the screen lets it be: its back has to be read.
-    const B = { ...R.end, s: tall ? Math.min((0.92 * vw) / pw, (0.74 * vh) / ph) : Math.min(Math.min(0.66 * vw, 1040) / pw, (0.7 * vh) / ph) };
-    // The sand has to reach every corner of the screen from wherever the card rests.
-    const reach = (P) => (2 * (Math.max(P.x, 1 - P.x, P.y, 1 - P.y) + 0.16)) / P.s;
-    const G = Math.max(reach(A), reach(B));
-    L = { vw, vh, tall, cw, ch, b, bb, pw, ph, A, B, G };
-    ground.style.transform = `scale(${G.toFixed(3)})`;
+    const P = {}, sand = {}, box = {};
+    for (const name of ['hero', 'walk', 'beach', 'end']) {
+      const p = R[name];
+      // At the end the card is as big as the screen lets it be: its back has to be read.
+      const s = name === 'end' ? (tall ? Math.min((0.92 * vw) / pw, (0.74 * vh) / ph) : Math.min(Math.min(0.66 * vw, 1040) / pw, (0.7 * vh) / ph))
+        : Math.min((p.w * vw) / cw, (p.h * vh) / ch);
+      const r = (p.rz * Math.PI) / 180, off = ((bb - b) / 2) * s;
+      // The world's move at rest: the picture's middle sits `off` above the paper's.
+      const tx = p.x * vw + Math.sin(r) * off - vw / 2, ty = p.y * vh - Math.cos(r) * off - vh / 2;
+      P[name] = { x: p.x, y: p.y, rz: p.rz, s, tx, ty };
+      // The sand for this pose: the inverse of the world's transform at rest, a little larger.
+      const over = sandOver(P[name], vw, vh) * SAND_SPARE;
+      sand[name] = `scale(${(over / s).toFixed(5)}) rotate(${(-p.rz).toFixed(3)}deg) translate(${(-tx).toFixed(2)}px, ${(-ty).toFixed(2)}px)`;
+      // The paper's edges on the screen at rest (it is turned), for the words beside it.
+      const hw = (pw * s * Math.abs(Math.cos(r)) + ph * s * Math.abs(Math.sin(r))) / 2, hh = (pw * s * Math.abs(Math.sin(r)) + ph * s * Math.abs(Math.cos(r))) / 2;
+      box[name] = { left: p.x * vw - hw, right: p.x * vw + hw, top: p.y * vh - hh, bottom: p.y * vh + hh };
+    }
+    L = { vw, vh, tall, cw, ch, b, bb, pw, ph, P, sand, box };
+    posed = null;
     card.style.setProperty('--cw', `${cw.toFixed(1)}px`);
     card.style.setProperty('--ch', `${ch.toFixed(1)}px`);
     card.style.setProperty('--b', `${b.toFixed(1)}px`);
     card.style.setProperty('--bb', `${bb.toFixed(1)}px`);
     flipEl.style.transformOrigin = `50% calc(50% + ${((bb - b) / 2).toFixed(1)}px)`;
-    back.style.width = `${(pw * B.s).toFixed(1)}px`;
-    back.style.height = `${(ph * B.s).toFixed(1)}px`;
-    back.style.left = `${(B.x * vw).toFixed(1)}px`;
-    back.style.top = `${(B.y * vh).toFixed(1)}px`;
-    // Where the card's edges are at rest, for the words beside or above it.
-    const turn = Math.abs(Math.sin((A.rz * Math.PI) / 180));
-    html.style.setProperty('--card-left', `${(A.x * vw - (pw * A.s) / 2 - (ph * A.s * turn) / 2).toFixed(0)}px`);
-    html.style.setProperty('--card-top', `${(A.y * vh - (ph * A.s) / 2 - (pw * A.s * turn) / 2).toFixed(0)}px`);
-    html.style.setProperty('--card-bottom', `${(A.y * vh + (ph * A.s) / 2 + (pw * A.s * turn) / 2).toFixed(0)}px`);
+    back.style.width = `${(pw * P.end.s).toFixed(1)}px`;
+    back.style.height = `${(ph * P.end.s).toFixed(1)}px`;
+    back.style.left = `${(P.end.x * vw).toFixed(1)}px`;
+    back.style.top = `${(P.end.y * vh).toFixed(1)}px`;
+    // Where the hero's card is, for the words beside or above it (page.css).
+    html.style.setProperty('--card-left', `${box.hero.left.toFixed(0)}px`);
+    html.style.setProperty('--card-top', `${box.hero.top.toFixed(0)}px`);
+    html.style.setProperty('--card-bottom', `${box.hero.bottom.toFixed(0)}px`);
     last = '';
     apply();
   }
 
-  // dive: 0 the card at rest in the hero, 1 its picture is the screen. out: 0 to 1, back down
-  // onto the sand at the end. flip: 0 to 1, over onto its back. settle: 0 to 1, the camera
-  // easing back to rest as the page opens.
+  // How much larger than the screen the sand has to be at rest in a pose for it to cover the
+  // screen all the way up: every corner of the screen, at every step of the world's move
+  // (as apply() makes it), taken back into the sand's own frame.
+  function sandOver(P, vw, vh) {
+    let k = 1;
+    for (let i = 0; i <= 80; i++) {
+      const e = i / 80, m = Math.pow(1 - e, 1.6), se = Math.exp((1 - e) * Math.log(P.s));
+      const a = ((P.rz - P.rz * m) * Math.PI) / 180, cos = Math.cos(a), sin = Math.sin(a), f = P.s / se;
+      for (const [qx, qy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+        const x = (qx * vw) / 2 - P.tx * m, y = (qy * vh) / 2 - P.ty * m;
+        const wx = f * (cos * x - sin * y), wy = f * (sin * x + cos * y);
+        k = Math.max(k, Math.abs(wx) / (vw / 2 - Math.sign(wx) * P.tx), Math.abs(wy) / (vh / 2 - Math.sign(wy) * P.ty));
+      }
+    }
+    return k;
+  }
+
+  // pose: where the card rests (a name in POSES). up: 0 at rest there, 1 its picture is the
+  // screen. flip: 0 to 1, over onto its back (the ending). settle: 0 to 1, the camera easing
+  // back to rest as the page opens.
   function set(v) { Object.assign(state, v); apply(); }
 
   function apply() {
     if (!L) return;
     const { vw, vh, cw, ch, b, bb } = L;
-    const ending = state.out > 0;
-    const P = ending ? L.B : L.A;
-    const raw = ending ? 1 - state.out : state.dive;
+    const P = L.P[state.pose] ?? L.P.hero;
+    const raw = clamp01(state.up);
     const e = raw >= 1 ? 1 : raw <= 0 ? 0 : ease(raw);
     const full = e >= 1;
     // The print finish: on at rest, and the first thing to go as the card leaves the sand (it
     // is overlays over the whole canvas: free while nothing is drawn, not while the scene
     // draws every frame under it).
-    const f = ending ? smooth(0.72, 0.98, state.out) : 1 - smooth(0.02, 0.2, state.dive);
+    const f = 1 - smooth(0.02, 0.24, raw);
     const flip = state.flip;
-    const key = [e, f, flip, state.settle, tilt.x, tilt.y, tilt.nx].map((n) => n.toFixed(4)).join();
+    const key = state.pose + [e, f, flip, state.settle, tilt.x, tilt.y, tilt.nx].map((n) => n.toFixed(4)).join();
     if (key === last) return;
     last = key;
     table.classList.toggle('is-full', full);
-    table.classList.toggle('is-end', ending);
+    // (A new pose is taken while the picture is the whole screen and hides the sand: the sand
+    // is laid for it, the caption changed, the light moved to the side the words will be.)
+    if (posed !== state.pose) {
+      posed = state.pose;
+      ground.style.transform = L.sand[posed] ?? L.sand.hero;
+      const text = captions[posed] ?? captionOwn;
+      captionEls.forEach((el, i) => { el.textContent = text[i] ?? captionOwn[i]; });
+      table.classList.toggle('is-end', posed === 'end');
+      table.classList.toggle('words-right', posed === 'beach' && !L.tall);
+    }
 
     if (full) {
       world.style.transform = 'none';
@@ -145,9 +205,7 @@ export function createPostcard({ reduced = false } = {}) {
     // Scale goes exponentially (a steady zoom), place and turn settle early.
     const s = Math.exp((1 - e) * Math.log(P.s)) * (1 + 0.07 * (1 - state.settle));
     const m = Math.pow(1 - e, 1.6);
-    const rz = P.rz * m, r = (P.rz * Math.PI) / 180, off = ((bb - b) / 2) * P.s;
-    const tx = (P.x * vw + Math.sin(r) * off - vw / 2) * m, ty = (P.y * vh - Math.cos(r) * off - vh / 2) * m;
-    world.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotate(${rz.toFixed(3)}deg) scale(${s.toFixed(5)})`;
+    world.style.transform = `translate3d(${(P.tx * m).toFixed(2)}px, ${(P.ty * m).toFixed(2)}px, 0) rotate(${(P.rz * m).toFixed(3)}deg) scale(${s.toFixed(5)})`;
 
     // The picture's window opens to the whole frame over the last part of the way up.
     const k = smooth(0.45, 1, e);
@@ -158,7 +216,7 @@ export function createPostcard({ reduced = false } = {}) {
     // and nothing repainted while the scene is drawing at full size underneath.
     const sx = (ww + 2 * b) / (cw + 2 * b), sy = Math.max((wh / 2 + b) / (ch / 2 + b), (wh / 2 + bb) / (ch / 2 + bb));
     paper.style.transform = `scale(${sx.toFixed(5)}, ${sy.toFixed(5)})`;
-    caption.style.opacity = (ending ? smooth(0.5, 0.85, state.out) : 1 - smooth(0.18, 0.42, state.dive)).toFixed(3);
+    caption.style.opacity = (1 - smooth(0.16, 0.46, raw)).toFixed(3);
 
     finish.style.opacity = f.toFixed(3);
     finish.style.visibility = f > 0.003 ? 'visible' : 'hidden';
@@ -178,7 +236,7 @@ export function createPostcard({ reduced = false } = {}) {
       ? `perspective(${(EYE / s).toFixed(0)}px) rotateX(${tilt.x.toFixed(3)}deg) rotateY(${(tilt.y + 180 * flip).toFixed(3)}deg) scale(${lift.toFixed(4)})`
       : 'none';
     back.style.visibility = turned ? 'visible' : 'hidden';
-    if (turned) back.style.transform = `translate(-50%, -50%) rotate(${L.B.rz}deg) perspective(${EYE}px) rotateY(${(180 * flip - 180).toFixed(3)}deg) scale(${lift.toFixed(4)})`;
+    if (turned) back.style.transform = `translate(-50%, -50%) rotate(${L.P.end.rz}deg) perspective(${EYE}px) rotateY(${(180 * flip - 180).toFixed(3)}deg) scale(${lift.toFixed(4)})`;
     // The shadow on the sand narrows with the card as it turns and slides out a little as it
     // lifts. Once turned, the back brings its own.
     const far = (lift - 1) * cw;
@@ -186,7 +244,8 @@ export function createPostcard({ reduced = false } = {}) {
     shadow.style.opacity = turned ? '0' : (1 - 3 * (lift - 1)).toFixed(3);
   }
 
-  // The lean toward the pointer: a card on sand is never quite flat. Only at rest in the hero.
+  // The lean toward the pointer: a card on sand is never quite flat. Only near rest, and not
+  // at the ending (where it turns over).
   if (!reduced && matchMedia('(hover: hover) and (pointer: fine)').matches) {
     addEventListener('pointermove', (ev) => {
       if (!L || ev.pointerType !== 'mouse') return;
@@ -195,7 +254,7 @@ export function createPostcard({ reduced = false } = {}) {
     }, { passive: true });
   }
   function tick(dt) {
-    const want = state.out > 0 ? 0 : 1 - smooth(0, 0.3, state.dive);
+    const want = state.pose === 'end' ? 0 : 1 - smooth(0, 0.3, clamp01(state.up));
     tilt.live += (want - tilt.live) * (1 - Math.exp(-8 * dt));
     const k = 1 - Math.exp(-5 * dt);
     const x = tilt.tx * tilt.live, y = tilt.ty * tilt.live;
@@ -208,7 +267,9 @@ export function createPostcard({ reduced = false } = {}) {
   return {
     layout, set, tick, ground, back, state,
     get L() { return L; },
-    // Is the picture standing still (so no frame has to be drawn)?
+    // The resting card's edges on the screen in a pose: { left, right, top, bottom } in pixels.
+    box: (pose) => L?.box[pose] ?? null,
+    // Is the card on its back (so the picture cannot be seen, and no frame has to be drawn)?
     get turned() { return state.flip > 0.5; },
   };
 }

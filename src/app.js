@@ -56,7 +56,8 @@ import { decodeBake } from './terrain/bake-format.js';
 
 // Where the assets are (v11): next to the page, or, in the standalone build, on the CDN it sets
 // in globalThis.__klAssets ({ textures, bake }).
-export const ASSETS = globalThis.__klAssets ?? { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin' };
+// (hero: the photograph of sand the landing page's postcard lies on, v35.)
+export const ASSETS = { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin', hero: 'assets/hero/sand.jpg', ...globalThis.__klAssets };
 
 // capture: a still for the tools (pixel ratio 1, 2048 terrain, the drawing buffer kept for
 // screenshots). keepBuffer: keep the drawing buffer without the rest (recording the scroll).

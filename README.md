@@ -1,10 +1,10 @@
 # Kelingking, in three.js
 
 A real place rebuilt in the browser: Kelingking Beach on Nusa Penida, Bali, the cliff everyone
-calls the T-Rex. The page opens on a postcard lying on the beach's sand. You scroll into the
-picture on it, down the path on the cliff to the water's edge, and the card turns over at the
-end. There is no 3D model file and no video. The cliffs, the path, the plants, the waves and
-the boat are all built by code when the page loads.
+calls the T-Rex. The page opens on a postcard lying on sand. You scroll into the picture on
+it, down the path on the cliff to the water's edge, and the card turns over at the end. There
+is no 3D model file and no video. The cliffs, the path, the plants, the waves and the boat
+are all built by code when the page loads. (One picture is not: the sand the postcard lies on.)
 
 The page is written as a travel page for a walk down to the beach ("Turun, guided descents").
 That part is a concept: the outfitter, the prices and the boat pick-up are invented. The real
@@ -153,26 +153,34 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   with the sand, the paper and the shadow, and the world is scaled down, turned and moved so
   the canvas lands where the picture should be, clipped to a postcard's shape. Scrolling takes
   that transform back to nothing, so at the end of the dive the page is a plain full-screen
-  canvas again. Nothing is cross-faded. At rest the camera is locked and the sea's clock is
-  stopped, so the page draws no frames at all. From the first touch of the scroll the sea
+  canvas again. Nothing is cross-faded. At rest the camera is stopped and so is the sea's
+  clock, and the page draws no frames at all. From the first touch of the scroll the sea
   starts and the camera sets off from `tau` 0.5, while the card is still small: you see the
   scene turn inside the picture before it grows (the flight before `tau` 0.5 is no longer on
-  the page). The sand is the scene's own beach, drawn once from straight above in evening
-  light while the page loads. At the end the same thing runs backwards and the card turns
-  over: its back is a second, unscaled element laid over the first, so its type stays sharp.
+  the page).
+- **The sand** is a photograph (`assets/hero/sand.jpg`, the one picture on the page the scene
+  did not draw). It lies in the card's world with the inverse of the world's resting
+  transform, so at rest it fills the screen as it was composed, and on the way up it grows
+  and turns with the card. How much larger than the screen it has to be for no edge to show
+  on the way is worked out for each pose and screen size (`sandOver`).
+- **The spreads** (v35, `spreads.js`). Twice on the way down the dive runs backwards: the frame
+  goes back to being a postcard on the sand, the camera slowing to a stop as it lands, and a
+  piece of the offer comes in beside it (words left of the card the first time, right of it
+  the second). Scrolling on dives back in. The card has a named place to rest for each
+  (`POSES` in `postcard.js`: hero, walk, beach, end) and changes pose only while its picture
+  is the whole screen.
 - **The day** (v35). The page sets the sun from where the scroll is (`DAY`, `LAPSE` in
   `scroll.js`). It opens in morning light. At `tau` 2.2, over the cove from 88 m, the scroll
   holds the camera for 1.8 screens and turns the sun instead, from morning through noon to
-  evening, and it is evening from there to the end. The sun moves every other frame, which
-  costs little, and it runs backwards with the scroll. The clock on that line reads the
-  story's day (07:10 to 17:40), not the sun's hours.
-- **The spreads** (v35, `spreads.js`). Twice on the way down the scroll holds the camera and
-  the page turns to paper for a magazine spread: who goes and how far, then the day and the
-  price. The postcard on each is a snapshot of the live canvas, taken as the paper comes over.
-- **The page in screens** (`page` in `scroll.js`). The dive (1.7 screens, the camera already
-  moving), the descent (`path.js`), three holds (two spreads of 1.15 and the day's 1.8) and
-  the ending (2.6): about 23 screens. `?notext` gives the scene alone as before v35, from
-  `tau` 0, for the tools that judge the scene.
+  evening, and it is evening from there to the end. The sun moves every other frame, and it
+  runs backwards with the scroll. The clock on that line reads the story's day (07:10 to
+  17:40), not the sun's hours.
+- **The ending.** The frame goes back to a card once more, and the card turns over: its back
+  is a second, unscaled element laid over the first, so its type stays sharp.
+- **The page in screens** (`page` in `scroll.js`): stretches of scroll in which the camera goes
+  at the scroll's speed, stands in a hold (a spread's card at rest, the day's time lapse), or
+  eases between the two. About 23.5 screens. `?notext` gives the scene alone as before v35,
+  from `tau` 0, for the tools that judge the scene.
 
 ```bash
 node tools/descent.mjs                 # the path's speeds, turn rates and clearance per stretch

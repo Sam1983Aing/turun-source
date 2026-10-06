@@ -60,6 +60,20 @@ are already in `vendor/fonts/` for the standalone file).
   the water there.
 - The card's edges did not convince (a dark lip along two sides, speckled paper).
 
+## Round 4 (6 October 2026, later)
+
+- Sam made mock-ups of the hero he wants (`output/hero-concepts-2026-10-06/`, five surfaces)
+  and proposed a generated image for the surface, so that only the card, the headline and the
+  button are live. Done with his `beach-sand-background-v2.png` (sand, a palm's shadow, a
+  shell): `assets/hero/sand.jpg`. This changes the scope above: the sand is no longer the
+  scene's own. Its credit and licence are open (`assets/hero/CREDITS.md`).
+- The paper spreads' transition "feels average". Sam: take the hero's transition and do it in
+  reverse. At each spread the scene goes back to being a postcard on the sand, the words
+  beside it (left of the card the first time, right of it the second), on the same sand "for
+  now". Then the dive again.
+- Still open from his mock-ups: a hand-lettered headline and typewriter small type (fonts to
+  be chosen and downloaded with his OK), which headline, and a prop or two.
+
 ## Found by other versions
 
 Nothing yet.

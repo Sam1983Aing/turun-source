@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 38e84dc. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
+  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 3ddbc88. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Turun · The walk down to Kelingking Beach</title>
@@ -94,7 +94,7 @@ html.scroll.loading { overflow: hidden; }
 html.scroll .table { position: fixed; left: 0; top: 0; width: 100vw; height: 100lvh; z-index: 0; overflow: hidden; background: var(--sand); }
 html.scroll .world { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
 html.scroll .table.is-full .world { will-change: auto; }
-html.scroll .ground { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: 50% 50%; will-change: transform; }
+html.scroll .ground { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: 50% 50%; will-change: transform; background: center / cover no-repeat; }
 html.scroll .card { position: absolute; inset: 0; }
 /* (Each moving part on a layer of its own: the tilt, the turn, the caption's fade and the
    shadow's squeeze are then the compositor's work, and the blurred shadow is painted once.) */
@@ -115,7 +115,7 @@ html.scroll #stage:focus-visible { outline: 2px solid rgba(243,239,230,.65); out
 html.scroll #stage.lookable { touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 html.scroll.in-scene #stage.lookable { cursor: grab; }
 html.scroll.in-scene.looking #stage.lookable { cursor: grabbing; }
-html.scroll.at-hero #stage { cursor: pointer; }
+html.scroll.at-card #stage { cursor: pointer; }
 
 /* The paper and its shadow: the picture's rectangle plus the border, sized once (postcard.js
    sets --cw, --ch, --b, --bb) and scaled about the middle of the picture as the window opens. */
@@ -144,6 +144,8 @@ html.scroll.at-hero #stage { cursor: pointer; }
 /* The light on the whole still life: warm from the top left, falling away to the far corner. */
 .table__light { position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(58% 78% at 20% 46%, rgba(255, 238, 206, 0.5), rgba(255, 238, 206, 0.22) 45%, rgba(255, 238, 206, 0) 78%), radial-gradient(130% 120% at 28% 18%, rgba(0, 0, 0, 0) 58%, rgba(64, 40, 14, 0.24) 100%); }
+/* (The pool of light is under the words: on the right when the card is on the left.) */
+.table.words-right .table__light { background: radial-gradient(58% 78% at 80% 46%, rgba(255, 238, 206, 0.5), rgba(255, 238, 206, 0.22) 45%, rgba(255, 238, 206, 0) 78%), radial-gradient(130% 120% at 72% 18%, rgba(0, 0, 0, 0) 58%, rgba(64, 40, 14, 0.24) 100%); }
 .table__light::after { content: ""; position: absolute; inset: 0; background: var(--grain); background-size: 150px auto; opacity: 0.5; }
 .table.is-full .ground, .table.is-full .card__paper, .table.is-full .card__shadow, .table.is-full .card__finish, .table.is-full .table__light { visibility: hidden; }
 
@@ -204,42 +206,42 @@ html.scroll.at-hero #stage { cursor: pointer; }
 .cover { position: fixed; inset: 0; z-index: 7; visibility: hidden; opacity: 0; pointer-events: none;
   background: radial-gradient(110% 90% at 20% 0%, #fbf6ea 0%, #f4ead7 60%, #ecdcc0 100%); }
 
-/* A spread (spreads.js): the page turned to paper while the scroll holds the camera. Its words
-   come in once the paper is nearly solid (GSAP, in spreads.js). */
-.sp { position: fixed; inset: 0; z-index: 6; visibility: hidden; opacity: 0; box-sizing: border-box; padding: clamp(84px, 13vh, 150px) var(--gutter) clamp(40px, 8vh, 90px); display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); align-items: center; gap: clamp(28px, 6vw, 110px); color: var(--ink);
-  background: var(--tooth), radial-gradient(110% 90% at 20% 0%, #fbf6ea 0%, #f4ead7 60%, #ecdcc0 100%); background-size: 130px auto, auto; pointer-events: none; }
+/* A spread (spreads.js): twice on the way down the frame goes back to being a postcard on the
+   sand, the hero's dive run backwards, and a piece of the offer is set beside it in ink, as the
+   hero's words are. --c-left, --c-right, --c-top, --c-bottom: the resting card's edges. */
+.sp { position: fixed; inset: 0; z-index: 5; visibility: hidden; pointer-events: none; color: var(--ink); }
 .sp.is-on a { pointer-events: auto; }
-.sp__text { display: grid; gap: clamp(18px, 3vh, 34px); }
-.sp__label { display: flex; align-items: baseline; gap: 16px; color: var(--ink-dim); }
+.sp__text { position: absolute; top: 0; bottom: 0; box-sizing: border-box; padding-bottom: 3vh; display: grid; align-content: center; gap: clamp(14px, 2.4vh, 28px); }
+/* The first: words left of the card. The second: words right of it. */
+.sp--walk .sp__text { left: var(--gutter); width: calc(var(--c-left, 50vw) - var(--gutter) - 3.5vw); }
+.sp--beach .sp__text { left: calc(var(--c-right, 50vw) + 3.5vw); right: var(--gutter); }
+.sp__label { display: flex; align-items: baseline; gap: 16px; color: rgba(20, 18, 14, 0.74); }
 .sp__label b { font-weight: 500; color: var(--ink); }
-.sp__head { font-size: clamp(3rem, 0.6rem + 7.2vw, 9.6rem); line-height: 0.88; letter-spacing: -0.028em; margin-left: -0.04em; }
-.sp__head em { color: var(--accent-deep); }
+.sp__head { font-size: clamp(2.6rem, 0.5rem + 5.5vw, 7.2rem); line-height: 0.88; letter-spacing: -0.026em; margin-left: -0.04em; }
+.sp__head em { color: #a8431f; }
 .sp__mask { display: block; overflow: clip; padding-bottom: 0.12em; margin-bottom: -0.12em; }
-.sp__ln { display: block; }
+.sp__ln { display: block; white-space: nowrap; }
 /* The rule draws itself across under the headline. */
-.sp__rule { display: block; height: 1px; background: var(--accent-deep); transform-origin: 0 50%; }
-.sp__rows { margin: 0; display: grid; gap: 0; max-width: 40rem; }
-.sp__rows div { display: grid; grid-template-columns: 8.5rem 1fr; align-items: baseline; padding: 13px 0; border-bottom: 1px solid rgba(20, 18, 14, 0.16); }
-.sp__rows dt { font: 500 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-deep); font-variant-numeric: tabular-nums; }
-.sp__rows dd { margin: 0; font: 400 clamp(1.25rem, 1rem + 0.8vw, 1.7rem)/1.15 var(--serif); }
-.sp__price { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; font: 400 0.98rem/1.3 var(--sans); color: var(--ink-dim); }
-.sp__price b { font: 400 2.1rem/1 var(--serif); color: var(--ink); margin-right: -14px; }
-/* A postcard of the view just left, lying on the spread. */
-.sp__card { margin: 0; justify-self: center; width: min(100%, 30rem); padding: 4.2% 4.2% 0; box-sizing: border-box; background: var(--tooth), linear-gradient(135deg, #fffefa 0%, #fdf9ef 55%, #f6efdf 100%); background-size: 120px auto, auto;
-  box-shadow: 2px 4px 5px -1px rgba(58, 36, 14, 0.4), 14px 26px 48px -6px rgba(58, 36, 14, 0.3), 0 0 90px rgba(58, 36, 14, 0.14); }
-.sp__card img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; background: #d8cfbd; }
-.sp__card figcaption { display: flex; justify-content: space-between; align-items: center; height: 3.4rem; font: 500 9px/1 var(--sans); letter-spacing: 0.24em; text-transform: uppercase; color: #3b342a; }
-.sp__card figcaption span:last-child { color: #6d6252; }
-@media (max-width: 860px), (max-aspect-ratio: 85/100) {
-  .sp { grid-template-columns: 1fr; align-content: center; gap: 22px; padding-top: 84px; }
-  .sp__card { order: -1; width: min(62%, 17rem); justify-self: start; margin-left: 4%; }
-  .sp__card figcaption { height: 2.2rem; font-size: 7.5px; }
-  .sp__card figcaption span:last-child { display: none; }
-  .sp__head { font-size: clamp(2.7rem, 13.4vw, 5rem); }
-  .sp__rows div { grid-template-columns: 5.6rem 1fr; padding: 10px 0; }
-  .sp__rows dd { font-size: 1.12rem; }
-  .sp__price b { font-size: 1.7rem; }
+.sp__rule { display: block; height: 1px; background: #a8431f; transform-origin: 0 50%; }
+.sp__rows { margin: 0; display: grid; }
+.sp__rows div { display: grid; grid-template-columns: 7.5rem 1fr; align-items: baseline; padding: 12px 0; border-bottom: 1px solid rgba(20, 18, 14, 0.26); }
+/* (Ink, not the accent: small terracotta type sank into the palm's shadows on the sand.) */
+.sp__rows dt { font: 500 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(20, 18, 14, 0.86); font-variant-numeric: tabular-nums; }
+.sp__rows dd { margin: 0; font: 400 clamp(1.15rem, 0.9rem + 0.7vw, 1.55rem)/1.15 var(--serif); }
+.sp__price { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; font: 400 0.98rem/1.3 var(--sans); color: rgba(20, 18, 14, 0.82); }
+.sp__price b { font: 400 2.1rem/1 var(--serif); color: var(--ink); margin-right: -12px; }
+/* A tall screen: the card low and the words above it, then the card high and the words below. */
+@media (max-aspect-ratio: 85/100) {
+  .sp .sp__text { left: var(--gutter); right: var(--gutter); width: auto; padding: 0; gap: 10px; }
+  .sp--walk .sp__text { top: calc(max(18px, env(safe-area-inset-top)) + 58px); bottom: calc(100% - var(--c-top, 50vh) + 10px); }
+  .sp--beach .sp__text { top: calc(var(--c-bottom, 50vh) + 12px); bottom: max(14px, env(safe-area-inset-bottom)); }
+  .sp__head { font-size: clamp(2.5rem, 12.2vw, 4.6rem); }
+  .sp__rows div { grid-template-columns: 5.4rem 1fr; padding: 8px 0; }
+  .sp__rows dd { font-size: 1.05rem; }
+  .sp__price b { font-size: 1.6rem; }
+  .sp__price .button { padding: 13px 16px 12px 18px; }
 }
+
 /* ------------------------------------------------------------ the frame around the scene */
 
 .hud { position: fixed; z-index: 10; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 44px; padding: max(18px, env(safe-area-inset-top)) var(--gutter) 0; pointer-events: none; color: var(--cream); text-shadow: var(--shadow); opacity: 0; transition: color 0.9s var(--ease), text-shadow 0.9s var(--ease); }
@@ -417,13 +419,13 @@ html.scroll.at-hero #stage { cursor: pointer; }
 </style>
 </head>
 <body>
-  <!-- The table (v35): the beach's own sand seen from straight above, and a postcard lying on
-       it. The picture on the card is the live scene (#stage), held still. Scrolling brings the
-       card up until its picture is the whole screen (src/scroll/postcard.js). For the tools
-       these wrappers make no boxes at all (page.css). -->
+  <!-- The table (v35): a photograph of sand in the shade of a palm, and a postcard lying on it.
+       The picture on the card is the live scene (#stage), held still. Scrolling brings the card
+       up until its picture is the whole screen (src/scroll/postcard.js). For the tools these
+       wrappers make no boxes at all (page.css). -->
   <div class="table">
     <div class="world">
-      <canvas class="ground" aria-hidden="true"></canvas>
+      <div class="ground" aria-hidden="true"></div>
       <div class="card">
         <div class="card__shadow"></div>
         <div class="card__flip">
@@ -484,10 +486,11 @@ html.scroll.at-hero #stage { cursor: pointer; }
     <!-- The curtain: blank paper over everything for a jump from the menu. -->
     <div class="cover" aria-hidden="true"></div>
 
-    <!-- The spreads: twice on the way down the scroll holds the camera and the page turns to
-         paper (src/scroll/spreads.js; where, in SPREADS in scroll.js). The postcard on each is
-         a snapshot of the view the visitor is leaving. -->
-    <section class="sp sp--walk" data-hold="walk" aria-label="The walk">
+    <!-- The spreads: twice on the way down the frame goes back to being a postcard on the sand
+         (the hero's dive in reverse), with these words beside it: left of the card the first
+         time, right of it the second (src/scroll/spreads.js; where, in SPREADS in scroll.js).
+         data-caption: what the card says under its picture there. -->
+    <section class="sp sp--walk" data-hold="walk" data-caption="From the steps, 120 m" aria-label="The walk">
       <div class="sp__text">
         <p class="label sp__label"><b>The walk</b><span>06:10</span></p>
         <h2 class="display sp__head"><span class="sp__mask"><span class="sp__ln">Six walkers.</span></span><span class="sp__mask"><span class="sp__ln">One <em>guide</em>.</span></span></h2>
@@ -498,9 +501,8 @@ html.scroll.at-hero #stage { cursor: pointer; }
           <div><dt>You carry</dt><dd>Water. We carry the rest.</dd></div>
         </dl>
       </div>
-      <figure class="sp__card"><img alt="" width="900" height="600"><figcaption><span>From the steps, 120 m</span><span>Kelingking</span></figcaption></figure>
     </section>
-    <section class="sp sp--beach" data-hold="beach" aria-label="The beach">
+    <section class="sp sp--beach" data-hold="beach" data-caption="Above the beach, 55 m" aria-label="The beach">
       <div class="sp__text">
         <p class="label sp__label"><b>The beach</b><span>07:10 to 17:40</span></p>
         <h2 class="display sp__head"><span class="sp__mask"><span class="sp__ln">Then a whole day</span></span><span class="sp__mask"><span class="sp__ln">of <em>nothing</em>.</span></span></h2>
@@ -512,7 +514,6 @@ html.scroll.at-hero #stage { cursor: pointer; }
         </dl>
         <p class="sp__price"><b>US$ 240</b> a walker, April to October <a class="button" href="#reserve">Reserve a morning</a></p>
       </div>
-      <figure class="sp__card"><img alt="" width="900" height="600"><figcaption><span>Above the beach, 55 m</span><span>Kelingking</span></figcaption></figure>
     </section>
 
     <header class="hud">
@@ -94777,7 +94778,8 @@ const { decodeBake } = __m["src/terrain/bake-format.js"];
 
 // Where the assets are (v11): next to the page, or, in the standalone build, on the CDN it sets
 // in globalThis.__klAssets ({ textures, bake }).
-const ASSETS = globalThis.__klAssets ?? { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin' };
+// (hero: the photograph of sand the landing page's postcard lies on, v35.)
+const ASSETS = { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin', hero: 'assets/hero/sand.jpg', ...globalThis.__klAssets };
 
 // capture: a still for the tools (pixel ratio 1, 2048 terrain, the drawing buffer kept for
 // screenshots). keepBuffer: keep the drawing buffer without the rest (recording the scroll).
@@ -95733,8 +95735,8 @@ return { "PACE": PACE, "STOPS": STOPS, "buildDescent": buildDescent, "makePace":
 // src/scroll/postcard.js
 __m["src/scroll/postcard.js"] = (function () {
 "use strict";
-// The postcard (v35): the page opens on the beach's sand seen from straight above, with a
-// postcard lying on it, and ends on the back of the same card.
+// The postcard (v35): the page opens on sand in the shade of a palm, with a postcard lying on
+// it. Twice on the way down the frame goes back to being that card, and the page ends on its back.
 //
 // The picture on the card is not a picture. It is the live canvas (#stage), the size of the
 // screen as always, sitting inside a "world" that is scaled down, turned and moved so the
@@ -95742,13 +95744,19 @@ __m["src/scroll/postcard.js"] = (function () {
 // shadow and print finish are plain elements in the same world. Bringing the card up is then
 // one transform going back to nothing: at the end of the dive the world has no transform, the
 // clip is gone, and the page is exactly what it was before v35, a full-screen canvas. Nothing
-// is cross-faded, so there is no seam.
+// is cross-faded, so there is no seam. Putting it down again is the same thing backwards.
 //
-// The sand is in the world too, so it grows with the card, as it would for a camera coming
-// down onto a table. What sells "flat" at rest is done by the caller (scroll.js): the camera
-// is locked and the sea's clock is stopped.
+// The card has several places to rest (POSES): the hero, one for each spread, the ending. The
+// caller (scroll.js) says which, and how far up the card is from it (`up`: 0 at rest, 1 the
+// picture is the screen). It changes pose only while the picture is the screen.
 //
-// Everything here is DOM and CSS. The scene is not touched.
+// The sand is in the world too, so it grows and turns with the card, as it would for a camera
+// coming down onto a table. It is a photograph composed for the screen (a palm's tip in one
+// corner, a shell in another), so it is laid in the world undoing the world's own resting
+// transform: at rest, in every pose, it fills the screen exactly as it was made.
+//
+// What sells "flat" at rest is done by the caller: the camera is stopped and so is the sea's
+// clock. Everything here is DOM and CSS. The scene is not touched.
 
 const clamp01 = (x) => Math.min(Math.max(x, 0), 1);
 const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
@@ -95756,16 +95764,32 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 // The card's shape and where it rests, as shares of the screen. x, y: the middle of the paper.
-// w: the picture's width. rz: its turn on the sand, in degrees.
-const REST = {
-  wide: { shape: 1.5, hero: { x: 0.705, y: 0.5, w: 0.4, h: 0.52, rz: -6 }, end: { x: 0.5, y: 0.492, rz: -2 } },
-  tall: { shape: 0.66, hero: { x: 0.52, y: 0.672, w: 0.56, h: 0.5, rz: -4.5 }, end: { x: 0.5, y: 0.46, rz: -1.5 } },
+// w, h: the most of the screen its picture may take. rz: its turn on the sand, in degrees.
+const POSES = {
+  wide: {
+    shape: 1.5,
+    hero: { x: 0.705, y: 0.5, w: 0.4, h: 0.52, rz: -6 },
+    walk: { x: 0.71, y: 0.5, w: 0.39, h: 0.5, rz: 3.5 },      // the first spread: card right, words left
+    beach: { x: 0.29, y: 0.5, w: 0.39, h: 0.5, rz: 5 },       // the second: card left, words right
+    end: { x: 0.5, y: 0.492, rz: -2 },
+  },
+  tall: {
+    shape: 0.66,
+    hero: { x: 0.52, y: 0.672, w: 0.56, h: 0.5, rz: -4.5 },
+    walk: { x: 0.5, y: 0.74, w: 0.6, h: 0.3, rz: 3.5 },       // card low, words above
+    beach: { x: 0.5, y: 0.275, w: 0.6, h: 0.29, rz: -3.5 },   // card high, words below
+    end: { x: 0.5, y: 0.46, rz: -1.5 },
+  },
 };
 // The white border as a share of the picture's width: sides and top, and the wider foot that
 // carries the caption.
 const BORDER = 0.042, FOOT = 0.108;
 // How far the eye is from the card for the tilt and the flip, in screen pixels.
 const EYE = 1900;
+// The sand is laid a little larger than the screen at rest: on the way up the card's world
+// turns and slides against it, and an edge of the photograph must never come into view. How
+// much larger is worked out for each pose and screen (sandOver), plus this much to spare.
+const SAND_SPARE = 1.015;
 
 // A tile of noise as a picture: specks of one colour, their alpha `gain` times a random number
 // plus `bias` (so most of the tile is clear). Two sizes of speck, so it is not TV static.
@@ -95795,7 +95819,9 @@ function noiseTile(size, rgb, gain, bias, seed, soft = false) {
   return `url(${big.toDataURL('image/png')})`;
 }
 
-function createPostcard({ reduced = false } = {}) {
+// captions: what is printed under the picture in each pose, { pose: [left, right] } (the hero's
+// is in the page's markup and stands for any pose not named).
+function createPostcard({ reduced = false, captions = {} } = {}) {
   const $ = (s) => document.querySelector(s);
   const html = document.documentElement;
   // (Soft and faint. As fine specks it sparkled at the card's resting size and read as
@@ -95805,67 +95831,103 @@ function createPostcard({ reduced = false } = {}) {
   const table = $('.table'), world = $('.world'), ground = $('.ground'), card = $('.card'), flipEl = $('.card__flip');
   const finish = $('.card__finish'), light = $('.table__light'), stage = $('#stage'), back = $('.back');
   const paper = $('.card__paper'), shadow = $('.card__shadow'), caption = $('.card__caption');
-  let L = null, last = '';
+  const captionEls = [...caption.querySelectorAll('span')], captionOwn = captionEls.map((e) => e.textContent);
+  let L = null, last = '', posed = null;
   const tilt = { x: 0, y: 0, tx: 0, ty: 0, nx: 0, tnx: 0, live: 0 };
-  const state = { dive: 0, out: 0, flip: 0, settle: 1 };
+  const state = { pose: 'hero', up: 0, flip: 0, settle: 1 };
 
   function layout() {
     const vw = table.clientWidth, vh = table.clientHeight, tall = vw / vh < 0.85;
-    const R = tall ? REST.tall : REST.wide;
+    const R = tall ? POSES.tall : POSES.wide;
     // The picture: the middle of the frame, cut to a postcard's shape.
     const shape = tall ? R.shape : Math.min(vw / vh, R.shape);
     const cw = Math.min(vw, vh * shape), ch = cw / shape;
     const b = cw * BORDER, bb = cw * FOOT;
     const pw = cw + 2 * b, ph = ch + b + bb;
-    const A = { ...R.hero, s: Math.min((R.hero.w * vw) / cw, (R.hero.h * vh) / ch) };
-    // At the end the card is as big as the screen lets it be: its back has to be read.
-    const B = { ...R.end, s: tall ? Math.min((0.92 * vw) / pw, (0.74 * vh) / ph) : Math.min(Math.min(0.66 * vw, 1040) / pw, (0.7 * vh) / ph) };
-    // The sand has to reach every corner of the screen from wherever the card rests.
-    const reach = (P) => (2 * (Math.max(P.x, 1 - P.x, P.y, 1 - P.y) + 0.16)) / P.s;
-    const G = Math.max(reach(A), reach(B));
-    L = { vw, vh, tall, cw, ch, b, bb, pw, ph, A, B, G };
-    ground.style.transform = `scale(${G.toFixed(3)})`;
+    const P = {}, sand = {}, box = {};
+    for (const name of ['hero', 'walk', 'beach', 'end']) {
+      const p = R[name];
+      // At the end the card is as big as the screen lets it be: its back has to be read.
+      const s = name === 'end' ? (tall ? Math.min((0.92 * vw) / pw, (0.74 * vh) / ph) : Math.min(Math.min(0.66 * vw, 1040) / pw, (0.7 * vh) / ph))
+        : Math.min((p.w * vw) / cw, (p.h * vh) / ch);
+      const r = (p.rz * Math.PI) / 180, off = ((bb - b) / 2) * s;
+      // The world's move at rest: the picture's middle sits `off` above the paper's.
+      const tx = p.x * vw + Math.sin(r) * off - vw / 2, ty = p.y * vh - Math.cos(r) * off - vh / 2;
+      P[name] = { x: p.x, y: p.y, rz: p.rz, s, tx, ty };
+      // The sand for this pose: the inverse of the world's transform at rest, a little larger.
+      const over = sandOver(P[name], vw, vh) * SAND_SPARE;
+      sand[name] = `scale(${(over / s).toFixed(5)}) rotate(${(-p.rz).toFixed(3)}deg) translate(${(-tx).toFixed(2)}px, ${(-ty).toFixed(2)}px)`;
+      // The paper's edges on the screen at rest (it is turned), for the words beside it.
+      const hw = (pw * s * Math.abs(Math.cos(r)) + ph * s * Math.abs(Math.sin(r))) / 2, hh = (pw * s * Math.abs(Math.sin(r)) + ph * s * Math.abs(Math.cos(r))) / 2;
+      box[name] = { left: p.x * vw - hw, right: p.x * vw + hw, top: p.y * vh - hh, bottom: p.y * vh + hh };
+    }
+    L = { vw, vh, tall, cw, ch, b, bb, pw, ph, P, sand, box };
+    posed = null;
     card.style.setProperty('--cw', `${cw.toFixed(1)}px`);
     card.style.setProperty('--ch', `${ch.toFixed(1)}px`);
     card.style.setProperty('--b', `${b.toFixed(1)}px`);
     card.style.setProperty('--bb', `${bb.toFixed(1)}px`);
     flipEl.style.transformOrigin = `50% calc(50% + ${((bb - b) / 2).toFixed(1)}px)`;
-    back.style.width = `${(pw * B.s).toFixed(1)}px`;
-    back.style.height = `${(ph * B.s).toFixed(1)}px`;
-    back.style.left = `${(B.x * vw).toFixed(1)}px`;
-    back.style.top = `${(B.y * vh).toFixed(1)}px`;
-    // Where the card's edges are at rest, for the words beside or above it.
-    const turn = Math.abs(Math.sin((A.rz * Math.PI) / 180));
-    html.style.setProperty('--card-left', `${(A.x * vw - (pw * A.s) / 2 - (ph * A.s * turn) / 2).toFixed(0)}px`);
-    html.style.setProperty('--card-top', `${(A.y * vh - (ph * A.s) / 2 - (pw * A.s * turn) / 2).toFixed(0)}px`);
-    html.style.setProperty('--card-bottom', `${(A.y * vh + (ph * A.s) / 2 + (pw * A.s * turn) / 2).toFixed(0)}px`);
+    back.style.width = `${(pw * P.end.s).toFixed(1)}px`;
+    back.style.height = `${(ph * P.end.s).toFixed(1)}px`;
+    back.style.left = `${(P.end.x * vw).toFixed(1)}px`;
+    back.style.top = `${(P.end.y * vh).toFixed(1)}px`;
+    // Where the hero's card is, for the words beside or above it (page.css).
+    html.style.setProperty('--card-left', `${box.hero.left.toFixed(0)}px`);
+    html.style.setProperty('--card-top', `${box.hero.top.toFixed(0)}px`);
+    html.style.setProperty('--card-bottom', `${box.hero.bottom.toFixed(0)}px`);
     last = '';
     apply();
   }
 
-  // dive: 0 the card at rest in the hero, 1 its picture is the screen. out: 0 to 1, back down
-  // onto the sand at the end. flip: 0 to 1, over onto its back. settle: 0 to 1, the camera
-  // easing back to rest as the page opens.
+  // How much larger than the screen the sand has to be at rest in a pose for it to cover the
+  // screen all the way up: every corner of the screen, at every step of the world's move
+  // (as apply() makes it), taken back into the sand's own frame.
+  function sandOver(P, vw, vh) {
+    let k = 1;
+    for (let i = 0; i <= 80; i++) {
+      const e = i / 80, m = Math.pow(1 - e, 1.6), se = Math.exp((1 - e) * Math.log(P.s));
+      const a = ((P.rz - P.rz * m) * Math.PI) / 180, cos = Math.cos(a), sin = Math.sin(a), f = P.s / se;
+      for (const [qx, qy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+        const x = (qx * vw) / 2 - P.tx * m, y = (qy * vh) / 2 - P.ty * m;
+        const wx = f * (cos * x - sin * y), wy = f * (sin * x + cos * y);
+        k = Math.max(k, Math.abs(wx) / (vw / 2 - Math.sign(wx) * P.tx), Math.abs(wy) / (vh / 2 - Math.sign(wy) * P.ty));
+      }
+    }
+    return k;
+  }
+
+  // pose: where the card rests (a name in POSES). up: 0 at rest there, 1 its picture is the
+  // screen. flip: 0 to 1, over onto its back (the ending). settle: 0 to 1, the camera easing
+  // back to rest as the page opens.
   function set(v) { Object.assign(state, v); apply(); }
 
   function apply() {
     if (!L) return;
     const { vw, vh, cw, ch, b, bb } = L;
-    const ending = state.out > 0;
-    const P = ending ? L.B : L.A;
-    const raw = ending ? 1 - state.out : state.dive;
+    const P = L.P[state.pose] ?? L.P.hero;
+    const raw = clamp01(state.up);
     const e = raw >= 1 ? 1 : raw <= 0 ? 0 : ease(raw);
     const full = e >= 1;
     // The print finish: on at rest, and the first thing to go as the card leaves the sand (it
     // is overlays over the whole canvas: free while nothing is drawn, not while the scene
     // draws every frame under it).
-    const f = ending ? smooth(0.72, 0.98, state.out) : 1 - smooth(0.02, 0.2, state.dive);
+    const f = 1 - smooth(0.02, 0.24, raw);
     const flip = state.flip;
-    const key = [e, f, flip, state.settle, tilt.x, tilt.y, tilt.nx].map((n) => n.toFixed(4)).join();
+    const key = state.pose + [e, f, flip, state.settle, tilt.x, tilt.y, tilt.nx].map((n) => n.toFixed(4)).join();
     if (key === last) return;
     last = key;
     table.classList.toggle('is-full', full);
-    table.classList.toggle('is-end', ending);
+    // (A new pose is taken while the picture is the whole screen and hides the sand: the sand
+    // is laid for it, the caption changed, the light moved to the side the words will be.)
+    if (posed !== state.pose) {
+      posed = state.pose;
+      ground.style.transform = L.sand[posed] ?? L.sand.hero;
+      const text = captions[posed] ?? captionOwn;
+      captionEls.forEach((el, i) => { el.textContent = text[i] ?? captionOwn[i]; });
+      table.classList.toggle('is-end', posed === 'end');
+      table.classList.toggle('words-right', posed === 'beach' && !L.tall);
+    }
 
     if (full) {
       world.style.transform = 'none';
@@ -95880,9 +95942,7 @@ function createPostcard({ reduced = false } = {}) {
     // Scale goes exponentially (a steady zoom), place and turn settle early.
     const s = Math.exp((1 - e) * Math.log(P.s)) * (1 + 0.07 * (1 - state.settle));
     const m = Math.pow(1 - e, 1.6);
-    const rz = P.rz * m, r = (P.rz * Math.PI) / 180, off = ((bb - b) / 2) * P.s;
-    const tx = (P.x * vw + Math.sin(r) * off - vw / 2) * m, ty = (P.y * vh - Math.cos(r) * off - vh / 2) * m;
-    world.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotate(${rz.toFixed(3)}deg) scale(${s.toFixed(5)})`;
+    world.style.transform = `translate3d(${(P.tx * m).toFixed(2)}px, ${(P.ty * m).toFixed(2)}px, 0) rotate(${(P.rz * m).toFixed(3)}deg) scale(${s.toFixed(5)})`;
 
     // The picture's window opens to the whole frame over the last part of the way up.
     const k = smooth(0.45, 1, e);
@@ -95893,7 +95953,7 @@ function createPostcard({ reduced = false } = {}) {
     // and nothing repainted while the scene is drawing at full size underneath.
     const sx = (ww + 2 * b) / (cw + 2 * b), sy = Math.max((wh / 2 + b) / (ch / 2 + b), (wh / 2 + bb) / (ch / 2 + bb));
     paper.style.transform = `scale(${sx.toFixed(5)}, ${sy.toFixed(5)})`;
-    caption.style.opacity = (ending ? smooth(0.5, 0.85, state.out) : 1 - smooth(0.18, 0.42, state.dive)).toFixed(3);
+    caption.style.opacity = (1 - smooth(0.16, 0.46, raw)).toFixed(3);
 
     finish.style.opacity = f.toFixed(3);
     finish.style.visibility = f > 0.003 ? 'visible' : 'hidden';
@@ -95913,7 +95973,7 @@ function createPostcard({ reduced = false } = {}) {
       ? `perspective(${(EYE / s).toFixed(0)}px) rotateX(${tilt.x.toFixed(3)}deg) rotateY(${(tilt.y + 180 * flip).toFixed(3)}deg) scale(${lift.toFixed(4)})`
       : 'none';
     back.style.visibility = turned ? 'visible' : 'hidden';
-    if (turned) back.style.transform = `translate(-50%, -50%) rotate(${L.B.rz}deg) perspective(${EYE}px) rotateY(${(180 * flip - 180).toFixed(3)}deg) scale(${lift.toFixed(4)})`;
+    if (turned) back.style.transform = `translate(-50%, -50%) rotate(${L.P.end.rz}deg) perspective(${EYE}px) rotateY(${(180 * flip - 180).toFixed(3)}deg) scale(${lift.toFixed(4)})`;
     // The shadow on the sand narrows with the card as it turns and slides out a little as it
     // lifts. Once turned, the back brings its own.
     const far = (lift - 1) * cw;
@@ -95921,7 +95981,8 @@ function createPostcard({ reduced = false } = {}) {
     shadow.style.opacity = turned ? '0' : (1 - 3 * (lift - 1)).toFixed(3);
   }
 
-  // The lean toward the pointer: a card on sand is never quite flat. Only at rest in the hero.
+  // The lean toward the pointer: a card on sand is never quite flat. Only near rest, and not
+  // at the ending (where it turns over).
   if (!reduced && matchMedia('(hover: hover) and (pointer: fine)').matches) {
     addEventListener('pointermove', (ev) => {
       if (!L || ev.pointerType !== 'mouse') return;
@@ -95930,7 +95991,7 @@ function createPostcard({ reduced = false } = {}) {
     }, { passive: true });
   }
   function tick(dt) {
-    const want = state.out > 0 ? 0 : 1 - smooth(0, 0.3, state.dive);
+    const want = state.pose === 'end' ? 0 : 1 - smooth(0, 0.3, clamp01(state.up));
     tilt.live += (want - tilt.live) * (1 - Math.exp(-8 * dt));
     const k = 1 - Math.exp(-5 * dt);
     const x = tilt.tx * tilt.live, y = tilt.ty * tilt.live;
@@ -95943,7 +96004,9 @@ function createPostcard({ reduced = false } = {}) {
   return {
     layout, set, tick, ground, back, state,
     get L() { return L; },
-    // Is the picture standing still (so no frame has to be drawn)?
+    // The resting card's edges on the screen in a pose: { left, right, top, bottom } in pixels.
+    box: (pose) => L?.box[pose] ?? null,
+    // Is the card on its back (so the picture cannot be seen, and no frame has to be drawn)?
     get turned() { return state.flip > 0.5; },
   };
 }
@@ -95953,111 +96016,87 @@ return { "createPostcard": createPostcard };
 // src/scroll/spreads.js
 __m["src/scroll/spreads.js"] = (function () {
 "use strict";
-// The spreads (v35): twice on the way down the scroll holds the camera and the page turns to
-// paper for a magazine spread (index.html, .sp). It is where the offer is spelled out: who
-// goes, how far, what the day holds, what it costs. The walk itself stays a walk.
+// The spreads (v35): twice on the way down the frame goes back to being a postcard on the sand,
+// the hero's dive run backwards, and a piece of the offer is set beside it: who goes and how
+// far, then the day and what it costs. Scrolling on dives back into the card.
 //
-// A spread fades over the scene just before its hold and off just after it. Its words come in
-// once the paper is nearly solid, on GSAP's clock like every other reveal on the page (so the
-// frame-by-frame recorder sees them as a visitor does). The postcard lying on it is a snapshot
-// of the live canvas, taken as the paper starts to come over, so it shows the view the visitor
-// is leaving, in the light of that moment.
+// The card and the sand are postcard.js's, and where the scroll does this is scroll.js's
+// (SPREADS). This is only the words: they come in as the card lands, on GSAP's clock like
+// every other reveal on the page, and go as it lifts. The first is on the left of its card,
+// the second on the right (page.css, .sp).
 
 const { gsap } = __m["global:gsap"];
 
-const clamp01 = (x) => Math.min(Math.max(x, 0), 1);
-const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
-
-// How many screens the paper takes to come over (and to lift).
-const FADE = 0.3;
 const EASE = 'expo.out';
+// The words come in once the landing card is this near to rest (0 at rest, 1 full screen), and
+// go as soon as it has lifted this far: the card grows over where they are.
+const NEAR = 0.1, LIFTED = 0.03;
 
-// holds: the page's holds ({ id, y, len }, scroll.js). app: the scene.
-function createSpreads({ app, holds, onReserve, reduced = false }) {
+function createSpreads({ reduced = false, onReserve } = {}) {
   const list = [...document.querySelectorAll('.sp[data-hold]')].map((node) => {
-    const h = holds.find((x) => x.id === node.dataset.hold);
-    if (!h) return null;
-    node.querySelectorAll('a[href="#reserve"]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); onReserve(); }));
+    node.querySelectorAll('a[href="#reserve"]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); onReserve?.(); }));
     const q = (sel) => [...node.querySelectorAll(sel)];
-    const s = { h, node, img: node.querySelector('.sp__card img'), a: -1, on: false, shot: false, set: false, gone: false, tl: null,
-      lines: q('.sp__ln'), rule: q('.sp__rule'), small: q('.sp__label, .sp__rows div, .sp__price'), card: q('.sp__card'),
-      turn: node.classList.contains('sp--beach') ? -1 : 1 };
+    const s = { id: node.dataset.hold, node, on: false, tl: null, up: 1, rising: false, lines: q('.sp__ln'), rule: q('.sp__rule'), small: q('.sp__label, .sp__rows div, .sp__price') };
+    node.inert = true;
     rest(s);
     return s;
-  }).filter(Boolean);
+  });
 
-  // Before its words come in: the lines under their masks, the rule undrawn, the card off the
-  // paper and turned. Only ever set while the spread itself is invisible.
+  // Before the words come in: the lines under their masks, the rule undrawn.
   function rest(s) {
-    s.tl?.kill();
     gsap.set(s.lines, { yPercent: 108 });
-    gsap.set(s.rule, { scaleX: 0 });
+    gsap.set(s.rule, { scaleX: 0, opacity: 1 });
     gsap.set(s.small, { opacity: 0, y: 12 });
-    gsap.set(s.card, { opacity: 0, y: 46, rotation: 9 * s.turn, scale: 1.06 });
-    s.set = s.gone = false;
   }
   function show(s) {
     s.tl?.kill();
+    rest(s);
     const d = reduced ? 0 : 1.1, t = (s.tl = gsap.timeline());
+    t.set(s.node, { visibility: 'visible' });
     t.to(s.lines, { yPercent: 0, duration: d, ease: EASE, stagger: 0.09 }, 0);
     t.to(s.rule, { scaleX: 1, duration: d * 1.3, ease: EASE }, reduced ? 0 : 0.25);
     t.to(s.small, { opacity: 1, y: 0, duration: d * 0.9, ease: EASE, stagger: 0.07 }, reduced ? 0 : 0.3);
-    // The card is dropped onto the page: it lands a little turned.
-    t.to(s.card, { opacity: 1, duration: d * 0.5, ease: 'power2.out' }, reduced ? 0 : 0.15);
-    t.to(s.card, { y: 0, rotation: 3.8 * s.turn, scale: 1, duration: d * 1.35, ease: EASE }, reduced ? 0 : 0.15);
-    s.set = true;
   }
-  // Going out, the spread lifts off as one with the scroll and is put back to rest once it is
-  // gone. Only the card goes first, and quickly: a dark photograph cross-fading over a bright
-  // scene lingers as a ghost rectangle long after the pale paper round it has gone.
-  function lift(s, gone) {
-    if (!s.set || gone === s.gone) return;
-    s.gone = gone;
-    gsap.to(s.card, { opacity: gone ? 0 : 1, duration: reduced ? 0 : gone ? 0.22 : 0.4, ease: 'power1.out', overwrite: 'auto' });
+  function hide(s) {
+    s.tl?.kill();
+    const d = reduced ? 0 : 0.4, t = (s.tl = gsap.timeline());
+    t.to(s.lines, { yPercent: -108, duration: d, ease: EASE, stagger: 0.04 }, 0);
+    t.to([...s.rule, ...s.small], { opacity: 0, duration: d * 0.7, ease: EASE }, 0);
+    t.set(s.node, { visibility: 'hidden' });
   }
 
-  // The snapshot, drawn through a canvas kept off the page and handed to the card as a
-  // picture. (Near-black under it: the scene's canvas is part see-through, see page.css.)
-  const film = document.createElement('canvas');
-  film.width = 900; film.height = 600;
-  const g = film.getContext('2d');
-  function shoot(s) {
-    app.renderFrame();
-    const src = app.renderer.domElement, k = Math.max(film.width / src.width, film.height / src.height);
-    g.fillStyle = '#12110e'; g.fillRect(0, 0, film.width, film.height);
-    g.drawImage(src, (film.width - src.width * k) / 2, (film.height - src.height * k) / 2, src.width * k, src.height * k);
-    s.img.src = film.toDataURL('image/jpeg', 0.9);
-  }
-
-  const api = {
-    // How much of the scene is under paper, 0 to 1.
-    cover: 0,
-    // y: the page's place in screens. quiet: nothing may show (a rewind, a jump from the menu).
-    update(y, quiet) {
-      let cover = 0;
+  return {
+    // Where each card rests (postcard.js): its words keep clear of it.
+    layout(post) {
       for (const s of list) {
-        const y0 = s.h.y, y1 = s.h.y + s.h.len;
-        const a = quiet ? 0 : smooth(y0 - FADE, y0, y) * (1 - smooth(y1, y1 + FADE, y));
-        if (a > 0.001 && !s.shot) { s.shot = true; shoot(s); }
-        if (a <= 0.001) { s.shot = false; if (s.set) rest(s); }
-        if (a !== s.a) {
-          s.a = a;
-          s.node.style.opacity = a.toFixed(3);
-          s.node.style.visibility = a > 0.002 ? 'visible' : 'hidden';
-        }
-        const on = a > 0.88;
-        if (on !== s.on) { s.on = on; s.node.classList.toggle('is-on', on); s.node.inert = !on; if (on && !s.set) show(s); }
-        lift(s, a < 0.86);
-        cover = Math.max(cover, a);
+        const b = post.box(s.id);
+        if (b) for (const k of ['left', 'right', 'top', 'bottom']) s.node.style.setProperty(`--c-${k}`, `${b[k].toFixed(0)}px`);
       }
-      api.cover = cover;
+    },
+    // card: which pose the card is in (scroll.js). up: how far it is from rest there.
+    // quiet: nothing may show (a rewind, a jump from the menu).
+    update(card, up, quiet) {
+      for (const s of list) {
+        const mine = card === s.id ? up : 1;
+        if (mine > s.up + 1e-6) s.rising = true; else if (mine < s.up - 1e-6) s.rising = false;
+        s.up = mine;
+        const on = !quiet && mine < (s.rising ? LIFTED : NEAR);
+        if (on === s.on) continue;
+        s.on = on;
+        s.node.classList.toggle('is-on', on);
+        s.node.inert = !on;
+        on ? show(s) : hide(s);
+      }
     },
   };
-  for (const s of list) s.node.inert = true;
-  return api;
 }
 
-return { "createSpreads": createSpreads };
+// What each spread's card says under its picture (index.html, data-caption), for postcard.js.
+function spreadCaptions() {
+  return Object.fromEntries([...document.querySelectorAll('.sp[data-hold][data-caption]')].map((n) => [n.dataset.hold, [n.dataset.caption, 'Kelingking']]));
+}
+
+return { "createSpreads": createSpreads, "spreadCaptions": spreadCaptions };
 })();
 // src/scroll/scroll.js
 __m["src/scroll/scroll.js"] = (function () {
@@ -96078,7 +96117,8 @@ __m["src/scroll/scroll.js"] = (function () {
 //                   stopped: a picture. From the first scroll the sea starts and the camera
 //                   sets off, so the scene moves inside the card well before it is full screen.
 //   the descent     path.js, from TAU0 (the card's picture) to 5 (the water's edge)
-//   the spreads     twice the scroll holds the camera under a paper spread (spreads.js)
+//   the spreads     twice the frame goes back to being a postcard on the sand (the dive run
+//                   backwards), words beside it, and then the dive again (spreads.js)
 //   the day         at LAPSE.tau it holds it again, over the cove from 88 m, and the scroll
 //                   turns the sun instead: morning through noon to evening
 //   the ending      the frame goes back to being a card on the sand, and turns over
@@ -96099,14 +96139,14 @@ __m["src/scroll/scroll.js"] = (function () {
 const { gsap } = __m["global:gsap"];
 const { SplitText } = __m["global:gsap/SplitText.js"];
 const Lenis = __m["global:lenis"]["default"];
-const { createApp } = __m["src/app.js"];
+const { createApp, ASSETS } = __m["src/app.js"];
 const { buildPanel } = __m["src/debug.js"];
 const { SHOTS } = __m["src/shots.js"];
 const { ORIGIN } = __m["src/terrain/geo.js"];
 const { walkLine } = __m["src/trail/route.js"];
 const { buildDescent, makePace, STOPS } = __m["src/scroll/path.js"];
 const { createPostcard } = __m["src/scroll/postcard.js"];
-const { createSpreads } = __m["src/scroll/spreads.js"];
+const { createSpreads, spreadCaptions } = __m["src/scroll/spreads.js"];
 
 gsap.registerPlugin(SplitText);
 
@@ -96122,12 +96162,12 @@ const LOOK_HOLD = 0.6, LOOK_BACK = 3.2;
 
 // The card's picture: this far down the flight (high over the bay, the whole headland in it).
 const TAU0 = 0.5;
-// The dive, in screens of scroll. The camera sets off this share of the way into it and eases
-// up to the scroll's speed over CAM_EASE screens: from the first touch, in other words. (The
-// first iteration held it for 60% of the dive, and Sam's note was that he scrolled and scrolled
-// and nothing moved until the picture was the screen. The card itself still grows slowly at
-// first, so the scene is seen turning while it is plainly still a card.)
-const HERO = 1.7, CAM_START = 0, CAM_EASE = 0.05;
+// The dive, in screens of scroll. The camera sets off at the first touch and is up to the
+// scroll's speed within START_EASE screens. (The first iteration held it for 60% of the dive,
+// and Sam's note was that he scrolled and scrolled and nothing moved until the picture was the
+// screen. The card itself still grows slowly at first, so the scene is seen turning while it is
+// plainly still a card.)
+const HERO = 1.7, START_EASE = 0.1;
 // The sea wakes over this stretch of the dive (0 a still picture, 1 its own clock).
 const WAKE = [0.015, 0.22];
 // The day. The page opens in morning light: about ten on the photo's day, the first hour the
@@ -96139,16 +96179,17 @@ const WAKE = [0.015, 0.22];
 const DAY = { from: 10.3, noon: 12, to: 17, ev: [0.15, 0, 0.5], clock: [7 + 10 / 60, 17 + 40 / 60] };
 // Where the scroll holds the camera and turns the sun through that day instead, and for how
 // many screens (the cove from 88 m, at the top of the switchbacks).
-const LAPSE = { tau: 2.2, len: 1.8 };
-// Where it holds under a paper spread (spreads.js), and for how many screens.
-const SPREADS = [{ id: 'walk', tau: 1.32, len: 1.15 }, { id: 'beach', tau: 3.02, len: 1.15 }];
+const LAPSE = { tau: 2.2, len: 1.8, easeIn: 0.3, easeOut: 0.3 };
+// The spreads: where on the way down the frame goes back to being a card on the sand (the hero's
+// dive in reverse), rests with its words, and is dived into again. In screens: `in` for the
+// card to come down, `rest` at rest, `out` to go back in. The camera keeps walking while the
+// card comes down and slows to a stop over the last `easeIn` of it, and it is walking again
+// `easeOut` into the way back in: the scene moves inside the card both ways.
+const SPREADS = [{ id: 'walk', tau: 1.32 }, { id: 'beach', tau: 3.02 }];
+const SPREAD = { in: 0.9, rest: 0.9, out: 1.05, easeIn: 0.6, easeOut: 0.2 };
 // The ending, in screens, and the shares of it for the frame going back to a card, and the
 // card turning over.
 const OUTRO = 2.6, OUT_CARD = [0, 0.46], OUT_FLIP = [0.5, 0.8], OUT_WORDS = 0.6, OUT_STAMP = 0.79;
-// Where the sand under the card is photographed: a spot on the upper beach, from this high,
-// through this lens, and in this light whatever the scene's is (a low sun rakes across the
-// sand's relief, where noon flattens it to a cream wall).
-const SAND = { at: [118, 212], up: 3.4, fov: 40, light: 'evening', lift: 'rgba(244, 216, 170, 0.24)' };
 // Turning to the boat at the water's edge: over this stretch, to put it this far across. The
 // eye comes up a little as it does (from 1.6 m above the swash a breaking wave stands as high
 // as the horizon and hides the hull each time it rears), and the lens closes in.
@@ -96181,47 +96222,73 @@ function startScroll({ params }) {
   const stage = $('#stage');
   stage.prepend(renderer.domElement);
   if (params.has('pr')) app.governor.on = false;
-  const post = createPostcard({ reduced });
+  const post = createPostcard({ reduced, captions: spreadCaptions() });
   // Frames owed (the picture stands still at rest, so frames are only drawn when asked; two,
   // as the haze settles over a frame).
   let dirty = 2;
-  if (BARE) post.set({ dive: 1 });
+  if (BARE) post.set({ up: 1 });
 
   // ---------------------------------------------------------------- the page in screens
 
   const pace = makePace();
   const sStart = BARE ? 0 : pace.screensAt(TAU0), sEnd = pace.screens;
-  const heroLen = BARE ? 0 : HERO, lead = heroLen * CAM_START, outLen = BARE ? 0 : OUTRO;
-  // The camera's start: its way along the path for scroll `d` past `lead`. It eases up to the
-  // scroll's own speed (a start from rest inside the card), and ends up CAM_EASE behind it.
-  const ease = BARE ? 0 : CAM_EASE;
-  const run = (d) => (ease ? d - ease * (1 - Math.exp(-d / ease)) : d);
-  const runBack = (r) => { let lo = r, hi = r + ease; for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; if (run(m) < r) lo = m; else hi = m; } return (lo + hi) / 2; };
-  // Where the scroll holds the camera still: under each paper spread, and for the day's time
-  // lapse. s: where on the path, len: for how many screens, y: where on the page.
-  const holds = (BARE ? [] : [...SPREADS, { id: 'lapse', ...LAPSE }]).map((h) => ({ id: h.id, s: pace.screensAt(h.tau), len: h.len })).sort((a, b) => a.s - b.s);
-  holds.reduce((before, h) => { h.y = lead + runBack(h.s - sStart) + before; return before + h.len; }, 0);
-  const held = holds.reduce((a, h) => a + h.len, 0);
-  const yOut = lead + runBack(sEnd - sStart) + held;
-  const lapse = holds.find((h) => h.id === 'lapse') ?? null;
+  const heroLen = BARE ? 0 : HERO, outLen = BARE ? 0 : OUTRO;
+  // Where the scroll holds the camera still: while a spread's card rests on the sand, and for
+  // the day's time lapse. s: where on the path. len: for how many screens. easeIn, easeOut: the
+  // screens over which the camera slows into it and picks up out of it. y: where on the page.
+  const holds = (BARE ? [] : [...SPREADS.map((h) => ({ ...h, card: true, len: SPREAD.rest, easeIn: SPREAD.easeIn, easeOut: SPREAD.easeOut })), { id: 'lapse', ...LAPSE }])
+    .map((h) => ({ ...h, s: pace.screensAt(h.tau) })).sort((a, b) => a.s - b.s);
+  // The page as stretches of scroll: the camera going at the scroll's own speed ('go'), standing
+  // in a hold, or easing between the two ('up', 'down': its speed a smoothstep, so it covers
+  // half the stretch's length).
+  const ramp = (u) => u * u * u - (u * u * u * u) / 2;   // the integral of smoothstep
+  const segs = [];
+  const yOut = (() => {
+    let y = 0, at = sStart;
+    const add = (kind, len, E = 0) => { if (len > 0) segs.push({ kind, y0: y, y1: y + len, s0: at, E }); y += Math.max(len, 0); };
+    const cruise = (to) => { add('go', to - at); at = Math.max(at, to); };
+    const turn = (kind, E) => { add(kind, E, E); at += E / 2; };
+    turn('up', BARE ? 0 : START_EASE);
+    for (const h of holds) { cruise(h.s - h.easeIn / 2); turn('down', h.easeIn); h.y = y; add('hold', h.len); turn('up', h.easeOut); }
+    cruise(sEnd);
+    return y;
+  })();
+  const lapse = holds.find((h) => h.id === 'lapse') ?? null, cards = holds.filter((h) => h.card);
   const page = {
     screens: yOut + outLen,
     holds,
     // The camera's place (in path.js's screens) for a place on the page, and back.
     camAt(y) {
-      if (y <= lead) return sStart;
-      let before = 0;
-      for (const h of holds) {
-        if (y <= h.y) break;
-        if (y <= h.y + h.len) return h.s;
-        before += h.len;
+      for (const g of segs) {
+        if (y > g.y1) continue;
+        if (y <= g.y0) return g.s0;
+        const u = (y - g.y0) / (g.y1 - g.y0);
+        return g.kind === 'go' ? g.s0 + (y - g.y0) : g.kind === 'hold' ? g.s0 : g.kind === 'up' ? g.s0 + g.E * ramp(u) : g.s0 + g.E * (0.5 - ramp(1 - u));
       }
-      return Math.min(sEnd, sStart + run(y - lead - before));
+      return sEnd;
     },
-    yAt(s) { return s <= sStart ? 0 : lead + runBack(Math.min(s, sEnd) - sStart) + holds.reduce((a, h) => a + (s > h.s + 1e-6 ? h.len : 0), 0); },
+    yAt(s) {
+      if (s <= sStart) return 0;
+      let lo = 0, hi = yOut;
+      for (let i = 0; i < 48; i++) { const m = (lo + hi) / 2; if (this.camAt(m) < s - 1e-7) lo = m; else hi = m; }
+      return hi;
+    },
     tauAt(y) { return pace.tauAt(this.camAt(y)); },
     screensAt(tau) { return this.yAt(pace.screensAt(tau)); },
   };
+  // Which card the page is at or on its way to or from, and how far up it is from rest there
+  // (0 at rest, 1 the picture is the screen): the hero's, a spread's, the ending's. Null and 1
+  // between them, in the scene.
+  function cardAt(y, out) {
+    if (BARE) return [null, 1];
+    if (y < heroLen) return ['hero', y / heroLen];
+    for (const h of cards) {
+      if (y <= h.y - SPREAD.in || y >= h.y + h.len + SPREAD.out) continue;
+      return [h.id, y < h.y ? (h.y - y) / SPREAD.in : y <= h.y + h.len ? 0 : (y - h.y - h.len) / SPREAD.out];
+    }
+    if (out > 0) return ['end', 1 - clamp01((out - OUT_CARD[0]) / (OUT_CARD[1] - OUT_CARD[0]))];
+    return [null, 1];
+  }
 
   // ---------------------------------------------------------------- time of day
 
@@ -96316,7 +96383,7 @@ function startScroll({ params }) {
     unit = h;
     track.style.height = `${page.screens * unit + innerHeight}px`;
     post.layout();
-    groundLight = null;
+    spreads?.layout(post);
     dirty = 2;
     if (walk && Math.abs(w / h / descent.aspect - 1) > 0.03) build();
     if (retained !== null) jumpTo(retained);
@@ -96331,36 +96398,15 @@ function startScroll({ params }) {
     return Math.min(82, (Math.atan(t) * 360) / Math.PI);
   }
 
-  // The sand under the card: the beach itself from straight above, drawn once by the scene in
-  // the light of the moment and kept as a picture (it is much bigger on the page than the
-  // canvas, so it is drawn finer than a frame). The sun comes from the top left of it.
-  const groundCtx = post.ground.getContext('2d');
-  let groundLight = null;   // (null: to be taken again, after a resize)
-  function captureGround() {
-    if (!app.hf || BARE) return;
-    const [w, h] = size, pr0 = renderer.getPixelRatio();
-    const pr = Math.max(pr0, Math.min(devicePixelRatio * 1.6, Math.sqrt((w < 720 ? 4e6 : 6e6) / (w * h))));
-    const keep = { p: camera.position.clone(), r: camera.rotation.clone(), fov: camera.fov };
-    renderer.setPixelRatio(pr); app.setSize(w, h);
-    const [x, y] = (params.get('sandAt') ?? '').includes(',') ? params.get('sandAt').split(',').map(Number) : SAND.at;
-    const up = +(params.get('sandUp') ?? SAND.up);
-    if (!fixedLight) app.setLighting(params.get('sandLight') ?? SAND.light);
-    app.setPose([x, y, app.groundAt(x, y) + up], app.state.sunAz + 45, -89.9, 0, SAND.fov);
-    app.advance(0); app.renderFrame(); app.renderFrame();
-    const c = renderer.domElement;
-    post.ground.width = c.width; post.ground.height = c.height;
-    groundCtx.drawImage(c, 0, 0);
-    // The low sun's shadows lifted a little, so small ink type can cross them.
-    groundCtx.fillStyle = SAND.lift;
-    groundCtx.fillRect(0, 0, c.width, c.height);
-    // Back to the page's own light (or the one picked by hand).
-    if (!fixedLight) { if (manual) app.setLighting(manual); else setSun(hourAt(cam.y)); syncLighting(); app.advance(0); }
-    renderer.setPixelRatio(pr0); app.setSize(w, h);
-    camera.position.copy(keep.p); camera.rotation.copy(keep.r);
-    camera.fov = keep.fov; camera.updateProjectionMatrix();
-    groundLight = true;
-    dirty = 2;
-  }
+  // The sand under the card: a photograph (assets/hero/, generated for this page), laid in the
+  // card's world by postcard.js. If it cannot be had, the table's plain sand colour stands in.
+  const sandReady = BARE ? Promise.resolve() : new Promise((done) => {
+    const img = new Image();
+    img.onload = () => { post.ground.style.backgroundImage = `url("${img.src}")`; (img.decode?.() ?? Promise.resolve()).catch(() => {}).then(done); };
+    img.onerror = () => { console.warn('the hero\'s sand did not load: plain sand instead'); done(); };
+    img.src = ASSETS.hero;
+    setTimeout(done, 8000);
+  });
 
   // ---------------------------------------------------------------- scroll
 
@@ -96400,8 +96446,11 @@ function startScroll({ params }) {
 
   // y: the page's place, in screens. screens: the camera's, in path.js's. hero: how far the
   // card is up (0 at rest, 1 the picture is the screen). out: how far into the ending.
-  const cam = { y: 0, screens: sStart, tau: BARE ? 0 : TAU0, pose: null, hero: BARE ? 1 : 0, out: 0 };
-  const inScene = () => cam.hero >= 1 && cam.out <= 0;
+  // y: the page's place, in screens. screens: the camera's, in path.js's. hero: how far into the
+  // dive. out: how far into the ending. card, up: which card the page is at and how far up it is
+  // from rest (cardAt).
+  const cam = { y: 0, screens: sStart, tau: BARE ? 0 : TAU0, pose: null, hero: BARE ? 1 : 0, out: 0, card: BARE ? null : 'hero', up: BARE ? 1 : 0 };
+  const inScene = () => cam.up >= 1;
   function placeCamera(dt, snap = false) {
     const target = scrollY() / unit;
     cam.y = (snap || reduced) ? target : cam.y + (target - cam.y) * (1 - Math.exp(-FOLLOW * dt));
@@ -96410,6 +96459,7 @@ function startScroll({ params }) {
     cam.tau = pace.tauAt(cam.screens);
     cam.hero = heroLen ? clamp01(cam.y / heroLen) : 1;
     cam.out = outLen ? clamp01((cam.y - yOut) / outLen) : 0;
+    [cam.card, cam.up] = cardAt(cam.y, cam.out);
     if (!descent) return;
     let p = descent.poseAt(cam.tau);
     // At the water's edge the head turns to the boat.
@@ -96520,10 +96570,11 @@ function startScroll({ params }) {
       html.classList.remove('looking');
     };
     for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) stage.addEventListener(ev, end);
-    // The card at rest: a click on its picture goes in.
+    // A card at rest (the hero's, a spread's): a click on its picture goes in.
     stage.addEventListener('click', () => {
-      if (!started || cam.hero > 0.02 || cam.out > 0 || BARE) return;
-      if (lenis) lenis.scrollTo(heroLen * unit, { duration: 3.4, easing: inOut }); else jumpTo(heroLen);
+      if (!started || BARE || cam.up > 0.02 || !cam.card || cam.card === 'end') return;
+      const h = cards.find((x) => x.id === cam.card), to = h ? h.y + h.len + SPREAD.out : heroLen;
+      if (lenis) lenis.scrollTo(to * unit, { duration: 3.4, easing: inOut }); else jumpTo(to);
     });
   }
 
@@ -96533,20 +96584,14 @@ function startScroll({ params }) {
   // The curtain: blank paper drawn over the page for a jump from the menu.
   const curtain = { a: 0 };
   let traveling = false, coverShown = -1, tickNo = 0;
-  // How much of the scene is under a paper spread.
-  const veil = () => spreads?.cover ?? 0;
   const clockEl = $('.clock');
   let clockShown = '';
   function updateStory() {
     if (BARE) return;
-    post.set({
-      dive: cam.hero,
-      out: clamp01((cam.out - OUT_CARD[0]) / (OUT_CARD[1] - OUT_CARD[0])),
-      flip: inOut(clamp01((cam.out - OUT_FLIP[0]) / (OUT_FLIP[1] - OUT_FLIP[0]))),
-    });
-    // A picture does not move: the sea's clock is stopped while the card rests, and runs up to
-    // its own speed as the card comes off the sand (and down again at the end).
-    const wake = Math.min(smooth(WAKE[0], WAKE[1], cam.hero), 1 - smooth(0.02, OUT_CARD[1] * 0.7, cam.out));
+    post.set({ ...(cam.card ? { pose: cam.card } : null), up: cam.up, flip: inOut(clamp01((cam.out - OUT_FLIP[0]) / (OUT_FLIP[1] - OUT_FLIP[0]))) });
+    // A picture does not move: the sea's clock is stopped while a card rests, and runs up to
+    // its own speed as the card comes off the sand (and down again as one lands).
+    const wake = smooth(WAKE[0], WAKE[1], cam.up);
     app.timeCtl.paused = wake <= 0;
     app.timeCtl.speed = wake;
 
@@ -96556,10 +96601,12 @@ function startScroll({ params }) {
     // stays until the beach is left.
     tickNo++;
     if (!fixedLight) {
-      if (manual && cam.tau < 4) { manual = null; dissolved(() => setSun(hourAt(cam.y)), !reduced && !RECORD && curtain.a < 0.5 && veil() < 0.5); }
+      if (manual && cam.tau < 4) { manual = null; dissolved(() => setSun(hourAt(cam.y)), !reduced && !RECORD && curtain.a < 0.5 && inScene()); }
       if (!manual) {
+        // (The two ends of the day are always landed on exactly: the last step into evening is
+        // a small one, and skipping it left the light a hair short of the Evening it shows.)
         const h = hourAt(cam.y), far = sunNow === null ? 9 : Math.abs(h - sunNow);
-        if (far > 1e-4 && (far > 0.5 || tickNo % 2 === 0 || h === DAY.from || h === DAY.to)) { setSun(h); syncLighting(); }
+        if (h !== sunNow && (h === DAY.from || h === DAY.to || far > 0.5 || (far > 1e-4 && tickNo % 2 === 0))) { setSun(h); syncLighting(); }
       }
       // The clock on the time lapse's line.
       if (clockEl) {
@@ -96568,17 +96615,15 @@ function startScroll({ params }) {
         if (t !== clockShown) { clockShown = t; clockEl.textContent = t; }
       }
     }
-    spreads?.update(cam.y, !wordsOn || rewinding || traveling);
+    spreads?.update(cam.card, cam.up, !wordsOn || rewinding || traveling);
     if (curtain.a !== coverShown) {
       coverShown = curtain.a;
       coverEl.style.opacity = curtain.a.toFixed(3);
       coverEl.style.visibility = curtain.a > 0.002 ? 'visible' : 'hidden';
     }
-    // The sand under the card again after a resize, whenever it is about to show.
-    if (!groundLight && (cam.hero < 1 || cam.out > 0 || curtain.a > 0.985)) captureGround();
   }
-  // Nothing in the picture changes while the card rests in the hero, or once it is on its back.
-  const still = () => !BARE && ((cam.out <= 0 && cam.hero <= 0) || post.turned || (cam.out > 0 && app.timeCtl.paused));
+  // Nothing in the picture changes while a card rests on the sand, or once it is on its back.
+  const still = () => !BARE && (cam.up <= 0 || post.turned);
 
   // A jump from the menu: the blank sand comes over, the page moves under it, it lifts.
   function travel(y) {
@@ -96592,7 +96637,7 @@ function startScroll({ params }) {
     } });
   }
   const places = { walk: () => page.screensAt(1), boat: () => page.screensAt(4.97), reserve: () => page.screens };
-  const spreads = BARE ? null : createSpreads({ app, holds, reduced, onReserve: () => travel(places.reserve()) });
+  const spreads = BARE ? null : createSpreads({ reduced, onReserve: () => travel(places.reserve()) });
   document.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', (e) => {
     e.preventDefault();
     travel(places[el.dataset.go]());
@@ -96686,9 +96731,7 @@ function startScroll({ params }) {
     for (const k of blocks) {
       const on = !quiet && (
         k.kind === 'hero' ? cam.out <= 0 && cam.hero >= k.a && cam.hero <= k.b
-        // (A note waits until a spread has lifted right off: its dark patch under the ghost of the
-        // spread's postcard read as a black rectangle.)
-        : k.kind === 'tau' ? inScene() && cam.tau >= k.a && cam.tau <= k.b && veil() < 0.03
+        : k.kind === 'tau' ? inScene() && cam.tau >= k.a && cam.tau <= k.b
         : cam.out >= k.a && cam.out <= k.b);
       if (on !== k.on) { k.on = on; on ? show(k) : hide(k); }
       // The line drifts across a little while it is up.
@@ -96729,18 +96772,18 @@ function startScroll({ params }) {
   const narrow = matchMedia('(max-width: 720px)');
   function updateFrame() {
     if (!cam.pose) return;
-    // On the sand (the hero, the ending) or in the scene: the menu changes while it is away,
+    // On the sand (the hero, a spread, the ending) or in the scene: the menu changes while it is away,
     // in the middle of the dive.
-    const sand = cam.hero < 0.5 || cam.out > 0.3;
-    const phase = `${sand ? 'at-sand' : 'in-scene'}${cam.hero <= 0.02 && cam.out <= 0 ? ' at-hero' : ''}`;
+    const sand = cam.up < 0.5;
+    const phase = `${sand ? 'at-sand' : 'in-scene'}${cam.up <= 0.02 && cam.card !== 'end' ? ' at-card' : ''}`;
     if (phase !== lastPhase) {
       lastPhase = phase;
-      for (const c of ['at-sand', 'in-scene', 'at-hero']) html.classList.toggle(c, phase.split(' ').includes(c));
+      for (const c of ['at-sand', 'in-scene', 'at-card']) html.classList.toggle(c, phase.split(' ').includes(c));
     }
     const quiet = !wordsOn || traveling;
-    setShown('.hud', !quiet && (cam.hero < 0.1 || (cam.hero >= 0.96 && cam.out < 0.05 && veil() < 0.4) || cam.out > 0.55));
-    setShown('.rail', !quiet && inScene() && cam.tau > 0.93 && veil() < 0.4);
-    setShown('.scene-controls', !quiet && inScene() && cam.tau >= 4.02 && veil() < 0.4);
+    setShown('.hud', !quiet && (cam.up >= 0.96 || (cam.up < 0.1 && (cam.card !== 'end' || cam.out > 0.55))));
+    setShown('.rail', !quiet && inScene() && cam.tau > 0.93);
+    setShown('.scene-controls', !quiet && inScene() && cam.tau >= 4.02);
 
     const [e, n, h] = cam.pose.pos;
     const lat = ORIGIN.lat + n / 111320, lon = ORIGIN.lon + e / (111320 * Math.cos((ORIGIN.lat * Math.PI) / 180));
@@ -96822,8 +96865,7 @@ function startScroll({ params }) {
       window.__calibration = { ms: timed.map((v) => +v.toFixed(1)), pr: r };
     }
     // The sand for the card to lie on, then the card's own picture.
-    captureGround();
-    await frame();
+    await sandReady;
     const at0 = params.has('at') ? +params.get('at') : 0;
     jumpTo(page.screensAt(at0));
     placeCamera(0, true);

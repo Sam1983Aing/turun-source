@@ -3600,3 +3600,90 @@ third of the size and drawn up smooth, fainter, and the white inner line is gone
 - Reduced motion: the spreads' reveals are instant, the time lapse still follows the scroll.
   Not tried with a screen reader.
 - Still not checked on a real phone or in Safari.
+
+## v35, round 4: a photograph for the sand, and the spreads as the hero in reverse (2026-10-06)
+
+### The sand is a photograph now
+
+Sam made five mock-ups of the hero he is after (sand, teak, linen, terrazzo, a painted
+table) and asked whether the surface could simply be a generated image, with only the card,
+the headline and the button live: "It will look more realistic." It does. The rendered sand
+was the weakest thing in the hero (one frame of the beach stretched four times, soft in the
+dive, and no source for its light). His image has grain, a palm's shadow and a shell.
+
+- It is laid in the card's world with the inverse of the world's resting transform, so at
+  rest it fills the screen exactly as composed, and it still grows and turns with the card.
+- **An edge of it could have come into view.** My first margin (3% larger than the screen)
+  was a guess. Worked through, it was short by a few pixels a third of the way up the dive,
+  where the world has turned and slid against the sand. `sandOver` now takes every corner of
+  the screen back into the sand's frame at 80 steps of the move and returns the size needed,
+  per pose and screen size. Checked in the page at six screen sizes for all four poses: 4 to
+  16 px to spare everywhere.
+- The source is 1586 px wide, and a Retina screen draws it at twice that, then the dive
+  another 2.4 times. It is scaled to 3172 px with Lanczos and a light unsharp mask, which is
+  crisper than the browser's own stretch but adds no detail. A 4K original would.
+- `captureGround`, its switches (`sandUp`, `sandAt`, `sandLight`) and the load-time render are
+  gone. The single file reads the image from next to itself, and falls back to a plain sand
+  colour without it. It is not on the CDN yet.
+- Open: which model made it and whether its output may ship in a public repo
+  (`assets/hero/CREDITS.md`). The project's rule is CC0 and credited. Not pushed.
+
+### The spreads, as the hero in reverse
+
+A few hours after picking the paper spreads Sam looked at them live: "the transition feels
+average." His idea: "take the transition from the hero where we enter, but do it in reverse.
+When we reach that specific point it will transition back to the hero section, and the text
+will appear on the left. Do the same for the second scene, but the postcard on the left and
+the text on the right."
+
+The postcard already did this once, at the ending. So this round is a generalisation:
+
+- **Poses.** The card had two places to rest (hero, end) wired in as `dive` and `out`. It now
+  has named poses (`hero`, `walk`, `beach`, `end`) and one number, `up` (0 at rest, 1 the
+  picture is the screen). The caller changes pose only while the picture is the whole screen,
+  where the sand is hidden and can be re-laid, the caption changed ("From the steps, 120 m")
+  and the pool of light moved to the side the words will be on.
+- **The camera keeps walking while the card comes down**, slowing to a stop over the last 0.6
+  of a screen, and is walking again 0.2 of a screen into the way back in. So the scene moves
+  inside the card both ways, which is what Sam asked of the hero the round before.
+- **The page's mapping was rewritten for that**: a list of stretches of scroll ('go', 'hold',
+  'up', 'down'), the eased ones with a smoothstep speed, and the inverse by bisection. It
+  replaces the special-cased start and holds. The time lapse got the same eased stop.
+- At rest a spread draws no frames, like the hero (0 in 1.2 s, both). A click on a resting
+  card dives in.
+- The words are the spread's old ones, in ink on the sand. Their small labels were terracotta
+  and sank into the palm's shadows on the right-hand spread: ink now.
+- The snapshot postcards, the paper and the fade are gone (`spreads.js` is the words only).
+
+### What went wrong
+
+- **The light stopped a hair short of evening.** After the time lapse the scene looked right
+  but reported its light as "custom", not "evening". The sun moves every other frame and
+  only for steps over a ten-thousandth of an hour, and the last step into 17:00 was smaller
+  than that. The two ends of the day are now always landed on. Found by reading the state
+  back after a real scroll, not by eye: the picture was the same.
+- **A descender in the way.** The words were still leaving (0.6 s) while the card grew over
+  them. They go as soon as the card has lifted 3% and take 0.4 s.
+- **A browser of mine had been left running for seventeen hours** (a tool run that timed
+  out). It was idle, but with Sam's own tab on the page as well, every frame timing this
+  round is noise: the plain walk stretch, which nothing here touches, read anywhere from 0 to
+  75 slow frames. The dive measured clean once (0 of 289 over 25 ms) with the photograph in.
+  The time lapse was the one stretch that was slow in every run (about a third of its frames
+  over 25 ms, against 0 to 7 the round before). To be timed again on a quiet machine.
+
+### Checked
+
+- Driven for real: both spreads forwards and backwards, the click on a resting card, the
+  spread's Reserve button, the three menu jumps, the rewind. Console clean.
+- Frame by frame at 1512 x 945 and 390 x 844: `captures/r5-spreads.jpg`, `captures/r5-phone.jpg`.
+- `kelingking.html` rebuilt and opened from `file://` as the scene and as the page: no errors.
+- `?notext` (the scene alone) against v34, same camera and sea, at `tau` 1, 2.6 and 4.2: 0 of
+  4.29 million channel values differ, run again at the end of this round.
+
+### Still weak
+
+- Three times the same sand, palm top left and shell bottom right. Sam's "for now".
+- The headline and small type are still the serif and the sans. His mock-ups are
+  hand-lettered with a typewriter face.
+- The card has no palm shadow on it though the sand around it does.
+- The page is about 23.5 screens long.

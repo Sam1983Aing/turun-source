@@ -185,8 +185,7 @@ console, `__scroll.jumpTo(__scroll.pace.screensAt(2.5))` goes to a place on the 
 From v9 the visitor can drag to look around (`__scroll.look` holds the head's turn), and the
 clouds take `clouds.coverage=`, `clouds.bank=`, `clouds.high=`, `clouds.clearRadius=` and more
 (`src/sky/clouds.js`). From v35: `boat=0` (no jukung), `boat=east,north[,heading]` (moored somewhere
-else), and on the landing page `sandUp=`, `sandAt=east,north`, `sandLight=` (how the sand under
-the card is photographed).
+else).
 
 Measuring light: `--measure` renders the shot twice more (class labels, and scene light
 before the tone curve) and averages the same pixels in the render and the photo. Shots can

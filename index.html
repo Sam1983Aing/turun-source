@@ -26,13 +26,13 @@
   </script>
 </head>
 <body>
-  <!-- The table (v35): the beach's own sand seen from straight above, and a postcard lying on
-       it. The picture on the card is the live scene (#stage), held still. Scrolling brings the
-       card up until its picture is the whole screen (src/scroll/postcard.js). For the tools
-       these wrappers make no boxes at all (page.css). -->
+  <!-- The table (v35): a photograph of sand in the shade of a palm, and a postcard lying on it.
+       The picture on the card is the live scene (#stage), held still. Scrolling brings the card
+       up until its picture is the whole screen (src/scroll/postcard.js). For the tools these
+       wrappers make no boxes at all (page.css). -->
   <div class="table">
     <div class="world">
-      <canvas class="ground" aria-hidden="true"></canvas>
+      <div class="ground" aria-hidden="true"></div>
       <div class="card">
         <div class="card__shadow"></div>
         <div class="card__flip">
@@ -93,10 +93,11 @@
     <!-- The curtain: blank paper over everything for a jump from the menu. -->
     <div class="cover" aria-hidden="true"></div>
 
-    <!-- The spreads: twice on the way down the scroll holds the camera and the page turns to
-         paper (src/scroll/spreads.js; where, in SPREADS in scroll.js). The postcard on each is
-         a snapshot of the view the visitor is leaving. -->
-    <section class="sp sp--walk" data-hold="walk" aria-label="The walk">
+    <!-- The spreads: twice on the way down the frame goes back to being a postcard on the sand
+         (the hero's dive in reverse), with these words beside it: left of the card the first
+         time, right of it the second (src/scroll/spreads.js; where, in SPREADS in scroll.js).
+         data-caption: what the card says under its picture there. -->
+    <section class="sp sp--walk" data-hold="walk" data-caption="From the steps, 120 m" aria-label="The walk">
       <div class="sp__text">
         <p class="label sp__label"><b>The walk</b><span>06:10</span></p>
         <h2 class="display sp__head"><span class="sp__mask"><span class="sp__ln">Six walkers.</span></span><span class="sp__mask"><span class="sp__ln">One <em>guide</em>.</span></span></h2>
@@ -107,9 +108,8 @@
           <div><dt>You carry</dt><dd>Water. We carry the rest.</dd></div>
         </dl>
       </div>
-      <figure class="sp__card"><img alt="" width="900" height="600"><figcaption><span>From the steps, 120 m</span><span>Kelingking</span></figcaption></figure>
     </section>
-    <section class="sp sp--beach" data-hold="beach" aria-label="The beach">
+    <section class="sp sp--beach" data-hold="beach" data-caption="Above the beach, 55 m" aria-label="The beach">
       <div class="sp__text">
         <p class="label sp__label"><b>The beach</b><span>07:10 to 17:40</span></p>
         <h2 class="display sp__head"><span class="sp__mask"><span class="sp__ln">Then a whole day</span></span><span class="sp__mask"><span class="sp__ln">of <em>nothing</em>.</span></span></h2>
@@ -121,7 +121,6 @@
         </dl>
         <p class="sp__price"><b>US$ 240</b> a walker, April to October <a class="button" href="#reserve">Reserve a morning</a></p>
       </div>
-      <figure class="sp__card"><img alt="" width="900" height="600"><figcaption><span>Above the beach, 55 m</span><span>Kelingking</span></figcaption></figure>
     </section>
 
     <header class="hud">
