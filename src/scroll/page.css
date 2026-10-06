@@ -11,7 +11,7 @@
      Motion     one ease (expo.out), reveals of 1.1 s, a heavy smooth scroll */
 
 :root {
-  --ink: #14120e;
+  --ink: #12110e;
   --ink-dim: rgba(20, 18, 14, 0.68);
   --cream: #f3efe6;
   --cream-dim: rgba(243, 239, 230, 0.8);
@@ -88,7 +88,11 @@ html.scroll .card__shadow { will-change: transform, opacity; }
 html.scroll .card__paper { will-change: transform; }
 html.scroll .card__caption, html.scroll .card__finish { will-change: opacity; }
 html.scroll .table.is-full .card__flip, html.scroll .table.is-full .card__shadow, html.scroll .table.is-full .card__paper, html.scroll .table.is-full .card__caption, html.scroll .table.is-full .card__finish { will-change: auto; }
-html.scroll #stage { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; }
+/* The stage is near-black behind the canvas, as the whole page was before v35. The canvas is
+   not opaque: where leaves hand over (alpha to coverage) its pixels are part see-through, so
+   what lies behind it is part of the scene's colour. With the sand behind it the greens went
+   pale and speckled. */
+html.scroll #stage { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; background: #12110e; }
 html.scroll #stage canvas { display: block; width: 100% !important; height: 100% !important; }
 html.scroll #stage:focus { outline: none; }
 html.scroll #stage:focus-visible { outline: 2px solid rgba(243,239,230,.65); outline-offset: -2px; }
@@ -117,9 +121,9 @@ html.scroll.at-hero #stage { cursor: pointer; }
    soft edge where the ink meets the border. Lifts as the card comes up. */
 .card__finish { position: absolute; left: calc(50% - var(--cw) / 2); top: calc(50% - var(--ch) / 2); width: var(--cw); height: var(--ch); pointer-events: none; 
   background: linear-gradient(104deg, rgba(255,255,255,0) 42%, rgba(255,255,255,0.16) 48%, rgba(255,255,255,0.04) 52%, rgba(255,255,255,0) 58%) var(--sheen, 50%) 0 / 300% 100% no-repeat,
-    radial-gradient(130% 120% at 28% 18%, rgba(255, 244, 222, 0.07), rgba(70, 48, 22, 0.08));
-  box-shadow: inset 0 0 0 calc(var(--cw) * 0.0009) rgba(50, 36, 18, 0.28), inset 0 0 calc(var(--cw) * 0.045) rgba(50, 36, 18, 0.16); }
-.card__finish::after { content: ""; position: absolute; inset: 0; background: var(--grain); background-size: calc(var(--cw) * 0.14) auto; opacity: 0.34; }
+    radial-gradient(130% 120% at 28% 18%, rgba(255, 244, 222, 0.03), rgba(70, 48, 22, 0.04));
+  box-shadow: inset 0 0 0 calc(var(--cw) * 0.0009) rgba(50, 36, 18, 0.28), inset 0 0 calc(var(--cw) * 0.03) rgba(50, 36, 18, 0.1); }
+.card__finish::after { content: ""; position: absolute; inset: 0; background: var(--grain); background-size: calc(var(--cw) * 0.14) auto; opacity: 0.2; }
 /* The light on the whole still life: warm from the top left, falling away to the far corner. */
 .table__light { position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(58% 78% at 20% 46%, rgba(255, 238, 206, 0.5), rgba(255, 238, 206, 0.22) 45%, rgba(255, 238, 206, 0) 78%), radial-gradient(130% 120% at 28% 18%, rgba(0, 0, 0, 0) 58%, rgba(64, 40, 14, 0.24) 100%); }

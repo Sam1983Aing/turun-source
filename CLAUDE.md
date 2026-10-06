@@ -33,6 +33,12 @@ section in `PROCESS.md`. Problems that belong to another version go into that ve
   can land twice or not at all.
 - **Pattern that repeats with the mesh?** Look for a jump in the function being drawn before
   blaming the mesh (the v1 wave "teeth").
+- **The canvas is not opaque.** Where leaves hand over (alpha to coverage) its pixels are part
+  see-through, so whatever sits behind the canvas on the page is part of the scene's colour.
+  v35 put sand-coloured paper behind it and every green went pale and speckled. Keep near-black
+  (`#12110e`, on `#stage`) behind it. The tools' pages are dark, so a check in `?shot=` mode
+  does not see this: compare the landing page itself against the last tag
+  (same `tau`, `t=17`, `pr=1`, `notext` on both: it should be 0 pixels different).
 - **Absolute frame times mean nothing on this Mac.** They swing 2x to 8x with whatever else is
   using the GPU. The browser pane showing the page while a benchmark runs made everything
   look 5 to 8 times slower for a whole stage. Close the page in the pane before timing, and

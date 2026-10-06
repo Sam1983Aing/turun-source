@@ -3430,12 +3430,29 @@ It is moored at `[29, 141]`, heading 220: 74 m from the last camera, in 4.4 m of
   still of the boat: a grey veil and a faint rectangle over the whole frame.
 - **Edge-on, the turning card still threw a full rectangle of shadow.** The shadow now
   narrows with the cosine of the turn.
+- **The whole scene went pale, and I told Sam it was unchanged.** His first reaction to the
+  page: "did something happen to the colour? It feels washed out compared to v34." It had. The
+  canvas is not opaque: where leaves hand over between levels of detail (alpha to coverage)
+  its pixels are part see-through. Until v35 the page behind it was near-black, so those
+  pixels went dark. v35 put the card's world behind it, sand-coloured, and they went pale: the
+  greens lost their depth and showed a speckle. Measured at `tau` 1 against v34, same camera
+  and sea: mean colour 81/124/138 against 73/117/131, saturation 0.529 against 0.549. My own
+  check ("the land is pixel-identical") was made in the tools' mode with a dark page, so it
+  could not see this. Fix: `#stage` is `#12110e` behind the canvas again. After: the scene on
+  the page (`?notext`) is 0 of 4.29 million channel values different from v34 at `tau` 1, 2.6
+  and 4.2, and the real page with its overlays hidden has the same mean colour and saturation
+  to 0.2 of a level (it cannot be pixel-exact there: the recorder's scroll position rounds to
+  whole pixels, which moves the camera a few centimetres on a moving stretch).
+  I had also faded the card's picture on purpose to look printed (less saturation and
+  contrast, a touch of sepia). That is gone: the picture keeps the scene's colour, and only
+  the paper, a light grain and the sheen say "print".
 - **Port 5178 was taken by another project's server**, so this session ran on 5181
   (`.claude/launch.json` has both). Every tool takes `--url=`.
 
 ### Verification (6 October 2026)
 
-- **The scene is the same scene.** `git diff v34 -- src/` touches `app.js` (the boat's hook)
+- **The scene is the same scene** (in the tools' mode; on the page it was not at first, see
+  "The whole scene went pale" above). `git diff v34 -- src/` touches `app.js` (the boat's hook)
   and `src/scroll/` only. Viewpoint and overview rendered from this build (`hide=water`,
   `boat=0`) and from v34 checked out from its tag (`hide=water`), at 1400 x 1050, sea frozen at
   17 s: 0 of 1,470,000 pixels differ in either. The terrain bake is up to date.
@@ -3465,8 +3482,8 @@ It is moored at `[29, 141]`, heading 220: 74 m from the last camera, in 4.4 m of
   the open-sea spectrum), nothing laps at its waterline, and up close the hull is clean CG.
 - The sand under the card is one frame stretched about four times, so it softens during the
   dive (motion hides most of it). At the end it is seen still, behind the card's back.
-- The print finish is subtle. On a first look the picture may not read as "printed" so much
-  as "small".
+- The picture on the card no longer has any print fade (Sam wants the scene's colour), so
+  what says "print" is only the paper, the grain, the sheen and its stillness.
 - The hero's golden sand is evening and the picture on the card is noon. Nobody will mind,
   but it is not one light.
 - Fonts are unchanged (Instrument Serif, Inter). A change means adding files to

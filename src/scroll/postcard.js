@@ -110,8 +110,8 @@ export function createPostcard({ reduced = false } = {}) {
     const e = raw >= 1 ? 1 : raw <= 0 ? 0 : ease(raw);
     const full = e >= 1;
     // The print finish: on at rest, and the first thing to go as the card leaves the sand (it
-    // is a filter and overlays over the whole canvas: free while nothing is drawn, not while
-    // the scene draws every frame under it).
+    // is overlays over the whole canvas: free while nothing is drawn, not while the scene
+    // draws every frame under it).
     const f = ending ? smooth(0.72, 0.98, state.out) : 1 - smooth(0.02, 0.2, state.dive);
     const flip = state.flip;
     const key = [e, f, flip, state.settle, tilt.x, tilt.y, tilt.nx].map((n) => n.toFixed(4)).join();
@@ -123,7 +123,6 @@ export function createPostcard({ reduced = false } = {}) {
     if (full) {
       world.style.transform = 'none';
       stage.style.clipPath = 'none';
-      stage.style.filter = 'none';
       flipEl.style.transform = 'none';
       flipEl.style.visibility = 'visible';
       back.style.visibility = 'hidden';
@@ -154,9 +153,9 @@ export function createPostcard({ reduced = false } = {}) {
     light.style.opacity = f.toFixed(3);
     light.style.visibility = f > 0.003 ? 'visible' : 'hidden';
     finish.style.setProperty('--sheen', `${(34 + tilt.nx * 30).toFixed(1)}%`);
-    stage.style.filter = f > 0.003
-      ? `saturate(${(1 - 0.14 * f).toFixed(3)}) contrast(${(1 - 0.05 * f).toFixed(3)}) brightness(${(1 + 0.02 * f).toFixed(3)}) sepia(${(0.08 * f).toFixed(3)})`
-      : 'none';
+    // (No fading of the picture's colour: the first iteration desaturated it to look printed,
+    // and Sam read the whole page as washed out. The paper, the sheen and the stillness say
+    // "print"; the colour stays the scene's.)
 
     // The card itself: leaning a little to the pointer at rest, and turning over at the end
     // (it lifts off the sand as it goes).
