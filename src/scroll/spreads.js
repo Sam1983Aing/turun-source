@@ -24,7 +24,7 @@ export function createSpreads({ app, holds, onReserve, reduced = false }) {
     if (!h) return null;
     node.querySelectorAll('a[href="#reserve"]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); onReserve(); }));
     const q = (sel) => [...node.querySelectorAll(sel)];
-    const s = { h, node, canvas: node.querySelector('canvas'), a: -1, on: false, shot: false, tl: null,
+    const s = { h, node, img: node.querySelector('.sp__card img'), a: -1, on: false, shot: false, set: false, gone: false, tl: null,
       lines: q('.sp__ln'), rule: q('.sp__rule'), small: q('.sp__label, .sp__rows div, .sp__price'), card: q('.sp__card'),
       turn: node.classList.contains('sp--beach') ? -1 : 1 };
     rest(s);
@@ -32,39 +32,46 @@ export function createSpreads({ app, holds, onReserve, reduced = false }) {
   }).filter(Boolean);
 
   // Before its words come in: the lines under their masks, the rule undrawn, the card off the
-  // paper and turned.
+  // paper and turned. Only ever set while the spread itself is invisible.
   function rest(s) {
+    s.tl?.kill();
     gsap.set(s.lines, { yPercent: 108 });
     gsap.set(s.rule, { scaleX: 0 });
-    gsap.set(s.small, { autoAlpha: 0, y: 12 });
-    gsap.set(s.card, { autoAlpha: 0, y: 46, rotation: 9 * s.turn, scale: 1.06 });
+    gsap.set(s.small, { opacity: 0, y: 12 });
+    gsap.set(s.card, { opacity: 0, y: 46, rotation: 9 * s.turn, scale: 1.06 });
+    s.set = s.gone = false;
   }
   function show(s) {
     s.tl?.kill();
     const d = reduced ? 0 : 1.1, t = (s.tl = gsap.timeline());
     t.to(s.lines, { yPercent: 0, duration: d, ease: EASE, stagger: 0.09 }, 0);
     t.to(s.rule, { scaleX: 1, duration: d * 1.3, ease: EASE }, reduced ? 0 : 0.25);
-    t.to(s.small, { autoAlpha: 1, y: 0, duration: d * 0.9, ease: EASE, stagger: 0.07 }, reduced ? 0 : 0.3);
+    t.to(s.small, { opacity: 1, y: 0, duration: d * 0.9, ease: EASE, stagger: 0.07 }, reduced ? 0 : 0.3);
     // The card is dropped onto the page: it lands a little turned.
-    t.to(s.card, { autoAlpha: 1, duration: d * 0.5, ease: 'power2.out' }, reduced ? 0 : 0.15);
+    t.to(s.card, { opacity: 1, duration: d * 0.5, ease: 'power2.out' }, reduced ? 0 : 0.15);
     t.to(s.card, { y: 0, rotation: 3.8 * s.turn, scale: 1, duration: d * 1.35, ease: EASE }, reduced ? 0 : 0.15);
+    s.set = true;
   }
-  function hide(s) {
-    s.tl?.kill();
-    const t = (s.tl = gsap.timeline());
-    t.to([...s.small, ...s.card], { autoAlpha: 0, duration: reduced ? 0 : 0.35, ease: 'power2.out' }, 0);
-    t.add(() => rest(s));
+  // Going out, the spread lifts off as one with the scroll and is put back to rest once it is
+  // gone. Only the card goes first, and quickly: a dark photograph cross-fading over a bright
+  // scene lingers as a ghost rectangle long after the pale paper round it has gone.
+  function lift(s, gone) {
+    if (!s.set || gone === s.gone) return;
+    s.gone = gone;
+    gsap.to(s.card, { opacity: gone ? 0 : 1, duration: reduced ? 0 : gone ? 0.22 : 0.4, ease: 'power1.out', overwrite: 'auto' });
   }
 
-  // (Near-black under the snapshot: the canvas is part see-through, see page.css.)
+  // The snapshot, drawn through a canvas kept off the page and handed to the card as a
+  // picture. (Near-black under it: the scene's canvas is part see-through, see page.css.)
+  const film = document.createElement('canvas');
+  film.width = 900; film.height = 600;
+  const g = film.getContext('2d');
   function shoot(s) {
     app.renderFrame();
-    const src = app.renderer.domElement, c = s.canvas;
-    const w = 900, h = 600, k = Math.max(w / src.width, h / src.height);
-    c.width = w; c.height = h;
-    const g = c.getContext('2d');
-    g.fillStyle = '#12110e'; g.fillRect(0, 0, w, h);
-    g.drawImage(src, (w - src.width * k) / 2, (h - src.height * k) / 2, src.width * k, src.height * k);
+    const src = app.renderer.domElement, k = Math.max(film.width / src.width, film.height / src.height);
+    g.fillStyle = '#12110e'; g.fillRect(0, 0, film.width, film.height);
+    g.drawImage(src, (film.width - src.width * k) / 2, (film.height - src.height * k) / 2, src.width * k, src.height * k);
+    s.img.src = film.toDataURL('image/jpeg', 0.9);
   }
 
   const api = {
@@ -77,14 +84,15 @@ export function createSpreads({ app, holds, onReserve, reduced = false }) {
         const y0 = s.h.y, y1 = s.h.y + s.h.len;
         const a = quiet ? 0 : smooth(y0 - FADE, y0, y) * (1 - smooth(y1, y1 + FADE, y));
         if (a > 0.001 && !s.shot) { s.shot = true; shoot(s); }
-        if (a <= 0.001) s.shot = false;
+        if (a <= 0.001) { s.shot = false; if (s.set) rest(s); }
         if (a !== s.a) {
           s.a = a;
           s.node.style.opacity = a.toFixed(3);
           s.node.style.visibility = a > 0.002 ? 'visible' : 'hidden';
         }
         const on = a > 0.88;
-        if (on !== s.on) { s.on = on; s.node.classList.toggle('is-on', on); s.node.inert = !on; on ? show(s) : hide(s); }
+        if (on !== s.on) { s.on = on; s.node.classList.toggle('is-on', on); s.node.inert = !on; if (on && !s.set) show(s); }
+        lift(s, a < 0.86);
         cover = Math.max(cover, a);
       }
       api.cover = cover;

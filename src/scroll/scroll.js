@@ -622,7 +622,9 @@ export function startScroll({ params }) {
     for (const k of blocks) {
       const on = !quiet && (
         k.kind === 'hero' ? cam.out <= 0 && cam.hero >= k.a && cam.hero <= k.b
-        : k.kind === 'tau' ? inScene() && cam.tau >= k.a && cam.tau <= k.b && veil() < 0.4
+        // (A note waits until a spread has lifted right off: its dark patch under the ghost of the
+        // spread's postcard read as a black rectangle.)
+        : k.kind === 'tau' ? inScene() && cam.tau >= k.a && cam.tau <= k.b && veil() < 0.03
         : cam.out >= k.a && cam.out <= k.b);
       if (on !== k.on) { k.on = on; on ? show(k) : hide(k); }
       // The line drifts across a little while it is up.
