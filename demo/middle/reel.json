@@ -1,0 +1,17 @@
+{
+  "section": "The middle: railing to sand",
+  "out": "middle-options",
+  "cardSeconds": 3.2,
+  "theme": {
+    "bg": "#12110e", "fg": "#f3efe6", "accent": "#d9774f",
+    "display": { "family": "Instrument Serif", "src": "../../vendor/fonts/InstrumentSerif-latin.woff2" },
+    "body": { "family": "Inter", "src": "../../vendor/fonts/Inter-latin.woff2" },
+    "mono": { "family": "Inter", "src": "../../vendor/fonts/Inter-latin.woff2", "weight": 500 }
+  },
+  "options": [
+    { "n": "00", "name": "Now", "line": "Three big lines over the walk, and the offer says nothing between the railing and the sand.", "desktop": "clips/now-d.mp4", "phone": "clips/now-p.mp4" },
+    { "n": "01", "name": "Field Notes", "line": "Small paper tags pinned to the real beach, boat, path and rail. Each one carries a fact of the trip and rides along as the camera moves.", "desktop": "clips/notes-d.mp4", "phone": "clips/notes-p.mp4" },
+    { "n": "02", "name": "Bookmark", "line": "A strip of the postcard's paper down the right edge. The day prints onto it line by line as you lose height, and the price is waiting at the bottom.", "desktop": "clips/bookmark-d.mp4", "phone": "clips/bookmark-p.mp4" },
+    { "n": "03", "name": "Spreads", "line": "Twice on the way down the scroll holds and the page turns to paper: a magazine spread with a postcard of the view you just left.", "desktop": "clips/spreads-d.mp4", "phone": "clips/spreads-p.mp4" }
+  ]
+}

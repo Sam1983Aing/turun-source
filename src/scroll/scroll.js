@@ -25,6 +25,8 @@
 //   record             the recorder drives the page frame by frame (tools/scroll-clip.mjs)
 //   pr=1               pixel ratio pinned (else it is picked while loading, then governed)
 //   lighting=, hour=   as in app.js, and the page then leaves the light alone
+//   middle=notes|bookmark|spreads   (demo) an option for the middle of the page, see
+//                      middle-options.js. Without it the page is as it was.
 //
 // Looking around (v9): drag the scene to turn the head away from the path's view; let go and it
 // eases back on the stairs. On the beach the chosen heading stays until reset. The scroll
@@ -40,6 +42,7 @@ import { ORIGIN } from '../terrain/geo.js';
 import { walkLine } from '../trail/route.js';
 import { buildDescent, makePace, STOPS } from './path.js';
 import { createPostcard } from './postcard.js';
+import { createMiddle, MIDDLE_HOLDS } from './middle-options.js';
 
 gsap.registerPlugin(SplitText);
 
@@ -81,6 +84,7 @@ export function startScroll({ params }) {
   const RECORD = params.has('record');
   const DEBUG = params.has('debug');
   const BARE = params.has('notext') || params.has('bare');
+  const MIDDLE = BARE ? null : params.get('middle');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const html = document.documentElement;
   if (params.has('notext')) html.classList.add('notext');
@@ -111,18 +115,28 @@ export function startScroll({ params }) {
   const pace = makePace();
   const sStart = BARE ? 0 : pace.screensAt(TAU0), sBeat = pace.screensAt(BEAT_TAU), sEnd = pace.screens;
   const heroLen = BARE ? 0 : HERO, lead = heroLen * CAM_START, beatLen = BARE ? 0 : BEAT, outLen = BARE ? 0 : OUTRO;
-  const yBeat = lead + (sBeat - sStart), yOut = lead + (sEnd - sStart) + beatLen;
+  // Where the scroll holds the camera still: the beat on the beach, and any an option for the
+  // middle asks for. s: where on the path, len: for how many screens, y: where on the page.
+  const holds = [{ id: 'beat', s: sBeat, len: beatLen }, ...((MIDDLE && MIDDLE_HOLDS[MIDDLE]) || []).map((h) => ({ id: h.id, s: pace.screensAt(h.tau), len: h.len }))]
+    .filter((h) => h.len > 0).sort((a, b) => a.s - b.s);
+  holds.reduce((before, h) => { h.y = lead + (h.s - sStart) + before; return before + h.len; }, 0);
+  const held = holds.reduce((a, h) => a + h.len, 0);
+  const yBeat = holds.find((h) => h.id === 'beat')?.y ?? 0, yOut = lead + (sEnd - sStart) + held;
   const page = {
     screens: yOut + outLen,
+    holds,
     // The camera's place (in path.js's screens) for a place on the page, and back.
     camAt(y) {
-      const d = y - lead;
-      if (d <= 0) return sStart;
-      if (d <= sBeat - sStart) return sStart + d;
-      if (d <= sBeat - sStart + beatLen) return sBeat;
-      return Math.min(sEnd, sStart + d - beatLen);
+      let s = sStart + (y - lead);
+      if (s <= sStart) return sStart;
+      for (const h of holds) {
+        if (s <= h.s) break;
+        if (s <= h.s + h.len) return h.s;
+        s -= h.len;
+      }
+      return Math.min(sEnd, s);
     },
-    yAt(s) { return s <= sStart ? 0 : lead + (s - sStart) + (s > sBeat + 1e-6 ? beatLen : 0); },
+    yAt(s) { return s <= sStart ? 0 : lead + (s - sStart) + holds.reduce((a, h) => a + (s > h.s + 1e-6 ? h.len : 0), 0); },
     tauAt(y) { return pace.tauAt(this.camAt(y)); },
     screensAt(tau) { return this.yAt(pace.screensAt(tau)); },
   };
@@ -415,6 +429,8 @@ export function startScroll({ params }) {
   // The curtain: the same blank sand, drawn over the page for a jump from the menu.
   const curtain = { a: 0 };
   let traveling = false, coverShown = -1, beatA = 0;
+  // How much of the scene is under blank paper: the beat's, or an option's spread.
+  const veil = () => Math.max(beatA, middle?.cover ?? 0);
   function updateStory() {
     if (BARE) return;
     post.set({
@@ -561,7 +577,7 @@ export function startScroll({ params }) {
     for (const k of blocks) {
       const on = !quiet && (
         k.kind === 'hero' ? cam.out <= 0 && cam.hero >= k.a && cam.hero <= k.b
-        : k.kind === 'tau' ? inScene() && cam.tau >= k.a && cam.tau <= k.b && beatA < 0.4
+        : k.kind === 'tau' ? inScene() && cam.tau >= k.a && cam.tau <= k.b && veil() < 0.4
         : k.kind === 'end' ? cam.out >= k.a && cam.out <= k.b
         : beatA > 0.9 && curtain.a < 0.05);
       if (on !== k.on) { k.on = on; on ? show(k) : hide(k); }
@@ -612,9 +628,9 @@ export function startScroll({ params }) {
       for (const c of ['at-sand', 'in-scene', 'at-hero']) html.classList.toggle(c, phase.split(' ').includes(c));
     }
     const quiet = !wordsOn || traveling;
-    setShown('.hud', !quiet && (cam.hero < 0.1 || (cam.hero >= 0.96 && cam.out < 0.05 && beatA < 0.4) || cam.out > 0.55));
-    setShown('.rail', !quiet && inScene() && cam.tau > 0.93 && beatA < 0.4);
-    setShown('.scene-controls', !quiet && inScene() && cam.tau >= 4.02 && beatA < 0.4);
+    setShown('.hud', !quiet && (cam.hero < 0.1 || (cam.hero >= 0.96 && cam.out < 0.05 && veil() < 0.4) || cam.out > 0.55));
+    setShown('.rail', !quiet && inScene() && cam.tau > 0.93 && veil() < 0.4);
+    setShown('.scene-controls', !quiet && inScene() && cam.tau >= 4.02 && veil() < 0.4);
 
     const [e, n, h] = cam.pose.pos;
     const lat = ORIGIN.lat + n / 111320, lon = ORIGIN.lon + e / (111320 * Math.cos((ORIGIN.lat * Math.PI) / 180));
@@ -736,6 +752,9 @@ export function startScroll({ params }) {
     lenis.scrollTo(0, { duration: Math.min(9, 2.5 + cam.y * 0.4), easing: inOut, onComplete: () => { rewinding = false; } });
   }));
 
+  // (Demo: an option for the middle of the page, if the URL asks for one.)
+  const middle = MIDDLE ? createMiddle(MIDDLE, { app, cam, page, html, reduced, inScene, descent: () => descent, travel: (k) => travel(places[k]()) }) : null;
+
   resize(true);
   addEventListener('resize', () => resize());
 
@@ -753,6 +772,7 @@ export function startScroll({ params }) {
     updateStory();
     updateWords();
     updateFrame();
+    middle?.tick(dt, { quiet: !wordsOn || rewinding || traveling, veil: beatA });
     post.tick(dt);
     // (At rest the picture is a picture: no frame is drawn until something in it changes.)
     if (dirty > 0 || !still()) { dirty = Math.max(0, dirty - 1); app.frame(dt); }
