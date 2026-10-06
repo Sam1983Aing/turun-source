@@ -1,0 +1,17 @@
+{
+  "section": "Lettering: the hero, a line over the scene, the first spread",
+  "out": "type-options",
+  "cardSeconds": 3.2,
+  "theme": {
+    "bg": "#12110e", "fg": "#f3efe6", "accent": "#d9774f",
+    "display": { "family": "Instrument Serif", "src": "../../vendor/fonts/InstrumentSerif-latin.woff2" },
+    "body": { "family": "Inter", "src": "../../vendor/fonts/Inter-latin.woff2" },
+    "mono": { "family": "Inter", "src": "../../vendor/fonts/Inter-latin.woff2", "weight": 500 }
+  },
+  "options": [
+    { "n": "00", "name": "Now", "line": "Instrument Serif for the lines, Inter for the small type. Editorial, like a magazine.", "desktop": "clips/now-d.mp4", "phone": "clips/now-p.mp4" },
+    { "n": "01", "name": "Water Brush", "line": "A loaded brush with a big swash on the capital, and Courier Prime as the typewriter. The nearest to your mock-ups.", "desktop": "clips/water-d.mp4", "phone": "clips/water-p.mp4" },
+    { "n": "02", "name": "Caramel", "line": "A smoother brush script that stays easy to read at any size, with the same Courier Prime.", "desktop": "clips/caramel-d.mp4", "phone": "clips/caramel-p.mp4" },
+    { "n": "03", "name": "Comforter", "line": "An upright, rougher hand, as if written quickly with a marker, and Special Elite, a worn typewriter.", "desktop": "clips/comforter-d.mp4", "phone": "clips/comforter-p.mp4" }
+  ]
+}

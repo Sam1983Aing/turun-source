@@ -162,7 +162,9 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   did not draw). It lies in the card's world with the inverse of the world's resting
   transform, so at rest it fills the screen as it was composed, and on the way up it grows
   and turns with the card. How much larger than the screen it has to be for no edge to show
-  on the way is worked out for each pose and screen size (`sandOver`).
+  on the way is worked out for each pose and screen size (`sandOver`). It is drawn into a
+  canvas at its own 3840 px, not set as a CSS background: a background is drawn once at the
+  element's size on the page and then stretched as the world grows, and went soft in the dive.
 - **The spreads** (v35, `spreads.js`). Twice on the way down the dive runs backwards: the frame
   goes back to being a postcard on the sand, the camera slowing to a stop as it lands, and a
   piece of the offer comes in beside it (words left of the card the first time, right of it

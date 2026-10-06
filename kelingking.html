@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 3ddbc88. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
+  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 8c52565. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Turun · The walk down to Kelingking Beach</title>
@@ -94,7 +94,7 @@ html.scroll.loading { overflow: hidden; }
 html.scroll .table { position: fixed; left: 0; top: 0; width: 100vw; height: 100lvh; z-index: 0; overflow: hidden; background: var(--sand); }
 html.scroll .world { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
 html.scroll .table.is-full .world { will-change: auto; }
-html.scroll .ground { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: 50% 50%; will-change: transform; background: center / cover no-repeat; }
+html.scroll .ground { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: 50% 50%; will-change: transform; }
 html.scroll .card { position: absolute; inset: 0; }
 /* (Each moving part on a layer of its own: the tilt, the turn, the caption's fade and the
    shadow's squeeze are then the compositor's work, and the blurred shadow is painted once.) */
@@ -425,7 +425,7 @@ html.scroll.at-card #stage { cursor: pointer; }
        wrappers make no boxes at all (page.css). -->
   <div class="table">
     <div class="world">
-      <div class="ground" aria-hidden="true"></div>
+      <canvas class="ground" aria-hidden="true"></canvas>
       <div class="card">
         <div class="card__shadow"></div>
         <div class="card__flip">
@@ -96032,7 +96032,8 @@ const EASE = 'expo.out';
 // go as soon as it has lifted this far: the card grows over where they are.
 const NEAR = 0.1, LIFTED = 0.03;
 
-function createSpreads({ reduced = false, onReserve } = {}) {
+// off: how far a line has to move to be out of its mask, in percent of its own height.
+function createSpreads({ reduced = false, off = 108, onReserve } = {}) {
   const list = [...document.querySelectorAll('.sp[data-hold]')].map((node) => {
     node.querySelectorAll('a[href="#reserve"]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); onReserve?.(); }));
     const q = (sel) => [...node.querySelectorAll(sel)];
@@ -96044,7 +96045,7 @@ function createSpreads({ reduced = false, onReserve } = {}) {
 
   // Before the words come in: the lines under their masks, the rule undrawn.
   function rest(s) {
-    gsap.set(s.lines, { yPercent: 108 });
+    gsap.set(s.lines, { yPercent: off });
     gsap.set(s.rule, { scaleX: 0, opacity: 1 });
     gsap.set(s.small, { opacity: 0, y: 12 });
   }
@@ -96060,7 +96061,7 @@ function createSpreads({ reduced = false, onReserve } = {}) {
   function hide(s) {
     s.tl?.kill();
     const d = reduced ? 0 : 0.4, t = (s.tl = gsap.timeline());
-    t.to(s.lines, { yPercent: -108, duration: d, ease: EASE, stagger: 0.04 }, 0);
+    t.to(s.lines, { yPercent: -off, duration: d, ease: EASE, stagger: 0.04 }, 0);
     t.to([...s.rule, ...s.small], { opacity: 0, duration: d * 0.7, ease: EASE }, 0);
     t.set(s.node, { visibility: 'hidden' });
   }
@@ -96098,6 +96099,41 @@ function spreadCaptions() {
 
 return { "createSpreads": createSpreads, "spreadCaptions": spreadCaptions };
 })();
+// src/scroll/type-options.js
+__m["src/scroll/type-options.js"] = (function () {
+"use strict";
+// Options for the page's lettering (demo, 6 October 2026): three pairs of a brush hand for
+// the lines and a typewriter face for the small type, after the hero mock-ups Sam made
+// (output/hero-concepts-2026-10-06/). Behind a URL switch; without it none of this runs and the
+// page keeps its serif and sans.
+//
+//   ?type=water       Water Brush + Courier Prime     the nearest to the mock-up: a loaded brush
+//   ?type=caramel     Caramel + Courier Prime         smoother and easier to read
+//   ?type=comforter   Comforter Brush + Special Elite upright, rough, a worn typewriter
+//
+// The fonts come from Google Fonts while this is a demo (all under the SIL Open Font License,
+// Special Elite under Apache 2.0). The one Sam picks has to be added to vendor/fonts/ for the
+// single file, which is a download to ask him about.
+
+const PAIRS = {
+  water: 'family=Water+Brush&family=Courier+Prime:wght@400;700',
+  caramel: 'family=Caramel&family=Courier+Prime:wght@400;700',
+  comforter: 'family=Comforter+Brush&family=Special+Elite',
+};
+
+// Returns how far (percent of their own height) the lines have to be moved to be out of their
+// masks: a brush hand reaches well outside its line, so the masks are larger (type-options.css).
+function applyType(kind) {
+  if (!PAIRS[kind]) return null;
+  const add = (href) => { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = href; document.head.append(l); };
+  add(`https://fonts.googleapis.com/css2?${PAIRS[kind]}&display=block`);
+  add(new URL('./type-options.css', location.href).href);
+  document.documentElement.classList.add('type', `type-${kind}`);
+  return { lineOff: 235 };
+}
+
+return { "applyType": applyType };
+})();
 // src/scroll/scroll.js
 __m["src/scroll/scroll.js"] = (function () {
 "use strict";
@@ -96131,6 +96167,8 @@ __m["src/scroll/scroll.js"] = (function () {
 //   record             the recorder drives the page frame by frame (tools/scroll-clip.mjs)
 //   pr=1               pixel ratio pinned (else it is picked while loading, then governed)
 //   lighting=, hour=   as in app.js, and the page then leaves the light alone
+//   type=water|caramel|comforter   (demo) the page's lettering as a brush hand and a typewriter
+//                      face, see type-options.js. Without it the page is as it was.
 //
 // Looking around (v9): drag the scene to turn the head away from the path's view; let go and it
 // eases back on the stairs. On the beach the chosen heading stays until reset. The scroll
@@ -96147,6 +96185,7 @@ const { walkLine } = __m["src/trail/route.js"];
 const { buildDescent, makePace, STOPS } = __m["src/scroll/path.js"];
 const { createPostcard } = __m["src/scroll/postcard.js"];
 const { createSpreads, spreadCaptions } = __m["src/scroll/spreads.js"];
+const { applyType } = __m["src/scroll/type-options.js"];
 
 gsap.registerPlugin(SplitText);
 
@@ -96206,6 +96245,9 @@ function startScroll({ params }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const html = document.documentElement;
   if (params.has('notext')) html.classList.add('notext');
+  // (Demo: an option for the lettering, if the URL asks for one.) How far a line has to move to
+  // be out of its mask, in percent of its own height.
+  const OFF = (BARE ? null : applyType(params.get('type')))?.lineOff ?? 105;
   const $ = (s) => document.querySelector(s);
   const loaderEl = $('.loader');
 
@@ -96384,6 +96426,7 @@ function startScroll({ params }) {
     track.style.height = `${page.screens * unit + innerHeight}px`;
     post.layout();
     spreads?.layout(post);
+    drawSand();
     dirty = 2;
     if (walk && Math.abs(w / h / descent.aspect - 1) > 0.03) build();
     if (retained !== null) jumpTo(retained);
@@ -96399,10 +96442,26 @@ function startScroll({ params }) {
   }
 
   // The sand under the card: a photograph (assets/hero/, generated for this page), laid in the
-  // card's world by postcard.js. If it cannot be had, the table's plain sand colour stands in.
+  // card's world by postcard.js. It is drawn into a canvas at the photograph's own size, not
+  // set as a background: the browser draws a background once at the size the element has on
+  // the page and stretches that as the world grows, where a canvas is sampled afresh at every
+  // size, so the sand stays sharp all the way into the card. If the photograph cannot be had,
+  // the table's plain sand colour stands in.
+  let sandImg = null;
+  function drawSand() {
+    if (!sandImg || !size[0]) return;
+    const c = post.ground, iw = sandImg.naturalWidth, ih = sandImg.naturalHeight, shape = size[0] / size[1];
+    // The middle of the photograph, in the screen's shape (a phone takes a tall strip of it).
+    const sw = Math.min(iw, ih * shape), sh = sw / shape;
+    const k = Math.min(1, Math.sqrt((size[0] < 720 ? 4.2e6 : 9.3e6) / (sw * sh)));
+    c.width = Math.round(sw * k); c.height = Math.round(sh * k);
+    const g = c.getContext('2d');
+    g.imageSmoothingQuality = 'high';
+    g.drawImage(sandImg, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
+  }
   const sandReady = BARE ? Promise.resolve() : new Promise((done) => {
     const img = new Image();
-    img.onload = () => { post.ground.style.backgroundImage = `url("${img.src}")`; (img.decode?.() ?? Promise.resolve()).catch(() => {}).then(done); };
+    img.onload = () => { (img.decode?.() ?? Promise.resolve()).catch(() => {}).then(() => { sandImg = img; drawSand(); done(); }); };
     img.onerror = () => { console.warn('the hero\'s sand did not load: plain sand instead'); done(); };
     img.src = ASSETS.hero;
     setTimeout(done, 8000);
@@ -96456,7 +96515,11 @@ function startScroll({ params }) {
     cam.y = (snap || reduced) ? target : cam.y + (target - cam.y) * (1 - Math.exp(-FOLLOW * dt));
     if (Math.abs(target - cam.y) < 1e-4) cam.y = target;
     cam.screens = page.camAt(cam.y);
+    const tauWas = cam.tau;
     cam.tau = pace.tauAt(cam.screens);
+    // (A jump from one resting card straight to another passes through no moving frame: the
+    // picture has to be drawn again for the new place all the same.)
+    if (cam.tau !== tauWas) dirty = Math.max(dirty, 2);
     cam.hero = heroLen ? clamp01(cam.y / heroLen) : 1;
     cam.out = outLen ? clamp01((cam.y - yOut) / outLen) : 0;
     [cam.card, cam.up] = cardAt(cam.y, cam.out);
@@ -96637,7 +96700,7 @@ function startScroll({ params }) {
     } });
   }
   const places = { walk: () => page.screensAt(1), boat: () => page.screensAt(4.97), reserve: () => page.screens };
-  const spreads = BARE ? null : createSpreads({ reduced, onReserve: () => travel(places.reserve()) });
+  const spreads = BARE ? null : createSpreads({ reduced, off: OFF, onReserve: () => travel(places.reserve()) });
   document.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', (e) => {
     e.preventDefault();
     travel(places[el.dataset.go]());
@@ -96666,7 +96729,7 @@ function startScroll({ params }) {
         k.byEl.set(d, self.lines);
         k.lines = [...k.byEl.values()].flat();
         k.tl?.progress(1);
-        gsap.set(self.lines, { yPercent: k.on ? 0 : 105 });
+        gsap.set(self.lines, { yPercent: k.on ? 0 : OFF });
       } });
     }
     gsap.set(after, { autoAlpha: 0, y: 14 });
@@ -96718,10 +96781,10 @@ function startScroll({ params }) {
     const t = (k.tl = gsap.timeline());
     k.el.classList.remove('is-on');
     const d = reduced ? 0 : 0.7;
-    if (k.lines.length) t.to(k.lines, { yPercent: -105, duration: d, ease: EASE, stagger: 0.04 }, 0);
+    if (k.lines.length) t.to(k.lines, { yPercent: -OFF, duration: d, ease: EASE, stagger: 0.04 }, 0);
     t.to(k.after, { autoAlpha: 0, y: -8, duration: d * 0.8, ease: EASE }, 0);
     t.set(k.el, { visibility: 'hidden' });
-    if (k.lines.length) t.set(k.lines, { yPercent: 105 });
+    if (k.lines.length) t.set(k.lines, { yPercent: OFF });
     t.set(k.after, { y: 14 });
   }
   let wordsOn = false;

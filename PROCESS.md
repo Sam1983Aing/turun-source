@@ -3687,3 +3687,56 @@ The postcard already did this once, at the ending. So this round is a generalisa
   hand-lettered with a typewriter face.
 - The card has no palm shadow on it though the sand around it does.
 - The page is about 23.5 screens long.
+
+## v35, round 5: the sand at 4K, and options for the lettering (2026-10-06)
+
+### The sand at 4K
+
+Sam regenerated the sand at 3840 x 2400 from a prompt I wrote for him (the same picture,
+larger: flat and top-down, sharp edge to edge, light from the top left, nothing in the
+middle). Two things came with it:
+
+- **A sharper file was not enough on its own.** The sand was a CSS background on an element
+  the size of the screen, inside a world scaled up 2.4 times and more. The browser draws a
+  background once at the element's own size and stretches that, so a 4K file would still
+  have been sampled at about 1500 px and gone soft in the dive. It is now drawn into a
+  canvas at the photograph's own size (cropped to the screen's shape, capped at about 4 MP
+  on a phone), which is sampled afresh at whatever size it is shown. Mid-dive at a pixel
+  ratio of 2, before and after: the grains are grains.
+- The first version's upscale and sharpening are gone: the file is the original, as JPEG.
+
+### A card could show the wrong picture
+
+Found on a phone sheet: after a jump straight from the hero at rest to a spread at rest,
+the spread's card still showed the hero's picture. Nothing is drawn while a card rests, and
+a jump between two rests passes through no frame that moves. A change of the camera's place
+now always owes two frames. A visitor could have hit this with the scrollbar or the End key
+when smooth scrolling is off (reduced motion).
+
+### Options for the lettering
+
+Sam's mock-ups are hand-lettered, with typewriter small type, and he asked to see fonts that
+come close. A specimen sheet of eighteen brush hands and four typewriter faces first
+(set in the page's own headline), then three pairs built into the real page behind `?type=`
+and recorded next to the page as it is (`src/scroll/type-options.js` and `.css`, the reels in
+`demo/type/`):
+
+- `?type=water` Water Brush and Courier Prime. A loaded brush with a swash capital: the
+  nearest to the mock-ups, and the hardest to read small.
+- `?type=caramel` Caramel and Courier Prime. Smoother, legible at any size.
+- `?type=comforter` Comforter Brush and Special Elite. Upright and rough, a worn typewriter.
+
+All are free to ship (SIL Open Font License, Special Elite Apache 2.0). They load from Google
+Fonts while this is a demo. The one he picks has to go into `vendor/fonts/` for the single
+file, which is a download to ask him about.
+
+What a brush hand needed that the serif did not:
+
+- **Size by measurement.** A script at the serif's size is far smaller on the page. Each is
+  scaled from the measured width of the widest line against the column (1.14 to 1.5 times).
+- **Bigger masks.** The lines rise out of masks, and a brush swings well outside its line.
+  Padding the masks with negative margins collapsed between the lines and pushed them
+  apart (the first render had a headline three times too tall), so the masks clip with a
+  `clip-path` set further out, and the lines travel 235% of their height, not 105%.
+- **Ink.** Pen blue on the sand, the same hand in cream over the scene, one brushed stroke
+  under the word that matters, the lines written a few degrees uphill.

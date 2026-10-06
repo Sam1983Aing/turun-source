@@ -28,6 +28,8 @@
 //   record             the recorder drives the page frame by frame (tools/scroll-clip.mjs)
 //   pr=1               pixel ratio pinned (else it is picked while loading, then governed)
 //   lighting=, hour=   as in app.js, and the page then leaves the light alone
+//   type=water|caramel|comforter   (demo) the page's lettering as a brush hand and a typewriter
+//                      face, see type-options.js. Without it the page is as it was.
 //
 // Looking around (v9): drag the scene to turn the head away from the path's view; let go and it
 // eases back on the stairs. On the beach the chosen heading stays until reset. The scroll
@@ -44,6 +46,7 @@ import { walkLine } from '../trail/route.js';
 import { buildDescent, makePace, STOPS } from './path.js';
 import { createPostcard } from './postcard.js';
 import { createSpreads, spreadCaptions } from './spreads.js';
+import { applyType } from './type-options.js';
 
 gsap.registerPlugin(SplitText);
 
@@ -103,6 +106,9 @@ export function startScroll({ params }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const html = document.documentElement;
   if (params.has('notext')) html.classList.add('notext');
+  // (Demo: an option for the lettering, if the URL asks for one.) How far a line has to move to
+  // be out of its mask, in percent of its own height.
+  const OFF = (BARE ? null : applyType(params.get('type')))?.lineOff ?? 105;
   const $ = (s) => document.querySelector(s);
   const loaderEl = $('.loader');
 
@@ -281,6 +287,7 @@ export function startScroll({ params }) {
     track.style.height = `${page.screens * unit + innerHeight}px`;
     post.layout();
     spreads?.layout(post);
+    drawSand();
     dirty = 2;
     if (walk && Math.abs(w / h / descent.aspect - 1) > 0.03) build();
     if (retained !== null) jumpTo(retained);
@@ -296,10 +303,26 @@ export function startScroll({ params }) {
   }
 
   // The sand under the card: a photograph (assets/hero/, generated for this page), laid in the
-  // card's world by postcard.js. If it cannot be had, the table's plain sand colour stands in.
+  // card's world by postcard.js. It is drawn into a canvas at the photograph's own size, not
+  // set as a background: the browser draws a background once at the size the element has on
+  // the page and stretches that as the world grows, where a canvas is sampled afresh at every
+  // size, so the sand stays sharp all the way into the card. If the photograph cannot be had,
+  // the table's plain sand colour stands in.
+  let sandImg = null;
+  function drawSand() {
+    if (!sandImg || !size[0]) return;
+    const c = post.ground, iw = sandImg.naturalWidth, ih = sandImg.naturalHeight, shape = size[0] / size[1];
+    // The middle of the photograph, in the screen's shape (a phone takes a tall strip of it).
+    const sw = Math.min(iw, ih * shape), sh = sw / shape;
+    const k = Math.min(1, Math.sqrt((size[0] < 720 ? 4.2e6 : 9.3e6) / (sw * sh)));
+    c.width = Math.round(sw * k); c.height = Math.round(sh * k);
+    const g = c.getContext('2d');
+    g.imageSmoothingQuality = 'high';
+    g.drawImage(sandImg, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
+  }
   const sandReady = BARE ? Promise.resolve() : new Promise((done) => {
     const img = new Image();
-    img.onload = () => { post.ground.style.backgroundImage = `url("${img.src}")`; (img.decode?.() ?? Promise.resolve()).catch(() => {}).then(done); };
+    img.onload = () => { (img.decode?.() ?? Promise.resolve()).catch(() => {}).then(() => { sandImg = img; drawSand(); done(); }); };
     img.onerror = () => { console.warn('the hero\'s sand did not load: plain sand instead'); done(); };
     img.src = ASSETS.hero;
     setTimeout(done, 8000);
@@ -353,7 +376,11 @@ export function startScroll({ params }) {
     cam.y = (snap || reduced) ? target : cam.y + (target - cam.y) * (1 - Math.exp(-FOLLOW * dt));
     if (Math.abs(target - cam.y) < 1e-4) cam.y = target;
     cam.screens = page.camAt(cam.y);
+    const tauWas = cam.tau;
     cam.tau = pace.tauAt(cam.screens);
+    // (A jump from one resting card straight to another passes through no moving frame: the
+    // picture has to be drawn again for the new place all the same.)
+    if (cam.tau !== tauWas) dirty = Math.max(dirty, 2);
     cam.hero = heroLen ? clamp01(cam.y / heroLen) : 1;
     cam.out = outLen ? clamp01((cam.y - yOut) / outLen) : 0;
     [cam.card, cam.up] = cardAt(cam.y, cam.out);
@@ -534,7 +561,7 @@ export function startScroll({ params }) {
     } });
   }
   const places = { walk: () => page.screensAt(1), boat: () => page.screensAt(4.97), reserve: () => page.screens };
-  const spreads = BARE ? null : createSpreads({ reduced, onReserve: () => travel(places.reserve()) });
+  const spreads = BARE ? null : createSpreads({ reduced, off: OFF, onReserve: () => travel(places.reserve()) });
   document.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', (e) => {
     e.preventDefault();
     travel(places[el.dataset.go]());
@@ -563,7 +590,7 @@ export function startScroll({ params }) {
         k.byEl.set(d, self.lines);
         k.lines = [...k.byEl.values()].flat();
         k.tl?.progress(1);
-        gsap.set(self.lines, { yPercent: k.on ? 0 : 105 });
+        gsap.set(self.lines, { yPercent: k.on ? 0 : OFF });
       } });
     }
     gsap.set(after, { autoAlpha: 0, y: 14 });
@@ -615,10 +642,10 @@ export function startScroll({ params }) {
     const t = (k.tl = gsap.timeline());
     k.el.classList.remove('is-on');
     const d = reduced ? 0 : 0.7;
-    if (k.lines.length) t.to(k.lines, { yPercent: -105, duration: d, ease: EASE, stagger: 0.04 }, 0);
+    if (k.lines.length) t.to(k.lines, { yPercent: -OFF, duration: d, ease: EASE, stagger: 0.04 }, 0);
     t.to(k.after, { autoAlpha: 0, y: -8, duration: d * 0.8, ease: EASE }, 0);
     t.set(k.el, { visibility: 'hidden' });
-    if (k.lines.length) t.set(k.lines, { yPercent: 105 });
+    if (k.lines.length) t.set(k.lines, { yPercent: OFF });
     t.set(k.after, { y: 14 });
   }
   let wordsOn = false;

@@ -14,7 +14,8 @@ const EASE = 'expo.out';
 // go as soon as it has lifted this far: the card grows over where they are.
 const NEAR = 0.1, LIFTED = 0.03;
 
-export function createSpreads({ reduced = false, onReserve } = {}) {
+// off: how far a line has to move to be out of its mask, in percent of its own height.
+export function createSpreads({ reduced = false, off = 108, onReserve } = {}) {
   const list = [...document.querySelectorAll('.sp[data-hold]')].map((node) => {
     node.querySelectorAll('a[href="#reserve"]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); onReserve?.(); }));
     const q = (sel) => [...node.querySelectorAll(sel)];
@@ -26,7 +27,7 @@ export function createSpreads({ reduced = false, onReserve } = {}) {
 
   // Before the words come in: the lines under their masks, the rule undrawn.
   function rest(s) {
-    gsap.set(s.lines, { yPercent: 108 });
+    gsap.set(s.lines, { yPercent: off });
     gsap.set(s.rule, { scaleX: 0, opacity: 1 });
     gsap.set(s.small, { opacity: 0, y: 12 });
   }
@@ -42,7 +43,7 @@ export function createSpreads({ reduced = false, onReserve } = {}) {
   function hide(s) {
     s.tl?.kill();
     const d = reduced ? 0 : 0.4, t = (s.tl = gsap.timeline());
-    t.to(s.lines, { yPercent: -108, duration: d, ease: EASE, stagger: 0.04 }, 0);
+    t.to(s.lines, { yPercent: -off, duration: d, ease: EASE, stagger: 0.04 }, 0);
     t.to([...s.rule, ...s.small], { opacity: 0, duration: d * 0.7, ease: EASE }, 0);
     t.set(s.node, { visibility: 'hidden' });
   }
