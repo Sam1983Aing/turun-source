@@ -63,7 +63,7 @@ const WAKE = [0.2, 0.58];
 const BEAT_TAU = 4.66, BEAT = 0.8, BEAT_FADE = 0.32;
 // The ending, in screens, and the shares of it for the frame going back to a card, and the
 // card turning over.
-const OUTRO = 2.6, OUT_CARD = [0, 0.46], OUT_FLIP = [0.5, 0.8], OUT_WORDS = 0.76;
+const OUTRO = 2.6, OUT_CARD = [0, 0.46], OUT_FLIP = [0.5, 0.8], OUT_WORDS = 0.6, OUT_STAMP = 0.79;
 // Where the sand under the card is photographed: a spot on the upper beach, from this high,
 // through this lens, and in this light whatever the scene's is (a low sun rakes across the
 // sand's relief, where noon flattens it to a cream wall).
@@ -501,26 +501,34 @@ export function startScroll({ params }) {
     gsap.set(after, { autoAlpha: 0, y: 14 });
     return k;
   });
-  // The back of the card: what is written on it comes in once it has turned over.
-  const backParts = [...document.querySelectorAll('.back__head, .back__note, .back__plan li, .back__price, .stamp, .back__to, .back__addr .field, .back__addr .button, .back__small')];
+  // The back of the card: what is written on it is there by the time it has turned to face
+  // you (it starts coming in while the card is still edge-on), and the postmark lands once
+  // the card is down.
+  const backParts = [...document.querySelectorAll('.back__head, .back__note, .back__plan li, .back__price, .stamp__paper, .back__to, .back__addr .field, .back__addr .button, .back__small')];
   const backIn = $('.back__in');
-  let backOn = null, backTl = null;
+  let backOn = null, backTl = null, stampOn = null;
   function showBack(on) {
     if (on === backOn) return;
     backOn = on;
     backTl?.kill();
-    const d = reduced ? 0 : REVEAL;
+    const d = reduced ? 0 : 0.7;
     backTl = gsap.timeline();
     if (on) {
-      backTl.to(backIn, { '--rule': 1, duration: d * 1.3, ease: EASE }, 0);
-      backTl.to(backParts, { autoAlpha: 1, y: 0, duration: d, ease: EASE, stagger: 0.055 }, 0.05);
-      backTl.fromTo('.stamp__mark', { scale: 1.5, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: reduced ? 0 : 0.5, ease: 'power4.in' }, reduced ? 0 : 0.55);
+      backTl.to(backIn, { '--rule': 1, duration: d * 1.6, ease: EASE }, 0);
+      backTl.to(backParts, { autoAlpha: 1, y: 0, duration: d, ease: EASE, stagger: 0.03 }, 0);
     } else {
-      backTl.to(backParts, { autoAlpha: 0, y: 10, duration: d * 0.4, ease: EASE }, 0);
+      backTl.to(backParts, { autoAlpha: 0, y: 8, duration: d * 0.4, ease: EASE }, 0);
       backTl.to(backIn, { '--rule': 0, duration: d * 0.4, ease: EASE }, 0);
     }
   }
-  gsap.set(backParts, { autoAlpha: 0, y: 10 });
+  function showStamp(on) {
+    if (on === stampOn) return;
+    stampOn = on;
+    if (on) gsap.fromTo('.stamp__mark', { scale: 1.45, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: reduced ? 0 : 0.42, ease: 'power4.in', overwrite: true });
+    else gsap.to('.stamp__mark', { autoAlpha: 0, duration: 0.2, overwrite: true });
+  }
+  gsap.set(backParts, { autoAlpha: 0, y: 8 });
+  gsap.set('.stamp__mark', { autoAlpha: 0 });
   gsap.set(backIn, { '--rule': 0 });
 
   let rewinding = false;
@@ -564,6 +572,7 @@ export function startScroll({ params }) {
       }
     }
     showBack(!quiet && cam.out >= OUT_WORDS);
+    showStamp(!quiet && cam.out >= OUT_STAMP);
   }
 
   // ---------------------------------------------------------------- the frame around the scene

@@ -176,6 +176,28 @@ node tools/path-bench.mjs --pace       # real frame pacing while the page scroll
 Landing page switches: `debug`, `at=2.5` (start at that `tau`), `notext`, `record` (for
 `scroll-clip.mjs`), and every scene switch (`pr=`, `q=`, `hour=`, ...).
 
+## How the boat works
+
+v35 added one object to the scene: a jukung, the Balinese double-outrigger canoe, at anchor
+about 70 m off the beach (`src/boat/`). It is built in code like the plants: a lofted hull,
+two bamboo floats on arched beams lashed with the path's blue cord, a raked mast with the sail
+rolled round its yard, a storm lantern over the stern.
+
+- **It floats on the sea the page draws.** Nothing comes back from the GPU, so `sea.js` works
+  out the same surface on the CPU (the wave train off the beach and the FFT ocean's longer
+  waves, from the same seed) at nine points under the hull and the floats. A plane through
+  them gives heave, pitch and roll. It is a function of the clock alone.
+- **It is lit like the path** (a patched standard material: the atmosphere's sun, the baked
+  island shadow, cloud shadows, haze before the tone curve), and shades itself with a few
+  capsules, not a shadow map.
+- **What it does to the water** is a sheet of its own laid on the sea round the hull
+  (`on-water.js`): the boat's shadow in the water, its reflection, the lantern's path of
+  light. The sea's shader is not touched. Without these the hull looked pasted on.
+- **The lantern** lights when the sun is low or gone. Its brightness is set on screen and
+  divided by the exposure, which runs over fifteen stops between noon and night.
+
+`?boat=0` leaves it out, `?boat=east,north[,heading]` moors it somewhere else.
+
 ## The standalone file
 
 `kelingking.html` is the whole page in one file you can double-click. Browsers refuse ES

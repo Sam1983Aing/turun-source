@@ -27,6 +27,7 @@
 //                      (src/sky/clouds.js); cloudDefines=LIGHT_STEPS:3,FINE_DIV:4.0 its shader's
 //                      step counts and shape constants, for timing (tools/cloud-bench.mjs)
 //   trail=0            no path (v6): the ground uncarved, no steps, rails or plants cleared for it
+//   boat=0             no jukung (v35); boat=east,north[,heading] moors it somewhere else
 //   faceStep=0.55      spacing of the face strips' vertices near the headland (metres)
 //   vegDetail=1        (v7) how far the full plants reach before their lighter level (0: none)
 //   vegHide=near:grass,impostor   (v7) leave out plant meshes by the start of their names
@@ -50,6 +51,7 @@ import { loadSurfaceTextures } from './terrain/surface-textures.js';
 import { createVegetation } from './veg/plants.js';
 import { SPECIES } from './veg/scatter.js';
 import { createTrail } from './trail/trail.js';
+import { createJukung } from './boat/jukung.js';
 import { decodeBake } from './terrain/bake-format.js';
 
 // Where the assets are (v11): next to the page, or, in the standalone build, on the CDN it sets
@@ -243,6 +245,11 @@ export function createApp({ params, capture = false, keepBuffer = false, maxPixe
   trail.uniforms.uClayT.value = state.clay ? 1 : 0;
   let trailReady = false;
   trail.ready.then(() => { trailReady = true; emit('trail'); checkLoaded(); });
+  // The jukung at anchor off the beach (src/boat/, v35), lit the same way and afloat on the
+  // sea's own waves. boat=0 leaves it out; boat=east,north[,heading] moors it somewhere else.
+  const boat = params.get('boat') === '0' ? null : createJukung({ renderer, water, lightUniforms, gradeUniforms: grade.uniforms,
+    shared: { uExtent: terrain.uniforms.uExtent, uSunShadow: water.uniforms.uSunShadow }, place: params.get('boat') });
+  if (boat) scene.add(boat.group);
   for (const name of hidden) {
     if (name === 'trail') trail.group.visible = false;
     if (name === 'terrain') terrain.mesh.visible = false;
@@ -405,6 +412,7 @@ export function createApp({ params, capture = false, keepBuffer = false, maxPixe
     // The plants near the camera are picked for where it is now (near.js).
     if (plants) plants.update(hf?.extent, camera, simTime);
     trail.cullLashings(camera);
+    boat?.update(simTime, camera, hf);
     atmosphere.update(camera);
     if (sky.visible && skyDome.material.uniforms.uHasClouds.value && skyInView()) clouds.render(simTime, camera);
     renderer.render(scene, camera);
@@ -438,7 +446,7 @@ export function createApp({ params, capture = false, keepBuffer = false, maxPixe
   }
 
   return {
-    THREE, params, state, layout, renderer, scene, camera, terrain, water, trail, sky, skyDome, atmosphere, grade, clouds, sunShadow,
+    THREE, params, state, layout, renderer, scene, camera, terrain, water, trail, boat, sky, skyDome, atmosphere, grade, clouds, sunShadow,
     timeCtl, governor, hidden, on, groundAt, setPose, setSize, renderFrame, frame, advance, placeSun, relight, regenerate,
     regenerateSoon, terrainCloudShadows,
     get plants() { return plants; },

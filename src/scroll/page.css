@@ -230,7 +230,7 @@ html.scroll.at-hero #stage { cursor: pointer; }
 .hero { left: var(--gutter); top: 0; bottom: 0; width: calc(var(--card-left, 50vw) - var(--gutter) - 3.5vw); display: grid; align-content: center; gap: clamp(18px, 2.6vh, 30px); color: var(--ink); padding-bottom: 4vh; box-sizing: border-box; }
 .hero__label { display: flex; flex-wrap: wrap; gap: 6px 18px; color: rgba(20, 18, 14, 0.74); }
 .hero__label span:first-child { color: var(--ink); }
-.hero .display { font-size: clamp(3.3rem, 0.6rem + 6.9vw, 9rem); line-height: 0.88; letter-spacing: -0.026em; margin-left: -0.04em; }
+.hero .display { font-size: clamp(3.3rem, 0.6rem + 6.9vw, 9rem); line-height: 0.88; letter-spacing: -0.026em; margin-left: -0.04em; max-width: 5em; }
 .hero .display em { color: #a8431f; }
 .hero .body { color: rgba(20, 18, 14, 0.82); max-width: 27rem; }
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 30px; margin-top: 6px; }
@@ -327,7 +327,7 @@ html.scroll.at-hero #stage { cursor: pointer; }
 /* A tall screen: the words above the card, the way in below it. */
 @media (max-aspect-ratio: 85/100) {
   .hero { left: var(--gutter); right: var(--gutter); width: auto; top: calc(max(18px, env(safe-area-inset-top)) + 54px); bottom: auto; height: calc(var(--card-top, 46vh) - max(18px, env(safe-area-inset-top)) - 62px); padding: 0; gap: 12px; }
-  .hero .display { font-size: clamp(3rem, 15.4vw, 6rem); line-height: 0.88; }
+  .hero .display { font-size: clamp(3rem, 15.4vw, 6rem); line-height: 0.88; max-width: none; }
   .hero .body { font-size: 0.9rem; line-height: 1.45; }
   .hero__actions { position: absolute; left: 0; right: 0; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 16px); margin: 0; justify-content: space-between; flex-wrap: nowrap; }
   .hero__actions .button { padding: 15px 16px 14px 18px; white-space: nowrap; gap: 10px; }

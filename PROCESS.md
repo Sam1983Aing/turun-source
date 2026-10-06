@@ -3389,6 +3389,30 @@ at about twice the usual resolution, which is copied into a 2D canvas.
   like a printed card, and on a phone it stands upright with the note running round the stamp.
   The form sends nothing and says so.
 
+### The boat
+
+One jukung, built in code in `src/boat/` (a second session did this part alongside the page,
+with its own files and a five-line hook in `app.js`). A lofted hull with a terracotta rub
+rail, two bamboo floats on arched beams lashed with the path's blue cord, a raked mast with
+the sail rolled round its yard, a storm lantern on a crook over the stern, an anchor line.
+It is moored at `[29, 141]`, heading 220: 74 m from the last camera, in 4.4 m of water, about
+15 m clear of the white water by the rock.
+
+- **Afloat on the real sea.** The page draws the sea on the GPU and nothing comes back, so
+  `sea.js` works out the same surface on the CPU: a port of the wave train off the beach, and
+  the FFT ocean's spectrum rebuilt from the same seed and summed directly. Checked in the page
+  against the GPU: the wave train to 1e-5 m, the FFT cascades to 5 mm rms. Nine points under
+  the hull and floats, a plane through them, heave, pitch and roll.
+- **It looked like it was flying, and its height was right to the centimetre.** What was
+  missing was everything a boat does to the water. `on-water.js` is a sheet laid on the sea
+  round the hull that draws the boat's shadow in the water, its reflection (about twenty
+  capsules, stretched toward the eye as reflections on water are) and the lantern's path. The
+  sea's shader is untouched.
+- **The lantern** is set on screen and divided by the exposure. A real flame would vanish at
+  noon and burn out at night: the presets are fifteen stops apart.
+- **Cost:** about 0.23 ms a frame with the boat in view, six draw calls, all culled off
+  screen, no render passes.
+
 ### What went wrong
 
 - **Rules under every line of the headline.** The form's fill-in lines were classed `.line`
@@ -3408,3 +3432,43 @@ at about twice the usual resolution, which is copied into a 2D canvas.
   narrows with the cosine of the turn.
 - **Port 5178 was taken by another project's server**, so this session ran on 5181
   (`.claude/launch.json` has both). Every tool takes `--url=`.
+
+### Verification (6 October 2026)
+
+- **The scene is the same scene.** `git diff v34 -- src/` touches `app.js` (the boat's hook)
+  and `src/scroll/` only. Viewpoint and overview rendered from this build (`hide=water`,
+  `boat=0`) and from v34 checked out from its tag (`hide=water`), at 1400 x 1050, sea frozen at
+  17 s: 0 of 1,470,000 pixels differ in either. The terrain bake is up to date.
+- **Frame budget.** `node tools/hero.mjs v35`, best of three rounds alternating with v34:
+  +0% to +10% across the nine hero frames, "within budget" (table in `docs/gallery/v35`). The
+  boat on its own, same build both sides with `boat=0` on one (`tools/ab.mjs`): +3% to +6%.
+- **The dive at full frame rate.** On the page's own clock at 1512 x 945: 258 frames in the
+  4.3 s dive, median 16.7 ms, 2 over 25 ms (the walk down from the railing: 259 frames, none
+  over). At rest, 0 frames drawn in 1.5 s.
+- **Driven for real** (no `?record`): the card leans to the pointer, a click on it runs the
+  dive, the menu's three jumps land (the light changing behind the curtain), the form answers
+  that nothing was sent, "Back up to the railing" rewinds to the hero and noon. Console clean.
+- **Stills and recordings** at 1512 x 945, 1920 x 1080 and 390 x 844: `captures/v35-*.jpg`,
+  `captures/v35-desktop.mp4`, `captures/v35-phone.mp4` (local).
+- **The single file.** `kelingking.html` rebuilt: 60 modules, scripts parse as classic
+  scripts, the 35 assets on the CDN at tag 1.11.0 still match (code only, nothing pushed).
+  Opened from `file://` as the tools see it and as the page (hero, mid-dive, railing, the back
+  of the card): no console errors. With the network cut the local build generates its terrain
+  and runs.
+
+### Still weak
+
+- The middle of the page is still mostly a film. Five notes over fifteen screens is restraint
+  on purpose, but the offer goes quiet between the railing and the sand.
+- The boat is about 95 px long in the last frame at 1512 wide. It reads, and the head turns to
+  it, but it is small for the thing the whole offer rests on. Its motion is lively (it rides
+  the open-sea spectrum), nothing laps at its waterline, and up close the hull is clean CG.
+- The sand under the card is one frame stretched about four times, so it softens during the
+  dive (motion hides most of it). At the end it is seen still, behind the card's back.
+- The print finish is subtle. On a first look the picture may not read as "printed" so much
+  as "small".
+- The hero's golden sand is evening and the picture on the card is noon. Nobody will mind,
+  but it is not one light.
+- Fonts are unchanged (Instrument Serif, Inter). A change means adding files to
+  `vendor/fonts/` for the single file, which needs Sam's go-ahead.
+- Not checked on a real phone or in Safari, only in headless Chrome at phone size.
