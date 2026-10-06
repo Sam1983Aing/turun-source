@@ -3309,3 +3309,102 @@ soften at reduced resolution; distant impostors retain discrete baked directions
 existing coverage treatment. This fixes the reported near-foliage breakup without claiming
 infinite detail or adding a temporal post-processing pass. Own-render evidence is in
 `docs/gallery/v34`; raw PNG buffers and clips remain local in `captures/v34/`.
+
+## v35: The landing page: the postcard, the offer, the boat (2026-10-05, first iteration)
+
+Sam on the v34 page: the scene is premium and stays, the words and layout are "a two out of
+ten" and it "doesn't feel like a landing page". The brief he gave for the top of it: the
+overview of the real scene inside a postcard, at an angle, with nice shading, on sand, a
+headline beside it, and scrolling goes into the card so the flat picture turns out to be
+the 3D scene. "We should use what we built and not recreate something for the postcard."
+
+What was wrong with the old page, looking at its recording: one block of words in the same
+bottom-left corner six times at one size, and the only button on the page was "Climb back
+up". Nothing was offered. The writing was fine, and its best line ("Most people stop at the
+railing") was buried in chapter 02.
+
+Direction agreed before building (brief: `docs/versions/v35-landing-page.md`): the front and
+the back of a postcard as the page's frame, that line as the headline, one change of light
+(noon to evening), and a boat as the offer: walk down, sail out. The outfitter ("Turun",
+Indonesian for going down) is invented and the page's foot says so. I checked the boat idea
+against what is published about the place first: swimming is banned there and boats only
+pass, so a pick-up from the sand cannot be presented as real.
+
+### The postcard is the live canvas
+
+The canvas never changes size. It sits in a "world" element together with the sand, the
+paper and the shadow, and the world is scaled to about 0.42, turned 6 degrees and moved, so
+the canvas lands where the card's picture should be. A clip-path cuts it to a postcard's
+shape. The scroll takes that transform back to none (`src/scroll/postcard.js`). At the end of
+the dive the page is the same full-screen canvas it always was, so there is no cross-fade
+and no seam to hide. Scale is interpolated exponentially (a steady zoom), place and turn
+settle early, and the picture's window opens from the card's 3:2 to the screen's shape over
+the last part.
+
+What reads as "flat" at rest is three things, released in order on the way in: a print
+finish over the picture (grain, a sheen that follows the pointer, slightly faded colour),
+the sea's clock stopped, the camera locked. While the card rests the page draws no frames at
+all (measured: 0 in 1.5 s). The camera then sets off from `tau` 0.76 on the existing path:
+the first three quarters of the old flight, straight down from 1.1 km, are no longer on the
+page, because the headland does not read as the T-Rex from there and the card needs it to.
+
+The page is now measured in screens of its own (`page` in `scroll.js`): the dive, the
+descent, a held beat, the ending. `?notext` gives the scene alone exactly as before, from
+`tau` 0, so the tools that judge the scene are untouched.
+
+### The sand is the beach
+
+Nothing was downloaded or painted for the surface the card lies on. While the page loads,
+the scene's own camera looks straight down at the upper beach from 3.4 m and draws one frame
+at about twice the usual resolution, which is copied into a 2D canvas.
+
+- In the scene's noon light this read as a cream wall: no relief, nothing that said sand.
+  The capture now switches the scene to the evening preset for that one frame and back. A low
+  sun rakes across the ripples and it looks like a photograph of a beach.
+- At 2 m the grains came out coarse and soft, at 5 m it read as dunes from the air. 3.4 m.
+- The camera is turned so the sun comes from the top left (the sun's heading plus 45
+  degrees), which is where the card's shadow assumes it is.
+- The first spot tried, and three others, showed the baked sun shadow's stair-steps as dark
+  stripes across the sand at that sun angle. `[118, 212]` on the upper beach is clear of them.
+- The shadows are lifted with a warm 24% wash so small ink type can cross them.
+
+### The rest of the page
+
+- **Words.** One hero, five notes on the way down (each in its own place: two very large at
+  the bottom left, one small at the right, one centred in ink on the sand, one for the boat),
+  the beat's line, and the back of the card. Instrument Serif up to about 150 px. A soft dark
+  patch behind each note replaces the old page-wide scrim.
+- **The beat.** Changing the light rebakes the sun's shadow and the old dissolve would ghost
+  over a moving camera. At `tau` 4.66 the scroll holds the camera for 0.8 screens, blank
+  sand-coloured paper fades over everything with one line, the light goes from noon to evening
+  behind it, and it fades off. It is driven by the scroll, so it runs backwards too. The same
+  blank paper is the curtain for jumps from the menu.
+- **The boat's reveal.** At the water's edge the head turns to the boat and the lens closes
+  in by 11 degrees. The eye also rises 1.9 m: from 1.6 m above the swash a breaking wave
+  stands exactly as high as the horizon and hid the hull each time it reared.
+- **The ending.** The dive run backwards onto the same sand, then the card turns over. Its
+  back is a second, unscaled element laid over the card's place on screen (type set inside
+  the scaled world would be drawn at 0.6 size). Front and back turn about the same axis with
+  the same eye distance in screen pixels. Its type is sized in container units so it scales
+  like a printed card, and on a phone it stands upright with the note running round the stamp.
+  The form sends nothing and says so.
+
+### What went wrong
+
+- **Rules under every line of the headline.** The form's fill-in lines were classed `.line`
+  with a bottom border, and SplitText gives every split line of text the class `line`.
+- **The dive ran at half the frame rate of the walk.** Timed on the page's own clock: 55 of
+  160 frames over 25 ms in the dive, against none on the path. Switching layers off one at a
+  time found it: the paper. Its texture was an SVG turbulence filter used as a background
+  image, and it was repainted every frame. It is now a 128 px noise tile painted once into a
+  canvas. Each moving part of the card also got a layer of its own, the print finish lifts in
+  the first fifth of the dive (a CSS filter over the canvas is free while nothing is drawn
+  and not while the scene draws under it), and no frames are drawn until the sea starts.
+  After: 2 of 258 frames over 25 ms.
+- **The print finish stayed on over the scene after a jump from the menu.** Going from the
+  resting card straight to the full-screen state skipped the code that hides it. Found in a
+  still of the boat: a grey veil and a faint rectangle over the whole frame.
+- **Edge-on, the turning card still threw a full rectangle of shadow.** The shadow now
+  narrows with the cosine of the turn.
+- **Port 5178 was taken by another project's server**, so this session ran on 5181
+  (`.claude/launch.json` has both). Every tool takes `--url=`.

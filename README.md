@@ -1,9 +1,14 @@
 # Kelingking, in three.js
 
 A real place rebuilt in the browser: Kelingking Beach on Nusa Penida, Bali, the cliff everyone
-calls the T-Rex. You scroll from high above the bay, down the path on the cliff, to the water's
-edge. There is no 3D model file and no video. The cliffs, the path, the plants and the waves are
-all built by code when the page loads.
+calls the T-Rex. The page opens on a postcard lying on the beach's sand. You scroll into the
+picture on it, down the path on the cliff to the water's edge, and the card turns over at the
+end. There is no 3D model file and no video. The cliffs, the path, the plants, the waves and
+the boat are all built by code when the page loads.
+
+The page is written as a travel page for a walk down to the beach ("Turun, guided descents").
+That part is a concept: the outfitter, the prices and the boat pick-up are invented. The real
+surf at Kelingking is dangerous and swimming is banned.
 
 **[Open the live page](https://sam1983aing.github.io/kelingking/)** (a laptop with Chrome or
 Safari works best, it takes about 10 seconds to load)
@@ -12,8 +17,9 @@ Safari works best, it takes about 10 seconds to load)
 
 ## Four ways to use this
 
-1. **Just look at it.** Open the live page above and scroll. Drag the scene to look around.
-   The switch under "Kelingking" changes the time of day (Morning, Noon, Evening, Night).
+1. **Just look at it.** Open the live page above and scroll. Once you are in the picture, drag
+   the scene to look around. On the beach a line at the foot of the screen changes the time of
+   day (Morning, Noon, Evening, Night).
 2. **Keep a copy.** Download [`kelingking.html`](kelingking.html) (the download button on that
    page) and double-click it. It's the whole page in one file. It fetches about 35 MB of
    textures and terrain the first time, and still runs without internet, just plainer.
@@ -72,6 +78,7 @@ See [how v1 was built](docs/gallery/history/README.md).
 | v27 to v30 | The right beach wall, natural sand, the last water pass |
 | v31 | The beach camera, and morning, noon, evening and night |
 | v32 to v34 | Plant edges and a dark line on the cliff |
+| v35 | The travel page: the postcard you scroll into, the boat, the back of the card (in progress) |
 
 **Credits in short:** map data © OpenStreetMap contributors (ODbL), textures from Poly Haven
 (CC0), the code under the MIT licence. Details at the bottom.
@@ -82,16 +89,17 @@ See [how v1 was built](docs/gallery/history/README.md).
 python3 tools/serve.py
 ```
 
-Then open http://localhost:5178: the landing page, the scroll from high over the bay down
-to the water's edge (v8). The source needs a local server (a browser will not load ES modules
+Then open http://localhost:5178: the landing page, from the postcard on the sand (v35) down
+to the water's edge (v8) and the back of the card. The source needs a local server (a browser will not load ES modules
 or start a module worker from `file://`). `kelingking.html` is the same page built to run
 without one. Nothing to install: the source page loads three.js, GSAP and Lenis from jsDelivr
 and the fonts from Google Fonts, and the standalone file carries its own copies (`vendor/`).
 
-The scene controls beneath “Kelingking” switch between Morning, Noon, Evening and Night.
-The selection is preserved in the URL (for example `?at=4.35&lighting=evening`). Daylight
-uses the photo date's sun; Night is an authored moonlit view. Once off the stairs, the
-camera opens up across the cove. Drag to choose a view; it stays while you scroll along
+The page sets the light itself: noon on the way down, evening after the day on the beach
+(v35). On the beach a line at the foot of the screen switches between Morning, Noon, Evening
+and Night until you scroll on. A light in the URL (`?at=4.35&lighting=evening`) stays for the
+whole page. Daylight uses the photo date's sun; Night is an authored moonlit view. Once off
+the stairs, the camera opens up across the cove. Drag to choose a view; it stays while you scroll along
 the beach. “Reset view” returns to the composed camera. Left/right arrow keys work when
 the scene is focused; Escape resets. A vertical touch swipe still scrolls.
 
@@ -140,11 +148,27 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   `node tools/bake-terrain.mjs` (`--check` only says whether it is stale).
 - **Phones.** The lens widens on a tall screen, the flight starts higher so the frame stays on
   the modelled ground, the words sit at the bottom and a line across the top replaces the rule.
+- **The postcard** (v35, `postcard.js`). The page opens on a card lying on sand, and the picture
+  on the card is the live canvas. The canvas never changes size: it sits in a "world" element
+  with the sand, the paper and the shadow, and the world is scaled down, turned and moved so
+  the canvas lands where the picture should be, clipped to a postcard's shape. Scrolling takes
+  that transform back to nothing, so at the end of the dive the page is a plain full-screen
+  canvas again. Nothing is cross-faded. At rest the camera is locked and the sea's clock is
+  stopped, so the page draws no frames at all. On the way in the print finish lifts, the sea
+  starts, then the camera sets off from `tau` 0.76 (the flight before that is no longer on
+  the page). The sand is the scene's own beach, drawn once from straight above in evening
+  light while the page loads. At the end the same thing runs backwards and the card turns
+  over: its back is a second, unscaled element laid over the first, so its type stays sharp.
+- **The page in screens** (`page` in `scroll.js`). The dive (1.6 screens), the descent
+  (`path.js`, about 15.5), a blank beat on the beach (0.8, the light changes from noon to
+  evening behind it) and the ending (2.6). `?notext` gives the scene alone as before v35, from
+  `tau` 0, for the tools that judge the scene.
 
 ```bash
 node tools/descent.mjs                 # the path's speeds, turn rates and clearance per stretch
 node tools/scroll-clip.mjs             # a recording of the whole page, frame by frame (1080p)
 node tools/scroll-clip.mjs --phone     # the same at 390 x 844
+node tools/page-stills.mjs --at=0,0.8,1.6,tau:4.97,end   # stills at places on the page, words and all (v35)
 node tools/path-bench.mjs              # frame times all the way down, against the last version
 node tools/path-bench.mjs --pace       # real frame pacing while the page scrolls itself
 ```

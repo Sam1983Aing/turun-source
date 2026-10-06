@@ -1,18 +1,30 @@
-// The landing page (v8): the scroll takes the camera down from high over the bay to the
-// water's edge (path.js), and the words come and go with where the camera is.
+// The landing page (v8, a travel page from v35): the scroll takes the card up off the sand
+// until its picture is the screen (postcard.js), then the camera down the cliff path to the
+// water's edge (path.js), then back onto the sand and over onto the card's other side. The
+// words come and go with where all that is.
 //
-// One loop: GSAP's ticker drives Lenis (the weighted smooth scroll), then the camera, the words
-// and the frame, so the scene and the page never disagree by a frame. ScrollTrigger is not
-// used: every animation here keys off the camera's place on the path (tau), which follows the
-// scroll through a little extra smoothing (so a keyboard jump or a drag of the scrollbar still
-// glides), and ScrollTrigger only knows about the scroll.
+// One loop: GSAP's ticker drives Lenis (the weighted smooth scroll), then the camera, the card,
+// the words and the frame, so the scene and the page never disagree by a frame. ScrollTrigger
+// is not used: every animation here keys off one number, the page's place in screens of scroll
+// (cam.y), which follows the scroll through a little extra smoothing (so a keyboard jump or a
+// drag of the scrollbar still glides).
+//
+// The page, in screens of scroll (`page` below):
+//   the dive        the card comes up. For the first part the camera is locked and the sea's
+//                   clock is stopped: a picture. Then the sea starts, then the camera.
+//   the descent     path.js, from TAU0 (the card's picture) to 5 (the water's edge)
+//   the beat        at BEAT_TAU the screen goes to blank sand for a moment and the light behind
+//                   it goes from noon to evening (the day on the beach)
+//   the ending      the frame goes back to being a card on the sand, and turns over
 //
 // URL switches (the scene's own are in app.js):
 //   debug              the settings panel, keys 1-6 for the stops, and a readout
-//   at=2.5             start at this tau (0 over the bay, 5 at the water), for stills
-//   notext             the scene alone, no words or frame
+//   at=2.5             start at this tau (5 at the water), for stills
+//   notext             the scene alone as before v35: no words, no card, no beat, the whole
+//                      flight from tau 0 (the tools that judge the scene use it)
 //   record             the recorder drives the page frame by frame (tools/scroll-clip.mjs)
 //   pr=1               pixel ratio pinned (else it is picked while loading, then governed)
+//   lighting=, hour=   as in app.js, and the page then leaves the light alone
 //
 // Looking around (v9): drag the scene to turn the head away from the path's view; let go and it
 // eases back on the stairs. On the beach the chosen heading stays until reset. The scroll
@@ -27,6 +39,7 @@ import { SHOTS } from '../shots.js';
 import { ORIGIN } from '../terrain/geo.js';
 import { walkLine } from '../trail/route.js';
 import { buildDescent, makePace, STOPS } from './path.js';
+import { createPostcard } from './postcard.js';
 
 gsap.registerPlugin(SplitText);
 
@@ -40,9 +53,34 @@ const FOLLOW = 9;
 // it then turns back (a critically damped spring, per second: most of the way in a second).
 const LOOK_HOLD = 0.6, LOOK_BACK = 3.2;
 
+// The card's picture: this far down the flight (the headland reads as the T-Rex from here).
+const TAU0 = 0.76;
+// The dive, in screens of scroll, and the share of it after which the camera starts down.
+const HERO = 1.6, CAM_START = 0.6;
+// The sea wakes over this stretch of the dive (0 a still picture, 1 its own clock).
+const WAKE = [0.2, 0.58];
+// The day on the beach: where the blank beat is, how long it holds, how long it fades.
+const BEAT_TAU = 4.66, BEAT = 0.8, BEAT_FADE = 0.32;
+// The ending, in screens, and the shares of it for the frame going back to a card, and the
+// card turning over.
+const OUTRO = 2.6, OUT_CARD = [0, 0.46], OUT_FLIP = [0.5, 0.8], OUT_WORDS = 0.76;
+// Where the sand under the card is photographed: a spot on the upper beach, from this high,
+// through this lens, and in this light whatever the scene's is (a low sun rakes across the
+// sand's relief, where noon flattens it to a cream wall).
+const SAND = { at: [118, 212], up: 3.4, fov: 40, light: 'evening', lift: 'rgba(244, 216, 170, 0.24)' };
+// Turning to the boat at the water's edge: over this stretch, to put it this far across. The
+// eye comes up a little as it does (from 1.6 m above the swash a breaking wave stands as high
+// as the horizon and hides the hull each time it rears), and the lens closes in.
+const BOAT_PAN = [4.72, 4.985], BOAT_X = { wide: 0.66, tall: 0.6 }, BOAT_RISE = 1.9, BOAT_LENS = 11;
+
+const clamp01 = (x) => Math.min(Math.max(x, 0), 1);
+const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+const inOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+
 export function startScroll({ params }) {
   const RECORD = params.has('record');
   const DEBUG = params.has('debug');
+  const BARE = params.has('notext') || params.has('bare');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const html = document.documentElement;
   if (params.has('notext')) html.classList.add('notext');
@@ -62,10 +100,39 @@ export function startScroll({ params }) {
   const stage = $('#stage');
   stage.prepend(renderer.domElement);
   if (params.has('pr')) app.governor.on = false;
+  const post = createPostcard({ reduced });
+  // Frames owed (the picture stands still at rest, so frames are only drawn when asked; two,
+  // as the haze settles over a frame).
+  let dirty = 2;
+  if (BARE) post.set({ dive: 1 });
+
+  // ---------------------------------------------------------------- the page in screens
+
+  const pace = makePace();
+  const sStart = BARE ? 0 : pace.screensAt(TAU0), sBeat = pace.screensAt(BEAT_TAU), sEnd = pace.screens;
+  const heroLen = BARE ? 0 : HERO, lead = heroLen * CAM_START, beatLen = BARE ? 0 : BEAT, outLen = BARE ? 0 : OUTRO;
+  const yBeat = lead + (sBeat - sStart), yOut = lead + (sEnd - sStart) + beatLen;
+  const page = {
+    screens: yOut + outLen,
+    // The camera's place (in path.js's screens) for a place on the page, and back.
+    camAt(y) {
+      const d = y - lead;
+      if (d <= 0) return sStart;
+      if (d <= sBeat - sStart) return sStart + d;
+      if (d <= sBeat - sStart + beatLen) return sBeat;
+      return Math.min(sEnd, sStart + d - beatLen);
+    },
+    yAt(s) { return s <= sStart ? 0 : lead + (s - sStart) + (s > sBeat + 1e-6 ? beatLen : 0); },
+    tauAt(y) { return pace.tauAt(this.camAt(y)); },
+    screensAt(tau) { return this.yAt(pace.screensAt(tau)); },
+  };
 
   // ---------------------------------------------------------------- time of day
 
   const lightInputs = [...document.querySelectorAll('input[name="lighting"]')];
+  // The page sets the light itself (noon, then evening after the beat) unless the URL fixed it.
+  const fixedLight = BARE || ['lighting', 'hour', 'sun'].some((k) => params.has(k));
+  let manual = null, manualSide = false;
   let dissolve = null, dissolveAnimation = null;
   function stopDissolve() {
     dissolveAnimation?.cancel(); dissolveAnimation = null;
@@ -76,30 +143,33 @@ export function startScroll({ params }) {
     lightInputs.forEach((input) => { input.checked = input.value === app.state.lighting; });
   }
   syncLighting();
-  function chooseLighting(id) {
-    if (id === app.state.lighting || !started) return;
+  // withDissolve: the frame as it was fades out over the new light (when nothing covers it).
+  function setLight(id, withDissolve) {
+    if (id === app.state.lighting) return;
     stopDissolve();
-    if (!reduced && !RECORD) {
+    if (withDissolve) {
       app.renderFrame();
       const previous = document.createElement('canvas');
       previous.className = 'lighting-dissolve'; previous.setAttribute('aria-hidden', 'true');
       previous.width = renderer.domElement.width; previous.height = renderer.domElement.height;
       previous.getContext('2d').drawImage(renderer.domElement, 0, 0);
-      document.querySelector('.page').prepend(previous);
+      $('.page').prepend(previous);
       dissolve = previous;
     }
     app.setLighting(id);
     syncLighting();
     app.advance(0); app.renderFrame();
-    const url = new URL(location.href);
-    url.searchParams.set('lighting', id);
-    url.searchParams.delete('hour'); url.searchParams.delete('sun');
-    history.replaceState(null, '', url);
+    dirty = 2;
     if (dissolve) {
       const previous = dissolve;
       dissolveAnimation = previous.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 850, easing: 'ease-in-out' });
       dissolveAnimation.finished.then(() => { if (dissolve === previous) stopDissolve(); }).catch(() => {});
     }
+  }
+  function chooseLighting(id) {
+    if (id === app.state.lighting || !started) return;
+    manual = id; manualSide = cam.y > yBeat + beatLen / 2;
+    setLight(id, !reduced && !RECORD);
   }
   lightInputs.forEach((input) => input.addEventListener('change', () => chooseLighting(input.value)));
   addEventListener('wheel', stopDissolve, { passive: true });
@@ -109,7 +179,6 @@ export function startScroll({ params }) {
 
   // ---------------------------------------------------------------- size and scroll length
 
-  const pace = makePace();
   const track = $('.track');
   // One "screen" of scroll is the stage's height (100lvh, which does not change as a phone's
   // address bar comes and goes).
@@ -123,17 +192,18 @@ export function startScroll({ params }) {
     if (!force && w === size[0] && Math.abs(h - size[1]) < 2) return;
     // Retain the route beat when rotating a phone: the scroll is measured in stage
     // heights, so keeping the old pixel offset would move to another part of the trail.
-    const retainedScreens = descent ? cam.screens : null;
+    const retained = descent ? cam.y : null;
     size = [w, h];
     app.setSize(w, h);
     unit = h;
-    track.style.height = `${pace.screens * unit + innerHeight}px`;
+    track.style.height = `${page.screens * unit + innerHeight}px`;
+    post.layout();
+    groundLight = null;
+    dirty = 2;
     if (walk && Math.abs(w / h / descent.aspect - 1) > 0.03) build();
-    if (retainedScreens !== null) jumpTo(retainedScreens);
+    if (retained !== null) jumpTo(retained);
   }
-  resize(true);
-  addEventListener('resize', () => resize());
-  app.governor.onChange = () => { app.setSize(size[0], size[1]); };
+  app.governor.onChange = () => { app.setSize(size[0], size[1]); dirty = 2; };
 
   // The lens for the screen's shape: the path's poses are made for a landscape screen, and on a
   // tall one the same vertical angle leaves a sliver. Widen it, but not all the way.
@@ -141,6 +211,37 @@ export function startScroll({ params }) {
     if (aspect >= 1.2) return fov;
     const t = Math.tan((fov * Math.PI) / 360) * Math.pow(1.2 / aspect, 0.42);
     return Math.min(82, (Math.atan(t) * 360) / Math.PI);
+  }
+
+  // The sand under the card: the beach itself from straight above, drawn once by the scene in
+  // the light of the moment and kept as a picture (it is much bigger on the page than the
+  // canvas, so it is drawn finer than a frame). The sun comes from the top left of it.
+  const groundCtx = post.ground.getContext('2d');
+  let groundLight = null;   // (null: to be taken again, after a resize)
+  function captureGround() {
+    if (!app.hf || BARE) return;
+    const [w, h] = size, pr0 = renderer.getPixelRatio();
+    const pr = Math.max(pr0, Math.min(devicePixelRatio * 1.6, Math.sqrt((w < 720 ? 4e6 : 6e6) / (w * h))));
+    const keep = { p: camera.position.clone(), r: camera.rotation.clone(), fov: camera.fov };
+    renderer.setPixelRatio(pr); app.setSize(w, h);
+    const [x, y] = (params.get('sandAt') ?? '').includes(',') ? params.get('sandAt').split(',').map(Number) : SAND.at;
+    const up = +(params.get('sandUp') ?? SAND.up);
+    const was = app.state.lighting, light = fixedLight ? was : (params.get('sandLight') ?? SAND.light);
+    if (light !== was) app.setLighting(light);
+    app.setPose([x, y, app.groundAt(x, y) + up], app.state.sunAz + 45, -89.9, 0, SAND.fov);
+    app.advance(0); app.renderFrame(); app.renderFrame();
+    const c = renderer.domElement;
+    post.ground.width = c.width; post.ground.height = c.height;
+    groundCtx.drawImage(c, 0, 0);
+    // The low sun's shadows lifted a little, so small ink type can cross them.
+    groundCtx.fillStyle = SAND.lift;
+    groundCtx.fillRect(0, 0, c.width, c.height);
+    if (light !== was) { app.setLighting(was); app.advance(0); }
+    renderer.setPixelRatio(pr0); app.setSize(w, h);
+    camera.position.copy(keep.p); camera.rotation.copy(keep.r);
+    camera.fov = keep.fov; camera.updateProjectionMatrix();
+    groundLight = true;
+    dirty = 2;
   }
 
   // ---------------------------------------------------------------- scroll
@@ -155,10 +256,9 @@ export function startScroll({ params }) {
   // No scrolling until the loader lifts (Lenis stops it itself; without Lenis this does).
   html.classList.add('loading');
   const scrollY = () => (lenis ? lenis.scroll : window.scrollY);
-  function jumpTo(screens) {
-    const y = screens * unit;
-    if (lenis) lenis.scrollTo(y, { immediate: true, force: true }); else scrollTo(0, y);
-    cam.screens = screens;
+  function jumpTo(y) {
+    if (lenis) lenis.scrollTo(y * unit, { immediate: true, force: true }); else scrollTo(0, y * unit);
+    cam.y = y;
   }
 
   // ---------------------------------------------------------------- the path
@@ -180,14 +280,33 @@ export function startScroll({ params }) {
     build();
   });
 
-  const cam = { screens: 0, tau: 0, pose: null };
+  // y: the page's place, in screens. screens: the camera's, in path.js's. hero: how far the
+  // card is up (0 at rest, 1 the picture is the screen). out: how far into the ending.
+  const cam = { y: 0, screens: sStart, tau: BARE ? 0 : TAU0, pose: null, hero: BARE ? 1 : 0, out: 0 };
+  const inScene = () => cam.hero >= 1 && cam.out <= 0;
   function placeCamera(dt, snap = false) {
     const target = scrollY() / unit;
-    cam.screens = (snap || reduced) ? target : cam.screens + (target - cam.screens) * (1 - Math.exp(-FOLLOW * dt));
-    if (Math.abs(target - cam.screens) < 1e-4) cam.screens = target;
+    cam.y = (snap || reduced) ? target : cam.y + (target - cam.y) * (1 - Math.exp(-FOLLOW * dt));
+    if (Math.abs(target - cam.y) < 1e-4) cam.y = target;
+    cam.screens = page.camAt(cam.y);
     cam.tau = pace.tauAt(cam.screens);
+    cam.hero = heroLen ? clamp01(cam.y / heroLen) : 1;
+    cam.out = outLen ? clamp01((cam.y - yOut) / outLen) : 0;
     if (!descent) return;
-    const p = (cam.pose = descent.poseAt(cam.tau));
+    let p = descent.poseAt(cam.tau);
+    // At the water's edge the head turns to the boat.
+    if (app.boat && !BARE) {
+      const w = smooth(BOAT_PAN[0], BOAT_PAN[1], cam.tau);
+      if (w > 0) {
+        const bearing = (Math.atan2(app.boat.east - p.pos[0], app.boat.north - p.pos[1]) * 180) / Math.PI;
+        const fov = p.fov - BOAT_LENS * w;
+        const half = Math.tan((fovFor(fov, camera.aspect) * Math.PI) / 360) * camera.aspect;
+        const off = (Math.atan(((camera.aspect < 0.85 ? BOAT_X.tall : BOAT_X.wide) - 0.5) * 2 * half) * 180) / Math.PI;
+        const turn = Math.min(Math.max(angleDelta(bearing - off - p.yaw), -50), 50);
+        p = { ...p, yaw: p.yaw + turn * w, pos: [p.pos[0], p.pos[1], p.pos[2] + BOAT_RISE * w], fov };
+      }
+    }
+    cam.pose = p;
     if (look.pinned && cam.tau >= 4) {
       look.yaw = angleDelta(look.heading - p.yaw);
       look.pitch = look.elevation - p.pitch;
@@ -236,9 +355,9 @@ export function startScroll({ params }) {
   if (!RECORD) {
     stage.classList.add('lookable');
     stage.tabIndex = 0;
-    stage.setAttribute('aria-label', 'Beach view. Drag or use left and right arrows to look around. Escape resets the view.');
+    stage.setAttribute('aria-label', 'The view. Drag or use left and right arrows to look around. Escape resets the view.');
     stage.addEventListener('keydown', (e) => {
-      if (!started) return;
+      if (!started || !inScene()) return;
       if (e.key === 'Escape') { resetLook(); e.preventDefault(); return; }
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
       e.preventDefault();
@@ -246,7 +365,8 @@ export function startScroll({ params }) {
       look.idle = 0; pinLook();
     });
     stage.addEventListener('pointerdown', (e) => {
-      if (look.id !== null || !started || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      // (While the scene is a picture on a card there is nothing to look around in.)
+      if (look.id !== null || !started || !inScene() || (e.pointerType === 'mouse' && e.button !== 0)) return;
       look.wasPinned = look.pinned;
       look.pinned = false;
       look.id = e.pointerId; look.touch = e.pointerType !== 'mouse';
@@ -282,70 +402,180 @@ export function startScroll({ params }) {
       html.classList.remove('looking');
     };
     for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) stage.addEventListener(ev, end);
+    // The card at rest: a click on its picture goes in.
+    stage.addEventListener('click', () => {
+      if (!started || cam.hero > 0.02 || cam.out > 0 || BARE) return;
+      if (lenis) lenis.scrollTo(heroLen * unit, { duration: 3.4, easing: inOut }); else jumpTo(heroLen);
+    });
   }
+
+  // ---------------------------------------------------------------- the card, the sea's clock, the light
+
+  const coverEl = $('.cover');
+  // The curtain: the same blank sand, drawn over the page for a jump from the menu.
+  const curtain = { a: 0 };
+  let traveling = false, coverShown = -1, beatA = 0;
+  function updateStory() {
+    if (BARE) return;
+    post.set({
+      dive: cam.hero,
+      out: clamp01((cam.out - OUT_CARD[0]) / (OUT_CARD[1] - OUT_CARD[0])),
+      flip: inOut(clamp01((cam.out - OUT_FLIP[0]) / (OUT_FLIP[1] - OUT_FLIP[0]))),
+    });
+    // A picture does not move: the sea's clock is stopped while the card rests, and runs up to
+    // its own speed as the card comes off the sand (and down again at the end).
+    const wake = Math.min(smooth(WAKE[0], WAKE[1], cam.hero), 1 - smooth(0.02, OUT_CARD[1] * 0.7, cam.out));
+    app.timeCtl.paused = wake <= 0;
+    app.timeCtl.speed = wake;
+
+    beatA = smooth(yBeat - BEAT_FADE, yBeat, cam.y) * (1 - smooth(yBeat + beatLen, yBeat + beatLen + BEAT_FADE, cam.y));
+    const a = Math.max(beatA, curtain.a);
+    if (a !== coverShown) {
+      coverShown = a;
+      coverEl.style.opacity = a.toFixed(3);
+      coverEl.style.visibility = a > 0.002 ? 'visible' : 'hidden';
+    }
+    // The day: noon on the way down, evening after the beat. It changes behind the blank sand,
+    // or (the beat jumped over) with a dissolve. A light picked by hand on the beach stays
+    // until the beat is crossed or the beach is left.
+    if (!fixedLight) {
+      const side = cam.y > yBeat + beatLen / 2;
+      if (manual && (side !== manualSide || cam.tau < 4)) manual = null;
+      const want = manual ?? (side ? 'evening' : 'noon');
+      if (want !== app.state.lighting) {
+        if (a > 0.985) setLight(want, false);
+        else if (beatA < 0.02 && curtain.a < 0.02) setLight(want, !reduced && !RECORD);
+      }
+    }
+    // The sand again after a resize, whenever it is about to show.
+    if (!groundLight && (cam.hero < 1 || cam.out > 0 || a > 0.985)) captureGround();
+  }
+  // Nothing in the picture changes while the card rests in the hero and for the first of its
+  // way up (the camera locked, the sea not yet running), or once it is on its back.
+  const still = () => !BARE && ((cam.out <= 0 && cam.hero <= WAKE[0]) || post.turned || (cam.out > 0 && app.timeCtl.paused));
+
+  // A jump from the menu: the blank sand comes over, the page moves under it, it lifts.
+  function travel(y) {
+    if (traveling || !started) return;
+    if (reduced || RECORD) { jumpTo(y); return; }
+    traveling = true;
+    lenis?.stop();
+    gsap.to(curtain, { a: 1, duration: 0.6, ease: 'power2.inOut', onComplete: () => {
+      jumpTo(y);
+      gsap.to(curtain, { a: 0, duration: 1, ease: 'power2.inOut', delay: 0.3, onStart: () => { traveling = false; lenis?.start(); } });
+    } });
+  }
+  const places = { walk: () => page.screensAt(1), boat: () => page.screensAt(4.97), reserve: () => page.screens };
+  document.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', (e) => {
+    e.preventDefault();
+    travel(places[el.dataset.go]());
+  }));
+
+  // The booking: there is nobody to send it to.
+  const form = $('.back__addr'), formNote = $('.back__small');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    formNote.textContent = 'This is a concept page, so nothing was sent and nothing is booked. The walk down is real though.';
+    formNote.classList.add('is-sent');
+  });
 
   // ---------------------------------------------------------------- words
 
-  // Every block over the scene shows while the camera's tau is inside its data-tau range.
-  const blocks = [...document.querySelectorAll('.words > [data-tau]')].map((el) => {
-    const [a, b] = el.dataset.tau.split(',').map(Number);
-    const lines = [...el.querySelectorAll('[data-lines]')].flatMap((d) => SplitText.create(d, { type: 'lines', mask: 'lines', linesClass: 'line' }).lines);
-    const after = [...el.querySelectorAll('.label, .chapter__num, .body, .cue, .end__actions, .end__credits')];
-    const drift = el.querySelector('.display');
-    const num = el.querySelector('.chapter__num');
-    gsap.set(lines, { yPercent: 105 });
+  // Every block shows while the page is inside its range: data-hero (how far the card is up),
+  // data-tau (the camera's place on the way down), data-end (how far into the ending). The
+  // cover's line shows while the beat is fully up.
+  const blocks = [...document.querySelectorAll('.words > *, .cover')].map((el) => {
+    const kind = 'hero' in el.dataset ? 'hero' : 'tau' in el.dataset ? 'tau' : 'end' in el.dataset ? 'end' : 'cover';
+    const [a, b] = (el.dataset[kind] ?? '0,0').split(',').map(Number);
+    const after = [...el.querySelectorAll('.label, .body, .hero__actions, .facts > div, .foot > *')];
+    const k = { el, kind, a, b, lines: [], byEl: new Map(), after, drift: kind === 'tau' ? el.querySelector('.display') : null, on: false, tl: null };
+    // (Split again whenever the lines break differently: a font arriving, the window resized.)
+    for (const d of el.querySelectorAll('[data-lines]')) {
+      SplitText.create(d, { type: 'lines', mask: 'lines', linesClass: 'line', autoSplit: true, onSplit: (self) => {
+        k.byEl.set(d, self.lines);
+        k.lines = [...k.byEl.values()].flat();
+        k.tl?.progress(1);
+        gsap.set(self.lines, { yPercent: k.on ? 0 : 105 });
+      } });
+    }
     gsap.set(after, { autoAlpha: 0, y: 14 });
-    return { el, a, b, lines, after, drift, num, on: false, tl: null };
+    return k;
   });
+  // The back of the card: what is written on it comes in once it has turned over.
+  const backParts = [...document.querySelectorAll('.back__head, .back__note, .back__plan li, .back__price, .stamp, .back__to, .back__addr .field, .back__addr .button, .back__small')];
+  const backIn = $('.back__in');
+  let backOn = null, backTl = null;
+  function showBack(on) {
+    if (on === backOn) return;
+    backOn = on;
+    backTl?.kill();
+    const d = reduced ? 0 : REVEAL;
+    backTl = gsap.timeline();
+    if (on) {
+      backTl.to(backIn, { '--rule': 1, duration: d * 1.3, ease: EASE }, 0);
+      backTl.to(backParts, { autoAlpha: 1, y: 0, duration: d, ease: EASE, stagger: 0.055 }, 0.05);
+      backTl.fromTo('.stamp__mark', { scale: 1.5, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: reduced ? 0 : 0.5, ease: 'power4.in' }, reduced ? 0 : 0.55);
+    } else {
+      backTl.to(backParts, { autoAlpha: 0, y: 10, duration: d * 0.4, ease: EASE }, 0);
+      backTl.to(backIn, { '--rule': 0, duration: d * 0.4, ease: EASE }, 0);
+    }
+  }
+  gsap.set(backParts, { autoAlpha: 0, y: 10 });
+  gsap.set(backIn, { '--rule': 0 });
+
   let rewinding = false;
   function show(k) {
     k.tl?.kill();
     const t = (k.tl = gsap.timeline());
     t.set(k.el, { visibility: 'visible' });
+    k.el.classList.add('is-on');
     const d = reduced ? 0 : REVEAL;
-    t.to(k.lines, { yPercent: 0, duration: d, ease: EASE, stagger: 0.09 }, 0);
+    if (k.lines.length) t.to(k.lines, { yPercent: 0, duration: d, ease: EASE, stagger: 0.09 }, 0);
     // The small words come in after the line, one after another.
     t.to(k.after, { autoAlpha: 1, y: 0, duration: d, ease: EASE, stagger: 0.07 }, reduced ? 0 : 0.35);
   }
   function hide(k) {
     k.tl?.kill();
     const t = (k.tl = gsap.timeline());
+    k.el.classList.remove('is-on');
     const d = reduced ? 0 : 0.7;
-    t.to(k.lines, { yPercent: -105, duration: d, ease: EASE, stagger: 0.04 }, 0);
+    if (k.lines.length) t.to(k.lines, { yPercent: -105, duration: d, ease: EASE, stagger: 0.04 }, 0);
     t.to(k.after, { autoAlpha: 0, y: -8, duration: d * 0.8, ease: EASE }, 0);
-    t.set(k.el, { visibility: 'hidden' });
-    t.set(k.lines, { yPercent: 105 });
+    // (The cover's own visibility follows its opacity, in updateStory.)
+    if (k.kind !== 'cover') t.set(k.el, { visibility: 'hidden' });
+    if (k.lines.length) t.set(k.lines, { yPercent: 105 });
+    t.set(k.after, { y: 14 });
   }
-  const scrim = $('.scrim');
-  let scrimOn = false, wordsOn = false;
+  let wordsOn = false;
   function updateWords() {
     if (!wordsOn) return;
-    let any = false;
+    const quiet = rewinding || traveling;
     for (const k of blocks) {
-      const on = !rewinding && cam.tau >= k.a && cam.tau <= k.b;
+      const on = !quiet && (
+        k.kind === 'hero' ? cam.out <= 0 && cam.hero >= k.a && cam.hero <= k.b
+        : k.kind === 'tau' ? inScene() && cam.tau >= k.a && cam.tau <= k.b && beatA < 0.4
+        : k.kind === 'end' ? cam.out >= k.a && cam.out <= k.b
+        : beatA > 0.9 && curtain.a < 0.05);
       if (on !== k.on) { k.on = on; on ? show(k) : hide(k); }
-      // (The end is on its own card, the sand chapter in dark ink: no scrim for them.)
-      if (on && (k.el.classList.contains('end') || (k.el.classList.contains('on-light') && !html.classList.contains('dim-light')))) continue;
-      any ||= on;
-      // The line drifts across a little while it is up, the number the other way.
-      if (on && !reduced) {
-        const u = Math.min(Math.max((cam.tau - k.a) / (k.b - k.a), 0), 1);
-        const vw = innerWidth / 100;
-        if (k.drift) gsap.set(k.drift, { x: (0.8 - 1.6 * u) * vw });
-        if (k.num) gsap.set(k.num, { x: (-0.6 + 1.2 * u) * vw });
+      // The line drifts across a little while it is up.
+      if (on && k.drift && !reduced) {
+        const u = clamp01((cam.tau - k.a) / (k.b - k.a));
+        gsap.set(k.drift, { x: (0.7 - 1.4 * u) * (innerWidth / 100) });
       }
     }
-    if (any !== scrimOn) { scrimOn = any; gsap.to(scrim, { autoAlpha: any ? 1 : 0, duration: 1.2, ease: EASE }); }
+    showBack(!quiet && cam.out >= OUT_WORDS);
   }
 
   // ---------------------------------------------------------------- the frame around the scene
 
   const altEl = $('.hud__alt'), latEl = $('.hud__lat'), lonEl = $('.hud__lon');
   const railFill = $('.rail__fill'), railMark = $('.rail__mark'), railLabel = $('.rail__mark span'), railEl = $('.rail');
-  const stops = STOPS.map((_, i) => {
+  // The altimeter runs from the railing (tau 1) to the water (tau 5).
+  const RAIL = STOPS.slice(1);
+  const stops = RAIL.map((_, i) => {
     const d = document.createElement('div');
     d.className = 'rail__stop';
-    d.style.top = `${(i / (STOPS.length - 1)) * 100}%`;
+    d.style.top = `${(i / (RAIL.length - 1)) * 100}%`;
     railEl.append(d);
     return d;
   });
@@ -353,10 +583,30 @@ export function startScroll({ params }) {
     const a = Math.abs(v), d = Math.floor(a), m = Math.floor((a - d) * 60), s = Math.floor(((a - d) * 60 - m) * 60);
     return `${d}°${String(m).padStart(2, '0')}′${String(s).padStart(2, '0')}″${v >= 0 ? pos : neg}`;
   };
-  let lastHud = '';
+  // Parts of the frame come and go with the page's place: each fades when its turn changes.
+  const shown = new Map();
+  function setShown(sel, on, dur = REVEAL) {
+    if (shown.get(sel) === on) return;
+    shown.set(sel, on);
+    gsap.to(sel, { autoAlpha: on ? 1 : 0, duration: reduced ? 0 : on ? dur : 0.45, ease: EASE, overwrite: true });
+  }
+  let lastHud = '', lastPhase = '';
   const narrow = matchMedia('(max-width: 720px)');
   function updateFrame() {
     if (!cam.pose) return;
+    // On the sand (the hero, the ending) or in the scene: the menu changes while it is away,
+    // in the middle of the dive.
+    const sand = cam.hero < 0.5 || cam.out > 0.3;
+    const phase = `${sand ? 'at-sand' : 'in-scene'}${cam.hero <= 0.02 && cam.out <= 0 ? ' at-hero' : ''}`;
+    if (phase !== lastPhase) {
+      lastPhase = phase;
+      for (const c of ['at-sand', 'in-scene', 'at-hero']) html.classList.toggle(c, phase.split(' ').includes(c));
+    }
+    const quiet = !wordsOn || traveling;
+    setShown('.hud', !quiet && (cam.hero < 0.1 || (cam.hero >= 0.96 && cam.out < 0.05 && beatA < 0.4) || cam.out > 0.55));
+    setShown('.rail', !quiet && inScene() && cam.tau > 0.93 && beatA < 0.4);
+    setShown('.scene-controls', !quiet && inScene() && cam.tau >= 4.02 && beatA < 0.4);
+
     const [e, n, h] = cam.pose.pos;
     const lat = ORIGIN.lat + n / 111320, lon = ORIGIN.lon + e / (111320 * Math.cos((ORIGIN.lat * Math.PI) / 180));
     const alt = `${Math.max(0, Math.round(h)).toLocaleString('en')} m`;
@@ -368,13 +618,13 @@ export function startScroll({ params }) {
       latEl.textContent = dms(lat, 'N', 'S');
       lonEl.textContent = dms(lon, 'E', 'W');
     }
-    const u = cam.tau / (STOPS.length - 1);
+    const u = clamp01((cam.tau - 1) / (STOPS.length - 2));
     if (narrow.matches) railFill.style.transform = `scaleX(${u})`;
     else {
       railFill.style.transform = `scaleY(${u})`;
       railMark.style.transform = `translateY(${u * railEl.clientHeight}px)`;
     }
-    stops.forEach((d, i) => d.classList.toggle('passed', cam.tau >= i - 0.001));
+    stops.forEach((d, i) => d.classList.toggle('passed', cam.tau >= i + 1 - 0.001));
   }
 
   // ---------------------------------------------------------------- loading
@@ -387,7 +637,7 @@ export function startScroll({ params }) {
     { key: 'warm', w: 0.2, label: 'Filling the bay' },
   ];
   const done = new Set();
-  let shown = 0, sinceStep = 0, loaded = false, started = false;
+  let loadShown = 0, sinceStep = 0, loaded = false, started = false;
   for (const s of steps) if (s.key !== 'warm') app.on(s.key, () => { done.add(s.key); sinceStep = 0; });
   app.on('plants', (p) => { steps[2].label = `Growing ${Math.round((app.hf?.plants.count ?? 180000) / 1000) * 1000} plants`.replace(/(\d)(?=(\d{3})+\b)/g, '$1,'); });
   const countEl = $('.loader__count'), whatEl = $('.loader__what'), barEl = $('.loader__bar span');
@@ -396,10 +646,10 @@ export function startScroll({ params }) {
     const doneW = steps.filter((s) => done.has(s.key)).reduce((a, s) => a + s.w, 0);
     const next = steps.find((s) => !done.has(s.key));
     const goal = next ? doneW + next.w * 0.9 * (1 - Math.exp(-sinceStep / 2.5)) : 1;
-    shown += (goal - shown) * (1 - Math.exp(-dt * 4));
-    if (!next) shown = Math.max(shown, 0.999);
-    countEl.textContent = String(Math.min(100, Math.floor(shown * 100 + 0.5))).padStart(3, '0');
-    barEl.style.transform = `scaleX(${shown})`;
+    loadShown += (goal - loadShown) * (1 - Math.exp(-dt * 4));
+    if (!next) loadShown = Math.max(loadShown, 0.999);
+    countEl.textContent = String(Math.min(100, Math.floor(loadShown * 100 + 0.5))).padStart(3, '0');
+    barEl.style.transform = `scaleX(${loadShown})`;
     if (next && whatEl.textContent !== next.label) whatEl.textContent = next.label;
   }
 
@@ -411,12 +661,13 @@ export function startScroll({ params }) {
     const frame = () => new Promise((r) => requestAnimationFrame(r));
     const gl = renderer.getContext(), px = new Uint8Array(4);
     const timed = [];
-    const at = [0, 0.4, 0.7, 1, 1.4, 1.8, 2, 2.3, 2.6, 3, 3.3, 3.6, 4, 4.5, 5];
+    const first = BARE ? 0 : TAU0;
+    const at = [first, ...[0.4, 0.7, 0.9, 1, 1.4, 1.8, 2, 2.3, 2.6, 3, 3.3, 3.6, 4, 4.5, 5].filter((t) => t > first)];
     for (const t of at) {
       const p = descent.poseAt(t);
       app.setPose(p.pos, p.yaw, p.pitch, 0, fovFor(p.fov, camera.aspect));
       app.frame(1 / 60);
-      if ([0, 1, 2.6, 4].includes(t)) {
+      if ([first, 1, 2.6, 4].includes(t)) {
         // Twice more, timed to completion (reading a pixel makes the CPU wait for the GPU).
         app.renderFrame(); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
         const t0 = performance.now();
@@ -435,36 +686,49 @@ export function startScroll({ params }) {
       app.governor.min = Math.min(0.75, r);
       window.__calibration = { ms: timed.map((v) => +v.toFixed(1)), pr: r };
     }
+    // The sand for the card to lie on, then the card's own picture.
+    captureGround();
+    await frame();
     const at0 = params.has('at') ? +params.get('at') : 0;
-    jumpTo(pace.screensAt(at0));
+    jumpTo(page.screensAt(at0));
     placeCamera(0, true);
+    updateStory();
+    for (let i = 0; i < 3; i++) { app.advance(0); app.renderFrame(); await frame(); }
     done.add('warm');
     performance.mark('kl:warm-end');
   }
   app.on('loaded', () => { loaded = true; warmUp().catch((e) => console.error('warm-up failed', e)); });
 
-  // The loader lifts from black onto the bay, and the title comes up line by line.
+  // The loader lifts from black onto the sand and the card, the camera settles back to rest,
+  // and the title comes up line by line.
+  const intro = { k: 0 };
   function begin(skip = false) {
     started = true;
+    dirty = 2;
     performance.mark('kl:begin');
     html.classList.remove('loading');
-    if (skip) { gsap.set(loaderEl, { autoAlpha: 0 }); gsap.set(['.hud', '.rail', '.scene-controls'], { autoAlpha: 1 }); lenis?.start(); wordsOn = true; window.__ready = true; return; }
+    if (skip || reduced) post.set({ settle: 1 });
+    if (skip) { gsap.set(loaderEl, { autoAlpha: 0 }); lenis?.start(); wordsOn = true; window.__ready = true; return; }
     const t = gsap.timeline();
     t.to(loaderEl, { autoAlpha: 0, duration: reduced ? 0 : 1.6, ease: 'power2.inOut' });
+    if (!reduced && !BARE) t.to(intro, { k: 1, duration: 3.4, ease: 'power3.out', onUpdate: () => post.set({ settle: intro.k }) }, 0.15);
     // The title once the black has mostly lifted.
-    t.add(() => { wordsOn = true; }, reduced ? 0 : 1.2);
-    t.to(['.hud', '.rail', '.scene-controls'], { autoAlpha: 1, duration: reduced ? 0 : REVEAL, ease: EASE }, reduced ? 0 : 1.1);
+    t.add(() => { wordsOn = true; }, reduced ? 0 : 1.05);
     t.add(() => { lenis?.start(); }, 0.4);
     t.add(() => { window.__ready = true; }, reduced ? 0 : 3.2);
   }
+  if (!BARE) post.set({ settle: 0 });
 
   // Back to the top: the camera climbs the whole way back up. The words stay out of the way.
   document.querySelectorAll('[data-top]').forEach((b) => b.addEventListener('click', (e) => {
     e.preventDefault();
     if (!lenis || reduced) { rewinding = false; jumpTo(0); return; }
     rewinding = true;
-    lenis.scrollTo(0, { duration: Math.min(9, 2.5 + cam.screens * 0.45), easing: (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2), onComplete: () => { rewinding = false; } });
+    lenis.scrollTo(0, { duration: Math.min(9, 2.5 + cam.y * 0.4), easing: inOut, onComplete: () => { rewinding = false; } });
   }));
+
+  resize(true);
+  addEventListener('resize', () => resize());
 
   // ---------------------------------------------------------------- the loop
 
@@ -473,40 +737,45 @@ export function startScroll({ params }) {
   function tick(dt) {
     if (!started) {
       updateLoader(dt);
-      if (done.has('warm') && shown > 0.995) begin();
+      if (done.has('warm') && loadShown > 0.995) begin();
       return;
     }
     placeCamera(dt);
+    updateStory();
     updateWords();
     updateFrame();
-    app.frame(dt);
+    post.tick(dt);
+    // (At rest the picture is a picture: no frame is drawn until something in it changes.)
+    if (dirty > 0 || !still()) { dirty = Math.max(0, dirty - 1); app.frame(dt); }
     if (DEBUG) {
       frames++; fpsT += dt;
       if (fpsT > 0.5) { fps = frames / fpsT; frames = 0; fpsT = 0; }
       const p = cam.pose;
-      statusEl.textContent = `tau ${cam.tau.toFixed(3)}  screens ${cam.screens.toFixed(2)}/${pace.screens}  walked ${p && cam.tau > 1 ? descent.wAt(cam.tau).toFixed(1) + ' m' : '-'}\n`
+      statusEl.textContent = `tau ${cam.tau.toFixed(3)}  page ${cam.y.toFixed(2)}/${page.screens.toFixed(1)}  card ${cam.hero.toFixed(2)}  ending ${cam.out.toFixed(2)}  walked ${p && cam.tau > 1 ? descent.wAt(cam.tau).toFixed(1) + ' m' : '-'}\n`
         + `pos ${p?.pos.map((v) => v.toFixed(1)).join(', ')}  yaw ${p?.yaw.toFixed(1)} pitch ${p?.pitch.toFixed(1)} fov ${camera.fov.toFixed(1)}\n`
-        + `${fps.toFixed(0)} fps  pixel ratio ${app.governor.pr.toFixed(2)}  ${renderer.domElement.width}x${renderer.domElement.height}`;
+        + `${fps.toFixed(0)} fps  pixel ratio ${app.governor.pr.toFixed(2)}  ${renderer.domElement.width}x${renderer.domElement.height}  ${app.state.lighting}`;
     }
   }
 
+  const api = { pace: page, path: pace, get descent() { return descent; }, cam, look, resetLook, pinLook, chooseLighting, post, travel };
   if (RECORD) {
     // Frame by frame, on the recorder's clock: GSAP's own clock stops and is stepped with it.
     gsap.ticker.remove(gsap.updateRoot);
     let vt = 0;
     window.__scroll = {
+      ...api,
+      get descent() { return descent; },
       get ready() { return done.has('warm'); },
       begin(skip) { begin(skip); },
       // Advance dt seconds with the page scrolled to `screens` (snap: the camera there at once).
       frame(dt, screens, snap = false) {
         vt += dt;
         scrollTo(0, screens * unit);
-        if (snap) cam.screens = screens;
+        if (snap) cam.y = screens;
         gsap.updateRoot(vt);
         tick(dt);
         return cam.tau;
       },
-      pace, get descent() { return descent; }, cam, look, resetLook, pinLook, chooseLighting,
     };
     // Until the recorder starts, the loader runs on the real clock.
     const idle = () => { if (!started) { updateLoader(1 / 60); if (!done.has('warm')) requestAnimationFrame(idle); } };
@@ -517,7 +786,7 @@ export function startScroll({ params }) {
       lenis?.raf(time * 1000);
       tick(Math.min(deltaMs / 1000, 0.1));
     });
-    window.__scroll = { pace, get descent() { return descent; }, cam, look, resetLook, pinLook, chooseLighting, jumpTo, get lenis() { return lenis; } };
+    window.__scroll = { ...api, get descent() { return descent; }, jumpTo, get lenis() { return lenis; } };
   }
 
   // ---------------------------------------------------------------- debug
@@ -532,7 +801,7 @@ export function startScroll({ params }) {
         f.add({ text: true }, 'text').name('words').onChange((v) => html.classList.toggle('notext', !v));
       },
     });
-    const goTo = (i) => lenis ? lenis.scrollTo(pace.screensAt(i) * unit, { duration: 2.5 }) : jumpTo(pace.screensAt(i));
+    const goTo = (i) => lenis ? lenis.scrollTo(page.screensAt(i) * unit, { duration: 2.5 }) : jumpTo(page.screensAt(i));
     addEventListener('keydown', (e) => {
       if (e.target.tagName === 'INPUT') return;
       const n = +e.key;
@@ -540,4 +809,3 @@ export function startScroll({ params }) {
     });
   }
 }
-

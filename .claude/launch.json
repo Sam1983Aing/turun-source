@@ -9,6 +9,15 @@
         "5178"
       ],
       "port": 5178
+    },
+    {
+      "name": "kelingking-5181",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "tools/serve.py",
+        "5181"
+      ],
+      "port": 5181
     }
   ]
 }

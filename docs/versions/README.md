@@ -40,6 +40,7 @@ version. A session works on its element only, and goes deep on it.
 | v32 | Clean foliage edges and pixelation | [v32-foliage-edge-cleanup.md](v32-foliage-edge-cleanup.md) | done, tag `v32` |
 | v33 | Correct the artificial cliff shadow line | [v33-cliff-line.md](v33-cliff-line.md) | done, tag `v33` |
 | v34 | Remove remaining foliage coverage patterns | [v34-foliage-coverage.md](v34-foliage-coverage.md) | done, tag `v34` |
+| v35 | The landing page: the postcard, the offer, the boat | [v35-landing-page.md](v35-landing-page.md) | first iteration, branch `v35-landing-page`, waiting for Sam |
 
 Why this order: light first, because every colour decision after it is made under it. Then
 the elements Sam cares most about (rock, water, sand). The trail before the plants, so the
@@ -159,6 +160,7 @@ node tools/bake-terrain.mjs                                  # bake the terrain 
 node tools/load-time.mjs                                     # how long the page takes to load, step by step (v11)
 node tools/build-standalone.mjs                              # kelingking.html, the single file (v11, --local for localhost assets)
 node tools/test-standalone.mjs --offline                     # open it from file://, network cut, and photograph 4 stops (v11)
+node tools/page-stills.mjs --at=0,0.8,1.6,tau:4.97,end       # stills at places on the page in screens, words and card and all (v35; --phone, --each)
 ```
 
 Page switches: `?shot=`, `t=` (freeze the sea), `debug=`, `hide=terrain,water,plants,sky`,
@@ -178,7 +180,7 @@ shots, `O` overlay, `L` outline, `F` free camera, `C` contours.
 From v8 the page without `shot=`, `capture` or `cam=` is the landing page (`src/scroll/`), and
 the switches above are the tools'. The landing page takes `debug` (the panel, a readout, keys
 `1` to `6` for the stops), `at=` (start at a `tau`, 0 over the bay to 5 at the water),
-`notext`, `record` (stepped frame by frame by `scroll-clip.mjs`), and any scene switch. In the
+`notext` (from v35 also: no card, no beat, the whole flight from `tau` 0), `record` (stepped frame by frame by `scroll-clip.mjs`), and any scene switch. In the
 console, `__scroll.jumpTo(__scroll.pace.screensAt(2.5))` goes to a place on the way down.
 From v9 the visitor can drag to look around (`__scroll.look` holds the head's turn), and the
 clouds take `clouds.coverage=`, `clouds.bank=`, `clouds.high=`, `clouds.clearRadius=` and more
