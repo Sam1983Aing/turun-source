@@ -71,8 +71,12 @@ are already in `vendor/fonts/` for the standalone file).
   reverse. At each spread the scene goes back to being a postcard on the sand, the words
   beside it (left of the card the first time, right of it the second), on the same sand "for
   now". Then the dive again.
-- Still open from his mock-ups: a hand-lettered headline and typewriter small type (fonts to
-  be chosen and downloaded with his OK), which headline, and a prop or two.
+- From his mock-ups: a hand-lettered headline and typewriter small type. Sixteen hands were
+  shown in the real hero and Sam picked **Vujahday Script**, with Courier Prime for the small
+  type. Both are in the page. Their files are not in `vendor/fonts/` yet (a download for him
+  to OK), so the single file links them from Google Fonts for now.
+- Still open: which headline (the page keeps "Most people stop at the railing."), a prop or
+  two, the sand image's credit.
 
 ## Found by other versions
 

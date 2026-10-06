@@ -28,8 +28,6 @@
 //   record             the recorder drives the page frame by frame (tools/scroll-clip.mjs)
 //   pr=1               pixel ratio pinned (else it is picked while loading, then governed)
 //   lighting=, hour=   as in app.js, and the page then leaves the light alone
-//   type=water|caramel|comforter   (demo) the page's lettering as a brush hand and a typewriter
-//                      face, see type-options.js. Without it the page is as it was.
 //
 // Looking around (v9): drag the scene to turn the head away from the path's view; let go and it
 // eases back on the stairs. On the beach the chosen heading stays until reset. The scroll
@@ -46,13 +44,16 @@ import { walkLine } from '../trail/route.js';
 import { buildDescent, makePace, STOPS } from './path.js';
 import { createPostcard } from './postcard.js';
 import { createSpreads, spreadCaptions } from './spreads.js';
-import { applyType } from './type-options.js';
 
 gsap.registerPlugin(SplitText);
 
 // One motion personality for the page: this ease and this length for every reveal.
 const EASE = 'expo.out';
 const REVEAL = 1.1;
+// How far a line travels to be out of its mask, in percent of its own height. The lines are in
+// a hand that swings well outside its line box, so the masks clip further out (page.css) and
+// the lines have further to go than the 105 a serif needed.
+const LINE_OFF = 235;
 // How quickly the camera catches up with the scroll (per second): Lenis already smooths the
 // wheel, this only takes the edge off jumps (keys, the scrollbar, a touch fling).
 const FOLLOW = 9;
@@ -106,9 +107,6 @@ export function startScroll({ params }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const html = document.documentElement;
   if (params.has('notext')) html.classList.add('notext');
-  // (Demo: an option for the lettering, if the URL asks for one.) How far a line has to move to
-  // be out of its mask, in percent of its own height.
-  const OFF = (BARE ? null : applyType(params.get('type')))?.lineOff ?? 105;
   const $ = (s) => document.querySelector(s);
   const loaderEl = $('.loader');
 
@@ -561,7 +559,7 @@ export function startScroll({ params }) {
     } });
   }
   const places = { walk: () => page.screensAt(1), boat: () => page.screensAt(4.97), reserve: () => page.screens };
-  const spreads = BARE ? null : createSpreads({ reduced, off: OFF, onReserve: () => travel(places.reserve()) });
+  const spreads = BARE ? null : createSpreads({ reduced, off: LINE_OFF, onReserve: () => travel(places.reserve()) });
   document.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', (e) => {
     e.preventDefault();
     travel(places[el.dataset.go]());
@@ -590,7 +588,7 @@ export function startScroll({ params }) {
         k.byEl.set(d, self.lines);
         k.lines = [...k.byEl.values()].flat();
         k.tl?.progress(1);
-        gsap.set(self.lines, { yPercent: k.on ? 0 : OFF });
+        gsap.set(self.lines, { yPercent: k.on ? 0 : LINE_OFF });
       } });
     }
     gsap.set(after, { autoAlpha: 0, y: 14 });
@@ -642,10 +640,10 @@ export function startScroll({ params }) {
     const t = (k.tl = gsap.timeline());
     k.el.classList.remove('is-on');
     const d = reduced ? 0 : 0.7;
-    if (k.lines.length) t.to(k.lines, { yPercent: -OFF, duration: d, ease: EASE, stagger: 0.04 }, 0);
+    if (k.lines.length) t.to(k.lines, { yPercent: -LINE_OFF, duration: d, ease: EASE, stagger: 0.04 }, 0);
     t.to(k.after, { autoAlpha: 0, y: -8, duration: d * 0.8, ease: EASE }, 0);
     t.set(k.el, { visibility: 'hidden' });
-    if (k.lines.length) t.set(k.lines, { yPercent: OFF });
+    if (k.lines.length) t.set(k.lines, { yPercent: LINE_OFF });
     t.set(k.after, { y: 14 });
   }
   let wordsOn = false;

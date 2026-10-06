@@ -7,7 +7,8 @@
                 and the back of the same card to book.
      Mood       sun-bleached and quiet at the top, a long walk down, gold at the end
      Palette    ink on pale sand, cream over the scene, one terracotta accent
-     Type       Instrument Serif very large for the lines, Inter small and spaced for the rest
+     Type       the lines in a hand (Vujahday Script, a brush pen), everything small typed
+                (Courier Prime). Instrument Serif only for the wordmark.
      Motion     one ease (expo.out), reveals of 1.1 s, a heavy smooth scroll */
 
 :root {
@@ -19,8 +20,10 @@
   --sand: #ecdcc2;
   --accent: #d9774f;          /* terracotta, lifted to read over sea and sky */
   --accent-deep: #b4532d;     /* on sand, paper and the dark loader */
-  --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
-  --sans: "Inter", -apple-system, system-ui, sans-serif;
+  --pen: #17253d;             /* the hand's ink, on sand and paper */
+  --hand: "Vujahday Script", "Bradley Hand", "Segoe Script", cursive;   /* the lines: a brush pen */
+  --type: "Courier Prime", "Courier New", ui-monospace, monospace;      /* the rest: a typewriter */
+  --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;       /* the wordmark */
   --gutter: clamp(20px, 5.5vw, 88px);
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --shadow: 0 1px 2px rgba(10, 9, 7, 0.28), 0 2px 30px rgba(10, 9, 7, 0.4);
@@ -49,7 +52,7 @@ html.tool .page { display: none; }
 /* ------------------------------------------------------------ the landing page */
 
 html.scroll { background: var(--ink); }
-html.scroll body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+html.scroll body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(--type); -webkit-font-smoothing: antialiased; }
 html.scroll ::selection { background: var(--accent); color: var(--ink); }
 html.scroll #ref, html.scroll #status:empty { display: none; }
 html.scroll #status { position: fixed; left: 10px; bottom: 8px; z-index: 30; font: 11px/1.4 ui-monospace, monospace; color: #fff; white-space: pre; text-shadow: 0 1px 2px #000; pointer-events: none; }
@@ -61,14 +64,22 @@ html.scroll.loading { overflow: hidden; }
 .track { position: relative; width: 1px; pointer-events: none; }
 .notext .words, .notext .hud, .notext .rail, .notext .scene-controls, .notext .cover, .notext .sp { display: none !important; }
 
-.label { margin: 0; font: 500 11px/1.3 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; }
-.display { margin: 0; font: 400 clamp(2.5rem, 1.4rem + 3.6vw, 5.4rem)/0.98 var(--serif); letter-spacing: -0.014em; text-wrap: balance; }
-.display em { font-style: italic; color: var(--accent); }
-.body { margin: 0; font: 400 clamp(0.95rem, 0.9rem + 0.2vw, 1.06rem)/1.55 var(--sans); color: var(--cream-dim); max-width: 30rem; text-wrap: pretty; }
-/* Masks for the line reveals (SplitText). */
-.line-mask { overflow: clip; padding-bottom: 0.1em; margin-bottom: -0.1em; }
+.label { margin: 0; font: 700 12px/1.3 var(--type); letter-spacing: 0.09em; text-transform: uppercase; }
+/* The lines, in the hand. Its sizes come from measuring it against the serif it replaced
+   (the width of the widest line), its line height from the height of its ink. */
+.display { margin: 0; font: 400 clamp(2.5rem, 1.4rem + 3.6vw, 5.4rem)/0.76 var(--hand); text-wrap: balance; }
+.display em { font-style: normal; color: var(--accent); position: relative; display: inline-block; }
+.body { margin: 0; font: 400 clamp(0.95rem, 0.9rem + 0.2vw, 1.06rem)/1.6 var(--type); color: var(--cream-dim); max-width: 30rem; text-wrap: pretty; }
+/* Masks for the line reveals (SplitText). A hand swings well outside its line box, so the
+   masks clip that much further out all round (a clip-path: padding with negative margins
+   collapses between the lines and pushes them apart), and the lines travel further to clear
+   them (LINE_OFF in scroll.js). */
+.line-mask { overflow: visible !important; clip-path: inset(-0.45em -0.5em -0.5em -0.5em); }
+/* One brushed stroke under the word that matters, on the sand. */
+.hero .display em::after, .sp__head em::after { content: ""; position: absolute; left: -3%; right: -6%; bottom: -0.04em; height: 0.16em;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 40 4 110 3 197 7' fill='none' stroke='%23b4532d' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M30 13.5 C 80 9 140 8.5 186 11' fill='none' stroke='%23b4532d' stroke-width='1.6' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
 
-.button { pointer-events: auto; appearance: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 14px; background: var(--ink); color: var(--cream); padding: 17px 22px 16px 24px; font: 500 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; transition: background 0.5s var(--ease); }
+.button { pointer-events: auto; appearance: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 14px; background: var(--ink); color: var(--cream); padding: 16px 22px 15px 24px; font: 400 15px/1 var(--type); letter-spacing: 0.02em; text-decoration: none; transition: background 0.5s var(--ease); }
 .button::after { content: ""; width: 22px; height: 1px; background: currentColor; box-shadow: 0 0 0 0 currentColor; transform-origin: 0 50%; transition: transform 0.5s var(--ease); }
 .button:hover, .button:focus-visible { background: var(--accent-deep); }
 .button:hover::after, .button:focus-visible::after { transform: scaleX(1.5); }
@@ -117,7 +128,7 @@ html.scroll.at-card #stage { cursor: pointer; }
     calc(var(--cw) * 0.018) calc(var(--cw) * 0.036) calc(var(--cw) * 0.045) calc(var(--cw) * -0.012) rgba(58, 36, 14, 0.44),
     calc(var(--cw) * 0.035) calc(var(--cw) * 0.07) calc(var(--cw) * 0.16) calc(var(--cw) * -0.02) rgba(58, 36, 14, 0.3); }
 .card__caption { position: absolute; left: var(--b); right: var(--b); bottom: 0; height: var(--bb); margin: 0; display: flex; align-items: center; justify-content: space-between;
-  font: 500 calc(var(--cw) * 0.0152)/1 var(--sans); letter-spacing: 0.24em; text-transform: uppercase; color: #3b342a; text-shadow: 0 calc(var(--cw) * 0.0008) 0 rgba(255, 255, 255, 0.8); }
+  font: 400 calc(var(--cw) * 0.024)/1 var(--type); letter-spacing: 0.02em; color: #3b342a; text-shadow: 0 calc(var(--cw) * 0.0008) 0 rgba(255, 255, 255, 0.8); }
 .card__caption span:last-child { font-variant-numeric: tabular-nums; color: #6d6252; }
 /* The print finish over the picture: a sheen that moves with the tilt, the paper's tooth, a
    soft edge where the ink meets the border. Lifts as the card comes up. */
@@ -141,35 +152,35 @@ html.scroll.at-card #stage { cursor: pointer; }
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75), inset 0 0 40px rgba(120, 92, 52, 0.12), 2px 4px 5px rgba(66, 44, 20, 0.42), 14px 26px 46px rgba(66, 44, 20, 0.3), 0 0 110px rgba(66, 44, 20, 0.2); }
 .back__in { position: absolute; inset: 0; display: grid; grid-template-columns: 1.06fr 1fr; padding: 11cqh 5.2cqw 7.5cqh; }
 .back__in::before { content: ""; position: absolute; left: 51.4%; top: 15cqh; bottom: 9cqh; width: 1px; background: rgba(20, 18, 14, 0.32); transform-origin: 50% 0; transform: scaleY(var(--rule, 1)); }
-.back__head { position: absolute; left: 0; right: 0; top: 4.6cqh; margin: 0; text-align: center; font: 500 max(9px, 1.05cqw)/1 var(--sans); letter-spacing: 0.56em; text-indent: 0.56em; text-transform: uppercase; color: rgba(20, 18, 14, 0.55); }
+.back__head { position: absolute; left: 0; right: 0; top: 4.6cqh; margin: 0; text-align: center; font: 700 max(9px, 1.05cqw)/1 var(--type); letter-spacing: 0.5em; text-indent: 0.5em; text-transform: uppercase; color: rgba(20, 18, 14, 0.55); }
 .back__msg { padding-right: 5cqw; display: grid; align-content: center; gap: 4.2cqh; }
-.back__note { margin: 0; font: italic 400 3.5cqw/1.2 var(--serif); letter-spacing: -0.005em; color: #2a251d; text-wrap: pretty; }
-.back__plan { margin: 0; padding: 0; list-style: none; display: grid; gap: 1.5cqh; font: 400 max(11px, 1.36cqw)/1.35 var(--sans); color: var(--ink-dim); }
+.back__note { margin: 0; font: 400 3.7cqw/1 var(--hand); color: var(--pen); text-wrap: pretty; }
+.back__plan { margin: 0; padding: 0; list-style: none; display: grid; gap: 1.5cqh; font: 400 max(11px, 1.36cqw)/1.35 var(--type); color: var(--ink-dim); }
 .back__plan li { display: grid; grid-template-columns: 5.6cqw 1fr; align-items: baseline; }
-.back__plan time { font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: 0.06em; color: var(--accent-deep); }
-.back__price { margin: 0; padding-top: 2.6cqh; border-top: 1px solid rgba(20, 18, 14, 0.18); font: 400 max(11px, 1.36cqw)/1.4 var(--sans); color: var(--ink-dim); }
-.back__price b { font: 400 2.5cqw/1 var(--serif); color: var(--ink); margin-right: 0.3em; }
+.back__plan time { font-weight: 700; color: var(--accent-deep); }
+.back__price { margin: 0; padding-top: 2.6cqh; border-top: 1px solid rgba(20, 18, 14, 0.18); font: 400 max(11px, 1.36cqw)/1.4 var(--type); color: var(--ink-dim); }
+.back__price b { font: 700 2.2cqw/1 var(--type); letter-spacing: -0.03em; color: var(--ink); margin-right: 0.3em; }
 .back__addr { position: relative; padding-left: 5cqw; display: grid; align-content: end; gap: 2.5cqh; }
-.back__to { margin: 0 0 0.4cqh; font: italic 400 2.3cqw/1 var(--serif); color: #2a251d; }
+.back__to { margin: 0 0 0.4cqh; font: 400 2.7cqw/1 var(--hand); color: var(--pen); }
 .field { display: grid; gap: 0.7cqh; border-bottom: 1px solid rgba(20, 18, 14, 0.5); padding-bottom: 0.8cqh; }
-.field span { font: 500 max(9px, 0.98cqw)/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(20, 18, 14, 0.55); }
-.field input, .field select { appearance: none; -webkit-appearance: none; width: 100%; min-height: max(26px, 3.3cqw); border: 0; border-radius: 0; padding: 0; background: none; color: var(--ink); font: italic 400 max(17px, 2.35cqw)/1.1 var(--serif); }
+.field span { font: 700 max(9px, 0.98cqw)/1 var(--type); letter-spacing: 0.12em; text-transform: uppercase; color: rgba(20, 18, 14, 0.6); }
+.field input, .field select { appearance: none; -webkit-appearance: none; width: 100%; min-height: max(26px, 3.3cqw); border: 0; border-radius: 0; padding: 0; background: none; color: var(--pen); font: 400 max(20px, 2.64cqw)/1.1 var(--hand); }
 .field input:focus-visible, .field select:focus-visible { outline: none; }
 .field:focus-within { border-bottom-color: var(--accent-deep); box-shadow: 0 1px 0 var(--accent-deep); }
 .field--two { grid-template-columns: 1.3fr 1fr; gap: 3cqw; border: 0; padding: 0; }
 .field--two label { display: grid; gap: 0.7cqh; border-bottom: 1px solid rgba(20, 18, 14, 0.5); padding-bottom: 0.8cqh; }
 .field--two label:focus-within { border-bottom-color: var(--accent-deep); box-shadow: 0 1px 0 var(--accent-deep); }
 .back__addr .button { justify-self: start; margin-top: 1.2cqh; }
-.back__small { margin: 0; min-height: 2.6em; font: 400 max(10.5px, 1.16cqw)/1.4 var(--sans); color: var(--ink-dim); }
+.back__small { margin: 0; min-height: 2.6em; font: 400 max(10.5px, 1.16cqw)/1.4 var(--type); color: var(--ink-dim); }
 .back__small.is-sent { color: var(--accent-deep); }
 /* The stamp and its postmark, top right, as on any card. */
 .stamp { position: absolute; right: 0; top: -5.5cqh; width: 32cqw; height: 17cqw; color: var(--accent-deep); pointer-events: none; }
 .stamp__paper { position: absolute; right: 0; top: 0; width: 12.6cqw; transform: rotate(2.4deg); filter: drop-shadow(0 0.1cqw 0.15cqw rgba(60, 40, 16, 0.3)); }
-.stamp__paper text { fill: currentColor; font-family: var(--sans); }
-.stamp__paper .stamp__big { font-family: var(--serif); font-size: 50px; letter-spacing: -0.03em; }
-.stamp__small { font-size: 8.4px; font-weight: 500; letter-spacing: 0.2em; }
+.stamp__paper text { fill: currentColor; font-family: var(--type); }
+.stamp__paper .stamp__big { font-weight: 700; font-size: 42px; letter-spacing: -0.05em; }
+.stamp__small { font-size: 8.4px; font-weight: 700; letter-spacing: 0.14em; }
 .stamp__mark { position: absolute; right: 6.4cqw; top: 2.4cqw; width: 25cqw; color: rgba(20, 18, 14, 0.62); transform: rotate(-8deg); mix-blend-mode: multiply; }
-.stamp__mark text { fill: currentColor; font-family: var(--sans); font-weight: 500; }
+.stamp__mark text { fill: currentColor; font-family: var(--type); font-weight: 700; }
 .stamp__ring { font-size: 7.6px; letter-spacing: 0.22em; }
 .stamp__date { font-size: 10px; letter-spacing: 0.14em; }
 
@@ -177,12 +188,12 @@ html.scroll.at-card #stage { cursor: pointer; }
 
 .loader { position: fixed; inset: 0; z-index: 50; background: var(--ink); display: grid; place-content: center; justify-items: center; gap: 22px; text-align: center; padding: 0 var(--gutter); }
 .loader .label { color: var(--cream-dim); }
-.loader__title { margin: 0; font: 400 clamp(3.4rem, 2rem + 7vw, 8.5rem)/0.9 var(--serif); letter-spacing: -0.015em; }
+.loader__title { margin: 0; font: 400 clamp(3.8rem, 2.2rem + 7.6vw, 9.4rem)/0.9 var(--hand); }
 .loader__bar { width: min(340px, 60vw); height: 1px; background: rgba(243, 239, 230, 0.16); overflow: hidden; }
 .loader__bar span { display: block; height: 100%; background: var(--accent-deep); transform-origin: 0 50%; transform: scaleX(0); }
-.loader__step { margin: 0; display: flex; gap: 14px; align-items: baseline; justify-content: center; font: 500 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--cream-dim); min-height: 1em; }
+.loader__step { margin: 0; display: flex; gap: 14px; align-items: baseline; justify-content: center; font: 700 12px/1 var(--type); letter-spacing: 0.09em; text-transform: uppercase; color: var(--cream-dim); min-height: 1em; }
 .loader__count { font-variant-numeric: tabular-nums; color: var(--cream); }
-.loader__fail { display: none; max-width: 30rem; font: 400 15px/1.5 var(--sans); color: var(--cream-dim); letter-spacing: 0; text-transform: none; }
+.loader__fail { display: none; max-width: 30rem; font: 400 15px/1.5 var(--type); color: var(--cream-dim); letter-spacing: 0; text-transform: none; }
 .loader.failed .loader__fail { display: block; }
 .loader.failed .loader__step, .loader.failed .loader__bar { display: none; }
 
@@ -201,29 +212,30 @@ html.scroll.at-card #stage { cursor: pointer; }
 .sp--walk .sp__text { left: var(--gutter); width: calc(var(--c-left, 50vw) - var(--gutter) - 3.5vw); }
 .sp--beach .sp__text { left: calc(var(--c-right, 50vw) + 3.5vw); right: var(--gutter); }
 .sp__label { display: flex; align-items: baseline; gap: 16px; color: rgba(20, 18, 14, 0.74); }
-.sp__label b { font-weight: 500; color: var(--ink); }
-.sp__head { font-size: clamp(2.6rem, 0.5rem + 5.5vw, 7.2rem); line-height: 0.88; letter-spacing: -0.026em; margin-left: -0.04em; }
-.sp__head em { color: #a8431f; }
-.sp__mask { display: block; overflow: clip; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.sp__label b { color: var(--ink); }
+/* (Pen-blue ink, written a little uphill, as the hero's line is.) */
+.sp__head { font-size: clamp(2.6rem, 0.5rem + 5.5vw, 7.2rem); color: var(--pen); margin: 0.04em 0; transform: rotate(-2.5deg); transform-origin: 0 60%; }
+.sp__head em { color: var(--accent-deep); }
+.sp__mask { display: block; clip-path: inset(-0.45em -0.5em -0.5em -0.5em); }
 .sp__ln { display: block; white-space: nowrap; }
 /* The rule draws itself across under the headline. */
-.sp__rule { display: block; height: 1px; background: #a8431f; transform-origin: 0 50%; }
+.sp__rule { display: block; height: 1px; background: var(--accent-deep); transform-origin: 0 50%; }
 .sp__rows { margin: 0; display: grid; }
-.sp__rows div { display: grid; grid-template-columns: 7.5rem 1fr; align-items: baseline; padding: 12px 0; border-bottom: 1px solid rgba(20, 18, 14, 0.26); }
+.sp__rows div { display: grid; grid-template-columns: 8.2rem 1fr; align-items: baseline; padding: 12px 0; border-bottom: 1px solid rgba(20, 18, 14, 0.26); }
 /* (Ink, not the accent: small terracotta type sank into the palm's shadows on the sand.) */
-.sp__rows dt { font: 500 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(20, 18, 14, 0.86); font-variant-numeric: tabular-nums; }
-.sp__rows dd { margin: 0; font: 400 clamp(1.15rem, 0.9rem + 0.7vw, 1.55rem)/1.15 var(--serif); }
-.sp__price { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; font: 400 0.98rem/1.3 var(--sans); color: rgba(20, 18, 14, 0.82); }
-.sp__price b { font: 400 2.1rem/1 var(--serif); color: var(--ink); margin-right: -12px; }
+.sp__rows dt { font: 700 12px/1 var(--type); letter-spacing: 0.09em; text-transform: uppercase; color: rgba(20, 18, 14, 0.86); }
+.sp__rows dd { margin: 0; font: 400 clamp(1rem, 0.9rem + 0.3vw, 1.14rem)/1.35 var(--type); }
+.sp__price { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; font: 400 0.98rem/1.3 var(--type); color: rgba(20, 18, 14, 0.82); }
+.sp__price b { font: 700 1.9rem/1 var(--type); letter-spacing: -0.04em; color: var(--ink); margin-right: -8px; }
 /* A tall screen: the card low and the words above it, then the card high and the words below. */
 @media (max-aspect-ratio: 85/100) {
   .sp .sp__text { left: var(--gutter); right: var(--gutter); width: auto; padding: 0; gap: 10px; }
   .sp--walk .sp__text { top: calc(max(18px, env(safe-area-inset-top)) + 58px); bottom: calc(100% - var(--c-top, 50vh) + 10px); }
   .sp--beach .sp__text { top: calc(var(--c-bottom, 50vh) + 12px); bottom: max(14px, env(safe-area-inset-bottom)); }
-  .sp__head { font-size: clamp(2.5rem, 12.2vw, 4.6rem); }
-  .sp__rows div { grid-template-columns: 5.4rem 1fr; padding: 8px 0; }
-  .sp__rows dd { font-size: 1.05rem; }
-  .sp__price b { font-size: 1.6rem; }
+  .sp__head { font-size: clamp(2.3rem, 11.2vw, 4.2rem); margin: 0.12em 0 0.08em; }
+  .sp__rows div { grid-template-columns: 6.4rem 1fr; padding: 8px 0; }
+  .sp__rows dd { font-size: 0.95rem; }
+  .sp__price b { font-size: 1.5rem; }
   .sp__price .button { padding: 13px 16px 12px 18px; }
 }
 
@@ -232,8 +244,8 @@ html.scroll.at-card #stage { cursor: pointer; }
 .hud { position: fixed; z-index: 10; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 44px; padding: max(18px, env(safe-area-inset-top)) var(--gutter) 0; pointer-events: none; color: var(--cream); text-shadow: var(--shadow); opacity: 0; transition: color 0.9s var(--ease), text-shadow 0.9s var(--ease); }
 .hud a { pointer-events: auto; color: inherit; text-decoration: none; }
 .hud__mark { display: flex; align-items: baseline; gap: 14px; font: 400 27px/1 var(--serif); letter-spacing: -0.01em; }
-.hud__mark span { font: 500 10.5px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.62; }
-.hud__nav { display: flex; align-items: center; gap: clamp(18px, 2.4vw, 36px); font: 500 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; }
+.hud__mark span { font: 700 11px/1 var(--type); letter-spacing: 0.09em; text-transform: uppercase; opacity: 0.66; }
+.hud__nav { display: flex; align-items: center; gap: clamp(18px, 2.4vw, 36px); font: 400 14.5px/1 var(--type); letter-spacing: 0.02em; }
 .hud__nav a { position: relative; padding: 12px 0; }
 .hud__nav a:not(.hud__cta)::after { content: ""; position: absolute; left: 0; right: 0; bottom: 6px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: 100% 50%; transition: transform 0.6s var(--ease); }
 .hud__nav a:not(.hud__cta):hover::after, .hud__nav a:not(.hud__cta):focus-visible::after { transform: scaleX(1); transform-origin: 0 50%; }
@@ -241,7 +253,7 @@ html.scroll.at-card #stage { cursor: pointer; }
 .hud__cta:hover, .hud__cta:focus-visible { background: var(--cream); color: var(--ink) !important; border-color: var(--cream); text-shadow: none; }
 .hud a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .hud__nav { order: 3; }
-.hud__where { order: 2; margin: 0 auto 0 clamp(18px, 3vw, 48px); display: none; gap: 14px; font: 500 11px/1 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; font-variant-numeric: tabular-nums; color: inherit; }
+.hud__where { order: 2; margin: 0 auto 0 clamp(18px, 3vw, 48px); display: none; gap: 14px; font: 700 12px/1 var(--type); letter-spacing: 0.08em; text-transform: uppercase; color: inherit; }
 .hud__alt { color: var(--accent); min-width: 5em; }
 /* On sand (the hero, the ending): ink, the whole menu. In the scene: cream, where you are,
    and only the way to book. */
@@ -259,7 +271,7 @@ html.scroll.at-card #stage { cursor: pointer; }
 .rail__stop { position: absolute; left: -3px; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%; background: var(--ink); box-shadow: inset 0 0 0 1px rgba(243, 239, 230, 0.7); transition: background 0.6s var(--ease), box-shadow 0.6s var(--ease); }
 .rail__stop.passed { background: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .rail__mark { position: absolute; left: 0; top: 0; width: 13px; height: 1px; margin-left: -6px; background: var(--cream); }
-.rail__mark span { position: absolute; right: 22px; top: -6px; font: 500 11px/1 var(--sans); letter-spacing: 0.14em; white-space: nowrap; font-variant-numeric: tabular-nums; text-shadow: var(--shadow); }
+.rail__mark span { position: absolute; right: 22px; top: -6px; font: 700 12px/1 var(--type); letter-spacing: 0.06em; white-space: nowrap; text-shadow: var(--shadow); }
 
 /* ------------------------------------------------------------ the words */
 
@@ -271,18 +283,20 @@ html.scroll.at-card #stage { cursor: pointer; }
 .hero { left: var(--gutter); top: 0; bottom: 0; width: calc(var(--card-left, 50vw) - var(--gutter) - 3.5vw); display: grid; align-content: center; gap: clamp(18px, 2.6vh, 30px); color: var(--ink); padding-bottom: 4vh; box-sizing: border-box; }
 .hero__label { display: flex; flex-wrap: wrap; gap: 6px 18px; color: rgba(20, 18, 14, 0.74); }
 .hero__label span:first-child { color: var(--ink); }
-.hero .display { font-size: clamp(3.3rem, 0.6rem + 6.9vw, 9rem); line-height: 0.88; letter-spacing: -0.026em; margin-left: -0.04em; max-width: 5em; }
-.hero .display em { color: #a8431f; }
-.hero .body { color: rgba(20, 18, 14, 0.82); max-width: 27rem; }
+/* (Pen-blue ink, written a little uphill. The measure breaks it after "people" and "the".) */
+.hero .display { font-size: clamp(3.5rem, 0.64rem + 7.4vw, 9.6rem); color: var(--pen); max-width: 4.91em; text-wrap: wrap; margin: 0.06em 0 0.02em; transform: rotate(-3.5deg); transform-origin: 0 60%; }
+.hero .display em { color: var(--accent-deep); }
+.hero .body { color: rgba(20, 18, 14, 0.82); max-width: 29rem; }
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 30px; margin-top: 6px; }
-.cue { display: flex; align-items: center; gap: 14px; margin: 0; font: 500 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(20, 18, 14, 0.78); }
-.cue i { display: block; width: 46px; height: 1px; background: currentColor; transform-origin: 0 50%; animation: cue 2.6s var(--ease) infinite; }
+/* "Scroll into the picture": in the hand, like a note in the margin. */
+.cue { display: flex; align-items: center; gap: 10px; margin: 0; font: 400 2.34rem/1 var(--hand); color: var(--pen); transform: rotate(-5deg); }
+.cue i { display: block; width: 34px; height: 1.5px; background: currentColor; transform-origin: 0 50%; animation: cue 2.6s var(--ease) infinite; }
 @keyframes cue { 0% { transform: scaleX(0); } 55% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1); opacity: 0; } }
 .facts { position: absolute; left: 0; bottom: clamp(26px, 6vh, 60px); margin: 0; display: flex; gap: clamp(22px, 3vw, 46px); }
 .facts div { display: grid; gap: 8px; padding-left: clamp(14px, 1.4vw, 22px); border-left: 1px solid rgba(20, 18, 14, 0.28); }
-.facts dt { font: 400 clamp(2rem, 1.2rem + 1.7vw, 3.1rem)/0.9 var(--serif); letter-spacing: -0.02em; }
-.facts dt small { font-size: 0.5em; margin-left: 0.12em; letter-spacing: 0; }
-.facts dd { margin: 0; font: 500 10px/1.3 var(--sans); letter-spacing: 0.18em; text-transform: uppercase; color: rgba(20, 18, 14, 0.78); white-space: nowrap; }
+.facts dt { font: 700 clamp(1.8rem, 1.1rem + 1.5vw, 2.7rem)/0.9 var(--type); letter-spacing: -0.05em; }
+.facts dt small { font-size: 0.5em; margin-left: 0.2em; letter-spacing: 0; }
+.facts dd { margin: 0; font: 700 11px/1.3 var(--type); letter-spacing: 0.08em; text-transform: uppercase; color: rgba(20, 18, 14, 0.78); white-space: nowrap; }
 
 /* The notes on the way down: one thing each, each in its own place and at its own size. */
 .note { display: grid; gap: clamp(12px, 1.8vh, 20px); text-shadow: var(--shadow); }
@@ -293,16 +307,15 @@ html.scroll.at-card #stage { cursor: pointer; }
 .note.on-light::before { inset: -34% -10%; background: radial-gradient(closest-side, rgba(12, 11, 9, 0.7), rgba(12, 11, 9, 0.38) 60%, rgba(12, 11, 9, 0)); }
 .note.on-light .body { color: var(--cream); }
 .note .label { display: flex; align-items: baseline; gap: 14px; color: var(--cream); }
-.note .label b { position: relative; font-weight: 500; padding-left: 20px; font-variant-numeric: tabular-nums; }
+.note .label b { position: relative; padding-left: 20px; }
 .note .label b::before { content: ""; position: absolute; left: 0; top: 50%; width: 12px; height: 1px; background: var(--accent); }
-.note .label span { opacity: 0.86; }
-.note--xl .display { font-size: clamp(3rem, 0.8rem + 7.6vw, 10.2rem); line-height: 0.86; letter-spacing: -0.028em; margin-left: -0.04em; }
-.note--m .display { font-size: clamp(2.3rem, 1.2rem + 2.6vw, 4.1rem); line-height: 0.95; }
+.note .label span { opacity: 0.9; font-weight: 400; }
+.note--xl .display { font-size: clamp(2.95rem, 0.79rem + 7.5vw, 10rem); }
+.note--m .display { font-size: clamp(2.46rem, 1.28rem + 2.78vw, 4.4rem); }
 .note--xl .body { max-width: 28rem; }
 .at-bl { left: var(--gutter); bottom: clamp(36px, 8.5vh, 104px); max-width: min(70rem, calc(100vw - 2 * var(--gutter) - 80px)); }
 .at-r { right: calc(var(--gutter) + 72px); top: 50%; translate: 0 -50%; width: min(24rem, 30vw); padding-left: 22px; border-left: 1px solid rgba(243, 239, 230, 0.5); }
 .at-c { left: 50%; translate: -50% 0; bottom: clamp(44px, 12vh, 150px); width: min(64rem, calc(100vw - 2 * var(--gutter))); justify-items: center; text-align: center; }
-.at-c .display { margin-left: 0; }
 /* Over the sand at noon (a light picked by hand on the beach): dark ink, no veil. In the
    page's own evening, and in any other light, the sand is dark enough for cream. */
 .bright-light .note.on-light { color: var(--ink); text-shadow: none; }
@@ -314,11 +327,11 @@ html.scroll.at-card #stage { cursor: pointer; }
 .bright-light .note.on-light .body { color: var(--ink-dim); }
 
 /* The foot of the page, on the sand under the card's back. */
-.foot { left: var(--gutter); right: var(--gutter); bottom: max(20px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: 1fr 1.25fr auto; align-items: end; gap: clamp(18px, 4vw, 64px); color: rgba(20, 18, 14, 0.86); font: 400 11.5px/1.55 var(--sans); }
+.foot { left: var(--gutter); right: var(--gutter); bottom: max(20px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: 1fr 1.25fr auto; align-items: end; gap: clamp(18px, 4vw, 64px); color: rgba(20, 18, 14, 0.86); font: 400 11.5px/1.55 var(--type); }
 .foot p { margin: 0; max-width: 34rem; }
-.foot b { font-weight: 500; color: var(--ink); }
+.foot b { font-weight: 700; color: var(--ink); }
 .foot a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-.foot__top { appearance: none; border: 0; border-bottom: 1px solid currentColor; padding: 6px 0; background: none; color: var(--ink); cursor: pointer; font: 500 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; white-space: nowrap; }
+.foot__top { appearance: none; border: 0; border-bottom: 1px solid currentColor; padding: 6px 0; background: none; color: var(--ink); cursor: pointer; font: 700 12px/1 var(--type); letter-spacing: 0.09em; text-transform: uppercase; white-space: nowrap; }
 .foot__top:focus-visible { outline: 2px solid var(--accent-deep); outline-offset: 4px; }
 
 /* ------------------------------------------------------------ scene choices on the beach */
@@ -326,14 +339,14 @@ html.scroll.at-card #stage { cursor: pointer; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .scene-controls { position: fixed; z-index: 11; right: calc(var(--gutter) + 44px); bottom: clamp(26px, 6.5vh, 72px); display: grid; justify-items: end; gap: 2px; opacity: 0; visibility: hidden; color: var(--cream); text-shadow: var(--shadow); }
 .time-of-day { display: flex; align-items: center; margin: 0; padding: 0; border: 0; }
-.time-of-day::before { content: "Light"; margin-right: 10px; font: 500 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.7; }
+.time-of-day::before { content: "Light"; margin-right: 10px; font: 700 12px/1 var(--type); letter-spacing: 0.09em; text-transform: uppercase; opacity: 0.75; }
 .time-of-day label { position: relative; cursor: pointer; }
 .time-of-day input { position: absolute; width: 1px; height: 1px; opacity: 0; }
-.time-of-day span { display: grid; place-items: center; min-height: 44px; padding: 0 9px; font: 500 11px/1 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; color: rgba(243,239,230,.72); transition: color 0.5s var(--ease); }
+.time-of-day span { display: grid; place-items: center; min-height: 44px; padding: 0 9px; font: 700 12px/1 var(--type); letter-spacing: 0.08em; text-transform: uppercase; color: rgba(243,239,230,.78); transition: color 0.5s var(--ease); }
 .time-of-day label:hover span { color: var(--cream); }
 .time-of-day input:checked + span { color: var(--cream); box-shadow: inset 0 -13px 0 -12px var(--accent); }
 .time-of-day input:focus-visible + span { outline: 2px solid var(--cream); outline-offset: -4px; }
-.beach-look { display: flex; align-items: center; gap: 12px; padding-right: 9px; font: 400 11px/1.4 var(--sans); }
+.beach-look { display: flex; align-items: center; gap: 12px; padding-right: 9px; font: 400 12.5px/1.4 var(--type); }
 .beach-look[hidden] { display: none; }
 .look-reset { cursor: pointer; border: 0; border-bottom: 1px solid currentColor; padding: 10px 0; background: none; color: inherit; font: inherit; }
 .look-reset:focus-visible { outline: 2px solid var(--cream); outline-offset: 4px; }
@@ -357,7 +370,7 @@ html.scroll.at-card #stage { cursor: pointer; }
   .at-bl { bottom: max(26px, calc(env(safe-area-inset-bottom) + 18px)); max-width: calc(100vw - 2 * var(--gutter)); }
   .at-r { right: var(--gutter); left: var(--gutter); top: auto; bottom: max(26px, calc(env(safe-area-inset-bottom) + 18px)); translate: none; width: auto; padding-left: 16px; }
   .at-c { bottom: max(30px, calc(env(safe-area-inset-bottom) + 22px)); }
-  .note--xl .display { font-size: clamp(2.9rem, 14.5vw, 4.6rem); }
+  .note--xl .display { font-size: clamp(2.67rem, 13.3vw, 4.2rem); }
   .foot { grid-template-columns: 1fr; gap: 8px; font-size: 10.5px; line-height: 1.45; }
   .foot__credits { display: none; }
   .foot__top { justify-self: start; }
@@ -366,12 +379,12 @@ html.scroll.at-card #stage { cursor: pointer; }
 /* A tall screen: the words above the card, the way in below it. */
 @media (max-aspect-ratio: 85/100) {
   .hero { left: var(--gutter); right: var(--gutter); width: auto; top: calc(max(18px, env(safe-area-inset-top)) + 54px); bottom: auto; height: calc(var(--card-top, 46vh) - max(18px, env(safe-area-inset-top)) - 62px); padding: 0; gap: 12px; }
-  .hero .display { font-size: clamp(3rem, 15.4vw, 6rem); line-height: 0.88; max-width: none; }
-  .hero .body { font-size: 0.9rem; line-height: 1.45; }
+  .hero .display { font-size: clamp(2.76rem, 14.2vw, 5.5rem); max-width: none; margin: 0.2em 0 0.16em; }
+  .hero .body { font-size: 0.86rem; line-height: 1.5; }
   .hero__actions { position: absolute; left: 0; right: 0; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 16px); margin: 0; justify-content: space-between; flex-wrap: nowrap; }
   .hero__actions .button { padding: 15px 16px 14px 18px; white-space: nowrap; gap: 10px; }
   .hero__actions .button::after { width: 14px; }
-  .cue { white-space: nowrap; font-size: 10px; letter-spacing: 0.16em; gap: 10px; }
+  .cue { white-space: nowrap; font-size: 1.7rem; }
   .cue i { width: 20px; }
   .facts { display: none; }
   /* The back of the card stands upright: the message, then the lines to fill in. */
@@ -379,19 +392,19 @@ html.scroll.at-card #stage { cursor: pointer; }
   .back__in::before { display: none; }
   .back__head { top: 3.4cqh; font-size: max(9px, 2.6cqw); }
   .back__msg { padding: 0; gap: 2cqh; align-content: start; }
-  .back__note { font-size: 5.7cqw; line-height: 1.16; }
+  .back__note { font-size: 5.3cqw; }
   /* (Room for the stamp: the note runs round it.) */
-  .back__note::before { content: ""; float: right; width: 34cqw; height: 25cqw; }
+  .back__note::before { content: ""; float: right; width: 47cqw; height: 27cqw; }
   .wide-only { display: none; }
   .hero__actions { padding-right: 4px; }
   .back__plan { display: none; }
   .back__price { padding-top: 1.6cqh; font-size: max(11px, 3.1cqw); }
-  .back__price b { font-size: 6cqw; }
+  .back__price b { font-size: 5cqw; }
   .back__addr { padding: 0; gap: 1.5cqh; align-content: end; position: static; }
   .back__addr .button { margin-top: 0.6cqh; padding: 15px 18px 14px 20px; }
-  .back__to { font-size: 5.6cqw; }
+  .back__to { font-size: 6cqw; }
   .field span { font-size: max(9px, 2.5cqw); }
-  .field input, .field select { font-size: max(17px, 5.2cqw); min-height: 26px; }
+  .field input, .field select { font-size: max(20px, 5.6cqw); min-height: 26px; }
   .back__small { font-size: max(10.5px, 2.9cqw); min-height: 0; }
   .stamp { right: 6.5cqw; top: 7.4cqh; width: 40cqw; height: 28cqw; }
   .stamp__paper { width: 20cqw; }

@@ -22,7 +22,7 @@
 
 import { execSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
@@ -163,11 +163,20 @@ const code = ['var __m = {};', ...order.map(transform),
 // ---------------------------------------------------------------- the page
 
 const b64 = (p) => readFileSync(join(root, p)).toString('base64');
-const fonts = [
-  ['Instrument Serif', 'normal', '400', 'vendor/fonts/InstrumentSerif-latin.woff2'],
-  ['Instrument Serif', 'italic', '400', 'vendor/fonts/InstrumentSerif-italic-latin.woff2'],
-  ['Inter', 'normal', '400 500', 'vendor/fonts/Inter-latin.woff2'],
-].map(([family, style, weight, file]) => `@font-face{font-family:'${family}';font-style:${style};font-weight:${weight};font-display:swap;src:url(data:font/woff2;base64,${b64(file)}) format('woff2');}`).join('\n');
+// The page's fonts, inlined (v35: the hand and the typewriter; the serif is the wordmark's).
+// One that is not in vendor/fonts/ yet is linked from Google Fonts instead, and the build says
+// so: the file then needs a network for its lettering, and falls back to the system's own
+// script and Courier without one.
+const FONTS = [
+  ['Instrument Serif', 'normal', '400', 'vendor/fonts/InstrumentSerif-latin.woff2', 'Instrument+Serif'],
+  ['Vujahday Script', 'normal', '400', 'vendor/fonts/VujahdayScript-latin.woff2', 'Vujahday+Script'],
+  ['Courier Prime', 'normal', '400', 'vendor/fonts/CourierPrime-400-latin.woff2', 'Courier+Prime:wght@400;700'],
+  ['Courier Prime', 'normal', '700', 'vendor/fonts/CourierPrime-700-latin.woff2', 'Courier+Prime:wght@400;700'],
+];
+const fonts = FONTS.filter((f) => existsSync(join(root, f[3])))
+  .map(([family, style, weight, file]) => `@font-face{font-family:'${family}';font-style:${style};font-weight:${weight};font-display:swap;src:url(data:font/woff2;base64,${b64(file)}) format('woff2');}`).join('\n');
+const linked = [...new Set(FONTS.filter((f) => !existsSync(join(root, f[3]))).map((f) => f[4]))];
+if (linked.length) console.warn(`fonts not in vendor/fonts/, linked from Google Fonts instead: ${[...new Set(FONTS.filter((f) => !existsSync(join(root, f[3]))).map((f) => f[0]))].join(', ')}`);
 
 let commit = 'unknown';
 try { commit = execSync('git rev-parse --short HEAD', { cwd: root }).toString().trim(); } catch {}
@@ -182,7 +191,7 @@ html = html.replace(/\n\s*<script type="importmap">[\s\S]*?<\/script>/, '');
 const libs = ['vendor/gsap.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js'].map((f) => read(f).replaceAll('</script', '<\\/script'));
 swap('<script type="module" src="src/main.js"></script>',
   `<script>\n${libs.join('\n')}\n</script>\n<script>\nwindow.__klAssets = ${JSON.stringify(ASSETS)};\n${code}\n</script>`);
-swap('<head>', `<head>\n  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit ${commit}. Assets: ${BASE} -->`);
+swap('<head>', `<head>\n  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit ${commit}. Assets: ${BASE} -->${linked.length ? `\n  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?${linked.map((f) => `family=${f}`).join('&')}&display=swap">` : ''}`);
 writeFileSync(OUT, html);
 
 // Each inline script must parse as a classic script, as a browser reads it from file://. (Not

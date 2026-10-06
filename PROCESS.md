@@ -3740,3 +3740,45 @@ What a brush hand needed that the serif did not:
   `clip-path` set further out, and the lines travel 235% of their height, not 105%.
 - **Ink.** Pen blue on the sand, the same hand in cream over the scene, one brushed stroke
   under the word that matters, the lines written a few degrees uphill.
+
+## v35, round 6: the lettering (2026-10-06)
+
+Sam asked for more handwriting after the first three options, got twelve more set in the
+real hero, and picked one: "go with 07 Vujahday Script". It is now the page's own lettering,
+the switch and the fifteen other options are gone (they are in commit `baa8787`, with the
+table that sized each from its metrics).
+
+- **Three voices.** The lines in the hand (Vujahday Script). Everything small typed (Courier
+  Prime): labels, body, buttons, the menu, the card's captions, the rows of the spreads, the
+  numbers. Instrument Serif only for the wordmark, as in Sam's mock-ups. Inter is gone.
+- **On the sand** the hand is pen blue, written a few degrees uphill, with one brushed stroke
+  under the word that matters. Over the scene it is cream.
+- **The back of the card** is written in the same hand, and what a visitor types into its
+  fields is too.
+- **Sizes baked in.** The measured values for this hand (1.07 times the serif's size, a
+  measure of 4.91 em for the hero's line, a line height of 0.76, the stroke 0.04 em under the
+  baseline) are now plain numbers in `page.css`. The line masks clip 0.45 to 0.5 em outside
+  the line box and the lines travel 235% of their height (`LINE_OFF`), where the serif
+  needed 105%.
+- **Phone.** The hero's line had sat tight against the label above and the text below: it has
+  margins of its own now. On the back of the card the note ran into the postmark: the space
+  it flows round is wider.
+
+### The fonts' files
+
+The source page loads the two families from Google Fonts, as it always has for its fonts.
+The single file inlines what is in `vendor/fonts/`, and these are not there: putting them
+there is a download, which is Sam's to OK (Vujahday Script 31.9 KB, Courier Prime 11.2 and
+11.6 KB, from fonts.gstatic.com, SIL Open Font License). Until then `build-standalone.mjs`
+links any font it does not find from Google Fonts and says so when it runs. Without a
+network the single file falls back to the system's own script face and Courier.
+
+### Checked
+
+- Every screen at 1512 x 945 and 390 x 844 in the new lettering: `captures/r7-page.jpg`,
+  `captures/r7-phone.jpg`.
+- With "reduce motion" on: no smooth scroll, and at seven places down the page the right
+  words are up with their lines in place, the right light, console clean.
+- Driven for real as before (spreads both ways, the click on a card, Reserve, the menu, the
+  rewind): console clean, and still no frames drawn while a card rests.
+- The single file rebuilt and opened from `file://`: no errors.

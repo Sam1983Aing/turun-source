@@ -15,7 +15,7 @@ const EASE = 'expo.out';
 const NEAR = 0.1, LIFTED = 0.03;
 
 // off: how far a line has to move to be out of its mask, in percent of its own height.
-export function createSpreads({ reduced = false, off = 108, onReserve } = {}) {
+export function createSpreads({ reduced = false, off = 235, onReserve } = {}) {
   const list = [...document.querySelectorAll('.sp[data-hold]')].map((node) => {
     node.querySelectorAll('a[href="#reserve"]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); onReserve?.(); }));
     const q = (sel) => [...node.querySelectorAll(sel)];

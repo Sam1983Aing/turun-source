@@ -93,7 +93,8 @@ Then open http://localhost:5178: the landing page, from the postcard on the sand
 to the water's edge (v8) and the back of the card. The source needs a local server (a browser will not load ES modules
 or start a module worker from `file://`). `kelingking.html` is the same page built to run
 without one. Nothing to install: the source page loads three.js, GSAP and Lenis from jsDelivr
-and the fonts from Google Fonts, and the standalone file carries its own copies (`vendor/`).
+and the fonts from Google Fonts, and the standalone file carries its own copies (`vendor/`;
+a font not in `vendor/fonts/` yet is linked from Google Fonts instead, and the build says so).
 
 The page sets the light itself: morning at the top, a scroll-driven time lapse over the cove,
 evening from there on (v35). On the beach a line at the foot of the screen switches between
@@ -129,6 +130,10 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
 - **Pacing** is a monotone curve through `PACE` knots (screens of scroll against `tau`), with
   beats at the stops where the camera slows almost to a stop while the words come in. About
   19 screens top to bottom.
+- **The lettering** (v35). The lines are in a hand (Vujahday Script, a brush pen), everything
+  small is typed (Courier Prime), and Instrument Serif is left for the wordmark. The hand's
+  sizes were set by measuring it against the serif it replaced, and the masks its lines rise
+  out of clip well outside the line box, because a hand swings outside it (`LINE_OFF`).
 - **The page layer** (`scroll.js`, `page.css`): Lenis for a weighted smooth scroll, GSAP for
   the words (lines rising out of masks, SplitText), all driven from GSAP's ticker in one loop
   with the camera and the frame. Each block of words shows while the camera's `tau` is in its
