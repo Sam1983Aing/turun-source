@@ -3945,3 +3945,13 @@ Checked: every screen in the new face at desktop and phone size (`captures/h2-pa
 Still weak: seen straight down in morning light, the mainland's cliffs throw two large flat
 shadows into the card's picture. That is the scene at that hour and this brief does not
 touch the scene.
+
+### Jost it is (6 October)
+
+Sam picked Jost from the four. Its file is in `vendor/fonts/` now (26.6 KB, the latin subset
+with both weights in one file, from fonts.gstatic.com, with its Open Font License text from
+the google/fonts repository), so the single file carries all of its lettering again: no link
+to Google Fonts left in it, and opened from `file://` with the network blocked it reports no
+errors. Courier Prime and Inter are out of `vendor/fonts/`, nothing uses them. The `?small=`
+switch is gone. `?scene=sans` stays until he has chosen the face inside the picture.
+

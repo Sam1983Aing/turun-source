@@ -96,8 +96,8 @@ are already in `vendor/fonts/` for the standalone file).
 - The card: glossy white stock, no texture, no coloured edge, a slight shadow on the left and
   top as well.
 - The metrics at the bottom left: out.
-- The typewriter "doesn't feel vacation". The small type is a sans (Jost), with three others
-  to compare. His pick is open, and so is the download of its file.
+- The typewriter "doesn't feel vacation". The small type is a sans. Four were shown and he
+  picked Jost. Its file is in `vendor/fonts/`.
 - The dive to the second postcard was "too quick": the card's shot is higher, with the whole
   T-Rex in it, and that leg is slower.
 - Postcards two and three are to lie on something other than the hero's sand. Ideas shown as

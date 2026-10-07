@@ -539,9 +539,8 @@ caught.
   `assets/textures/CREDITS.md`. The plants are not scans: they are grown in code at load
   (`src/veg/grow/`, v7). v1 to v6 used three Poly Haven tree scans.
 - three.js 0.186 (MIT), GSAP 3.15 with SplitText (GreenSock's no-charge standard licence) and
-  Lenis 1.3.26 (MIT) are in `vendor/`, with the fonts Vujahday Script and Instrument Serif
-  (SIL Open Font License, from Google Fonts), each next to its licence. The small type, Jost
-  (also OFL), is loaded from Google Fonts for now. The tools' panel (lil-gui) loads from jsDelivr.
+  Lenis 1.3.26 (MIT) are in `vendor/`, with the fonts Vujahday Script, Instrument Serif and
+  Jost (SIL Open Font License, from Google Fonts), each next to its licence. The tools' panel (lil-gui) loads from jsDelivr.
 
 ## Licence
 

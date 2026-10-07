@@ -167,7 +167,7 @@ const b64 = (p) => readFileSync(join(root, p)).toString('base64');
 // one sans for everything small).
 // One that is not in vendor/fonts/ yet is linked from Google Fonts instead, and the build says
 // so: the file then needs a network for its lettering, and falls back to the system's own
-// script and Courier without one.
+// faces without one.
 const FONTS = [
   ['Instrument Serif', 'normal', '400', 'vendor/fonts/InstrumentSerif-latin.woff2', 'Instrument+Serif:ital@0;1'],
   ['Instrument Serif', 'italic', '400', 'vendor/fonts/InstrumentSerif-italic-latin.woff2', 'Instrument+Serif:ital@0;1'],

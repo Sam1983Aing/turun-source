@@ -119,18 +119,11 @@ export function startScroll({ params }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const html = document.documentElement;
   if (params.has('notext')) html.classList.add('notext');
-  // (Demo, two switches for Sam to compare faces in the page. ?scene=sans: the lines inside the
-  // picture in the sans, not the serif. ?small=figtree|cormorant|inter: another face for
-  // everything small, loaded from Google Fonts. Without them the page is as it is.)
-  const SMALL = { figtree: ['Figtree', 'Figtree:wght@400;500'], cormorant: ['Cormorant Garamond', 'Cormorant+Garamond:wght@500;600'], inter: ['Inter', 'Inter:wght@400;500'] };
-  const addCss = (href) => { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = href; document.head.append(l); };
-  if (params.get('scene') === 'sans' || SMALL[params.get('small')]) addCss(new URL('./type-options.css', import.meta.url).href);
-  if (params.get('scene') === 'sans') html.classList.add('scene-sans');
-  if (SMALL[params.get('small')]) {
-    const [family, spec] = SMALL[params.get('small')];
-    addCss(`https://fonts.googleapis.com/css2?family=${spec}&display=block`);
-    html.style.setProperty('--type', `"${family}", system-ui, sans-serif`);
-    html.classList.add(`small-${params.get('small')}`);
+  // (Demo, for Sam to compare in the page. ?scene=sans: the lines inside the picture in the
+  // sans, not the serif. Without it the page is as it is.)
+  if (params.get('scene') === 'sans') {
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('./type-options.css', import.meta.url).href; document.head.append(l);
+    html.classList.add('scene-sans');
   }
   const $ = (s) => document.querySelector(s);
   const loaderEl = $('.loader');
