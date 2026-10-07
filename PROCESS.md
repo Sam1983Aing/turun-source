@@ -4095,3 +4095,13 @@ Still weak: the boat's end of the line is a pixel wide at 52 m, so the tie is im
 than seen. The post meets the water in a hard cut, with no foam or reflection round its
 foot. 970 triangles, two draw calls.
 
+Checked: the turn to the boat and the last card at desktop and phone size
+(`captures/h8-boat.jpg`, `captures/h8-boat-p.jpg`), the single file rebuilt (62 modules) and
+opened from `file://` with no errors, the hero frames rendered again (the post is in `swash`).
+
+Not proven: the frame budget. `node tools/hero.mjs v35` rendered the nine frames, then one of
+its timing rounds gave up waiting for a page while three other sessions were using the GPU,
+and the times it did print disagree with themselves (a frame without its ground slower than
+with it). The post and line are 970 triangles in two draw calls with no new pass, so there is
+no reason to expect a cost, but it has not been measured. To be timed on a quiet machine.
+
