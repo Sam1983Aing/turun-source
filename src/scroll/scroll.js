@@ -111,9 +111,15 @@ const SPREAD = { in: 0.9, rest: 0.9, out: 1.05, easeIn: 0.6, easeOut: 0.2 };
 // card turning over.
 const OUTRO = 2.6, OUT_CARD = [0, 0.46], OUT_FLIP = [0.5, 0.8], OUT_WORDS = 0.6, OUT_STAMP = 0.79;
 // Turning to the boat at the water's edge: over this stretch, to put it this far across. The
-// eye comes up a little as it does (from 1.6 m above the swash a breaking wave stands as high
-// as the horizon and hides the hull each time it rears), and the lens closes in.
-const BOAT_PAN = [4.72, 4.985], BOAT_X = { wide: 0.64, tall: 0.58 }, BOAT_RISE = 2.3, BOAT_LENS = 16;
+// eye comes up as it does (from 1.6 m above the swash a breaking wave stands as high as the
+// horizon and hides the hull each time it rears), the view tips down to keep the boat where
+// it is, and the lens closes in. `wide`, `tall`: for the screen's shape.
+// (Wide screens got a longer lens and a higher eye on 7 October: Sam found the boat too small,
+// and at 2.3 m of rise a wave still hid its hull a quarter of the time, sampled over 14 s.
+// At 3.5 m it is half hidden for about one second in eight. The mooring post, src/boat/, stands
+// in the foreground of this frame. A phone keeps the first numbers, or the post's foot would
+// run into the words.)
+const BOAT_PAN = [4.72, 4.985], BOAT_X = { wide: 0.64, tall: 0.58 }, BOAT_RISE = { wide: 3.5, tall: 2.3 }, BOAT_LENS = { wide: 26, tall: 16 }, BOAT_TIP = { wide: -3.8, tall: 0 };
 
 const clamp01 = (x) => Math.min(Math.max(x, 0), 1);
 const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
@@ -437,11 +443,12 @@ export function startScroll({ params }) {
       const w = smooth(BOAT_PAN[0], BOAT_PAN[1], cam.tau);
       if (w > 0) {
         const bearing = (Math.atan2(app.boat.east - p.pos[0], app.boat.north - p.pos[1]) * 180) / Math.PI;
-        const fov = p.fov - BOAT_LENS * w;
+        const shape = camera.aspect < 0.85 ? 'tall' : 'wide';
+        const fov = p.fov - BOAT_LENS[shape] * w;
         const half = Math.tan((fovFor(fov, camera.aspect) * Math.PI) / 360) * camera.aspect;
-        const off = (Math.atan(((camera.aspect < 0.85 ? BOAT_X.tall : BOAT_X.wide) - 0.5) * 2 * half) * 180) / Math.PI;
+        const off = (Math.atan((BOAT_X[shape] - 0.5) * 2 * half) * 180) / Math.PI;
         const turn = Math.min(Math.max(angleDelta(bearing - off - p.yaw), -50), 50);
-        p = { ...p, yaw: p.yaw + turn * w, pos: [p.pos[0], p.pos[1], p.pos[2] + BOAT_RISE * w], fov };
+        p = { ...p, yaw: p.yaw + turn * w, pitch: p.pitch + BOAT_TIP[shape] * w, pos: [p.pos[0], p.pos[1], p.pos[2] + BOAT_RISE[shape] * w], fov };
       }
     }
     cam.pose = p;

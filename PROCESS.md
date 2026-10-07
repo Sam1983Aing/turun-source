@@ -4065,3 +4065,33 @@ Checked: the card leaning to all four corners at twice the density
   small type, because the terrain is OpenStreetMap's data and its licence asks for it (and
   this project's rules say to keep it). The note that the outfitter is invented is off the
   page, on Sam's call. The form still answers that nothing was sent.
+
+### Round 10: a post and a line for the boat (7 October)
+
+Sam: "I feel the boat is too small, maybe you can add like a pole somewhere with a cord that
+attaches the boat." Built by a second agent in `src/boat/mooring.js`, checked and placed here.
+
+- **The post.** Bamboo, 2.8 m showing, leaning 5 degrees, five turns of hemp lashed under its
+  top, standing in the shallows 13.5 m from where the walk ends, on the terrain's own height.
+  Its surface is a branch of the boat's shader, so it takes the scene's light and grade.
+- **The line** is two pieces, so nothing is rebuilt per frame. One hangs from the post and
+  runs out along the bottom towards the boat. The other belongs to the boat's group: a strop
+  round the stern and a few metres of line going down into the water, riding with the hull.
+  The stern, because the bow already carries the anchor line seaward.
+- **Why it stands in the water and not on wet sand.** In the last frame the eye is nearly
+  5 m over the water (the rise that keeps a wave from hiding the boat), so everything nearer
+  than about 11 m is under the bottom of the frame, and the water's edge is at 5.6 m.
+- **The boat is a third larger on a wide screen.** The lens closes to 31 degrees (`BOAT_LENS`
+  26, it was 16) and the view tips down (`BOAT_TIP`).
+- **And it is hidden less often.** Sampled 16 times over 14 s, a wave hid the hull in four of
+  them. With the eye 1.2 m higher (`BOAT_RISE` 3.5 on wide screens) it is half hidden in two
+  (`captures/h7-boatvis.jpg`: rows are the eye as it was, 1.2 m and 2.4 m higher). Higher
+  still clears it altogether but puts the post's foot under the frame.
+- A phone keeps the old lens and rise: with the new ones the post's foot runs into the words.
+- `boat=0` still takes everything out. `moor=0` takes out the post and line alone, and
+  `moor=east,north` stands the post somewhere else.
+
+Still weak: the boat's end of the line is a pixel wide at 52 m, so the tie is implied more
+than seen. The post meets the water in a hard cut, with no foam or reflection round its
+foot. 970 triangles, two draw calls.
+

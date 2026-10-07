@@ -228,7 +228,13 @@ rolled round its yard, a storm lantern over the stern.
 - **The lantern** lights when the sun is low or gone. Its brightness is set on screen and
   divided by the exposure, which runs over fifteen stops between noon and night.
 
-`?boat=0` leaves it out, `?boat=east,north[,heading]` moors it somewhere else.
+- **It is tied up** (`mooring.js`). A bamboo post stands in the shallows in front of the walk's
+  last frame, with a hemp line lashed to it that runs out along the bottom. The boat's end of
+  the line is part of the boat (a strop round the stern and a few metres going down into the
+  water), so it rides with the hull and nothing is rebuilt per frame.
+
+`?boat=0` leaves it all out, `?boat=east,north[,heading]` moors it somewhere else, `?moor=0`
+leaves out the post and line, `?moor=east,north` stands the post somewhere else.
 
 ## The standalone file
 

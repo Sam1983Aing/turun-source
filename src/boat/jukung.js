@@ -22,6 +22,8 @@
 //   the lantern   lit when the sun is low in the west or gone. Its brightness is set on screen
 //                 and divided by the exposure, which runs over fifteen stops between noon and
 //                 night: a real flame would vanish in one and burn out the other.
+//   the mooring   mooring.js: a bamboo post in the shallows and a stern line to it. Built with
+//                 this file's builder and drawn with its material.
 //
 // The boat's frame: x forward, y up, z to starboard, the origin amidships on the waterline.
 
@@ -31,6 +33,7 @@ import { CLOUD_SHADOW_GLSL } from '../sky/clouds.js';
 import { SUN_SHADOW_GLSL } from '../terrain/sun-shadow.js';
 import { createSea } from './sea.js';
 import { createOnWater } from './on-water.js';
+import { createMooring, MOORING_SURFACE } from './mooring.js';
 
 const DEG = Math.PI / 180, TAU = Math.PI * 2;
 const clamp = (x, a, b) => Math.min(Math.max(x, a), b);
@@ -87,6 +90,8 @@ const STROP_X = 3.2;
 const FAIR = (() => { const u = STROP_X / HALF; return [STROP_X, keel(u) - 0.012, 0]; })();
 const LINE_ANGLE = 20 * DEG;           // the line's slope down to the anchor
 const LINE_SAG = 0.3;
+// And the strop round the stern, for the line ashore (mooring.js): clear of the lantern over it.
+const STERN_X = -3.25;
 
 // ---------------------------------------------------------------- geometry
 
@@ -444,6 +449,8 @@ float jkInside = 0.0;    // down in the well: no light off the sea
 float jkSun = 1.0;       // the island's and the clouds' shadow here
 float jkShadow = 1.0;    // those and the boat's own
 vec3 jkEmis = vec3(0.0);
+vec3 jkBounce = vec3(0.0); // what the ground about it sends up, over the open sea's (the mooring, in the shallows)
+float jkFuzz = 0.0;      // fibres that light up against the sun (the mooring's hemp)
 
 float jkH(vec2 p) { vec3 p3 = fract(vec3(p.xyx) * 0.1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
 float jkH3(vec3 p) { p = fract(p * 0.1031); p += dot(p, p.zyx + 31.32); return fract((p.x + p.y) * p.z); }
@@ -653,7 +660,7 @@ vec3 jkSurface(vec3 P, vec3 N, float fp, int id) {
     jkRough = 0.45;
     jkGloss = 0.6;
     jkF0 = 0.3;
-  } else {
+  }${MOORING_SURFACE} else {
     col = vec3(0.01);
     jkEmis = uFlame * (0.55 + 0.45 * smoothstep(-0.305, -0.275, P.y));
   }
@@ -686,8 +693,13 @@ const FRAG_LIGHT = /* glsl */ `
   reflectedLight.indirectDiffuse *= jkAO;
   reflectedLight.directDiffuse *= mix(1.0, jkAO, 0.35);
   // Light off the sea below: a white hull over shallow water is turquoise underneath.
-  vec3 seaUp = uWaterAlb * (uSunIrr * max(uSunDir.y, 0.0) * jkSun + uSkyUp);
+  vec3 seaUp = (uWaterAlb + jkBounce) * (uSunIrr * max(uSunDir.y, 0.0) * jkSun + uSkyUp);
   reflectedLight.indirectDiffuse += seaUp * 0.5 * (1.0 - nW.y) * (1.0 - jkInside) * jkAO * BRDF_Lambert(material.diffuseColor);
+  // Rope against the light: its fuzz carries a low sun round both edges toward the eye.
+  if (jkFuzz > 0.0) {
+    float back = max(dot(-vW, uSunDir), 0.0), rim = 1.0 - clamp(dot(nW, vW), 0.0, 1.0);
+    reflectedLight.directDiffuse += jkFuzz * uSunIrr * jkShadow * rim * rim * back * back * BRDF_Lambert(material.diffuseColor);
+  }
   // The lantern.
   vec3 toL = uLampPos - vWorldPos;
   float d2 = dot(toL, toL);
@@ -710,10 +722,11 @@ function createBoatMaterial(lightUniforms, gradeUniforms, uniforms) {
     shader.vertexShader = [
       ['#include <common>', '#include <common>\n' + VERT_PARS],
       // (The beams bend: nothing at the rail, all of it at the float. The lantern and the anchor
-      // line share this material and lie within the rail's width of their own origins.)
+      // line share this material and lie within the rail's width of their own origins. The
+      // mooring's parts, the ids after the flame's, reach further and are left alone.)
       ['#include <begin_vertex>', `#include <begin_vertex>
         vPart = aPart; vRand = aRand; vLocal = position;
-        { float bend = smoothstep(${f(BEND[0])}, ${f(BEND[1])}, abs(position.z));
+        { float bend = smoothstep(${f(BEND[0])}, ${f(BEND[1])}, abs(position.z)) * step(aPart.x, ${FLAMEID}.5);
           vec2 fl = position.z > 0.0 ? uFlex.zw : uFlex.xy;
           transformed.y += bend * bend * clamp(fl.x + fl.y * position.x, -0.14, 0.14); }`],
       ['#include <project_vertex>', '#include <project_vertex>\nvWorldPos = (modelMatrix * vec4(transformed, 1.0)).xyz;\naerialVertex(vWorldPos);'],
@@ -808,8 +821,9 @@ function createHaloMaterial(uniforms) {
 
 // renderer, water (createWater's), lightUniforms and gradeUniforms as every lit material gets
 // them, shared: { uExtent, uSunShadow } (the ground's). place: 'east,north[,heading]' or
-// nothing for the anchorage below.
-export function createJukung({ renderer, water, lightUniforms = {}, gradeUniforms = {}, shared = {}, place = null }) {
+// nothing for the anchorage below. mooring: '0' for no post and stern line, 'east,north' to
+// stand the post somewhere else (mooring.js).
+export function createJukung({ renderer, water, lightUniforms = {}, gradeUniforms = {}, shared = {}, place = null, mooring = null }) {
   // Off the south end of the beach, in four metres of water, 50 m outside the break and 30 m
   // clear of the white water at the rock's foot: bearing 252 degrees and 74 m from where the
   // walk ends. Bow to the swell.
@@ -865,6 +879,10 @@ export function createJukung({ renderer, water, lightUniforms = {}, gradeUniform
   const onWater = createOnWater({ water, lightUniforms, gradeUniforms, uniforms,
     shape: { proxies: boatProxies(), half: HALF, beam: BEAM, bend: BEND, sheer: SHEER_GLSL, floats: { z: ZF, r: FLOAT_R, x0: -2.5, x1: 3.1 }, beams: BEAMS.map((bm) => bm.x) } });
   for (const o of [halo, onWater.mesh]) { o.matrixAutoUpdate = false; o.matrixWorldAutoUpdate = false; group.add(o); }
+  // The post ashore and the stern line to it.
+  const moorings = String(mooring) === '0' ? null : createMooring({ createBuilder, material, place: mooring, boat: { east, north, heading },
+    strop: (() => { const u = STERN_X / HALF; return { x: STERN_X, top: sheer(u) + 0.035, bot: keel(u) - 0.03, rz: halfBeam(u) + 0.046 }; })() });
+  if (moorings) group.add(moorings.post, moorings.line);
 
   // ---- afloat
   const sea = createSea(water);
@@ -902,6 +920,7 @@ export function createJukung({ renderer, water, lightUniforms = {}, gradeUniform
     line.name = 'boat-anchor-line';
     line.matrixAutoUpdate = false; line.matrixWorldAutoUpdate = false;
     group.add(line);
+    moorings?.plant(hf);
     group.visible = true;
   }
 
@@ -995,6 +1014,6 @@ export function createJukung({ renderer, water, lightUniforms = {}, gradeUniform
   return {
     group, east, north, heading, update, sea, state, uniforms, material, onWater,
     lantern: { group: lantern, position: lampW },
-    anchor,
+    anchor, mooring: moorings,
   };
 }

@@ -28,6 +28,7 @@
 //                      step counts and shape constants, for timing (tools/cloud-bench.mjs)
 //   trail=0            no path (v6): the ground uncarved, no steps, rails or plants cleared for it
 //   boat=0             no jukung (v35); boat=east,north[,heading] moors it somewhere else
+//   moor=0             no mooring post and stern line; moor=east,north stands the post elsewhere
 //   faceStep=0.55      spacing of the face strips' vertices near the headland (metres)
 //   vegDetail=1        (v7) how far the full plants reach before their lighter level (0: none)
 //   vegHide=near:grass,impostor   (v7) leave out plant meshes by the start of their names
@@ -250,8 +251,9 @@ export function createApp({ params, capture = false, keepBuffer = false, maxPixe
   trail.ready.then(() => { trailReady = true; emit('trail'); checkLoaded(); });
   // The jukung at anchor off the beach (src/boat/, v35), lit the same way and afloat on the
   // sea's own waves. boat=0 leaves it out; boat=east,north[,heading] moors it somewhere else.
+  // With it, its mooring: a post in the shallows and a stern line (moor=0 leaves those out).
   const boat = params.get('boat') === '0' ? null : createJukung({ renderer, water, lightUniforms, gradeUniforms: grade.uniforms,
-    shared: { uExtent: terrain.uniforms.uExtent, uSunShadow: water.uniforms.uSunShadow }, place: params.get('boat') });
+    shared: { uExtent: terrain.uniforms.uExtent, uSunShadow: water.uniforms.uSunShadow }, place: params.get('boat'), mooring: params.get('moor') });
   if (boat) scene.add(boat.group);
   for (const name of hidden) {
     if (name === 'trail') trail.group.visible = false;

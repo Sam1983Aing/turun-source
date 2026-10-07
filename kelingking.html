@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit e314fac. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
+  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 4149892. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Turun · The walk down to Kelingking Beach</title>
@@ -54,7 +54,7 @@
 html.tool, html.tool body { margin: 0; height: 100%; background: #0d0f11; overflow: hidden; font: 12px/1.4 -apple-system, system-ui, sans-serif; color: #ddd; }
 /* The table's wrappers make no boxes for the tools: the stage is the body's again. */
 html.tool .table, html.tool .world, html.tool .card, html.tool .card__flip { display: contents; }
-html.tool .ground, html.tool .card__shadow, html.tool .card__paper, html.tool .card__finish, html.tool .table__light, html.tool .back { display: none; }
+html.tool .ground, html.tool .card__shadow, html.tool .card__shade, html.tool .card__paper, html.tool .card__finish, html.tool .table__light, html.tool .back { display: none; }
 html.tool #stage { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
 html.tool #stage canvas { display: block; }
 html.tool #ref, html.tool #outline { position: absolute; top: 0; left: 0; pointer-events: none; }
@@ -115,6 +115,7 @@ html.scroll .card { position: absolute; inset: 0; }
    shadow's squeeze are then the compositor's work, and the blurred shadow is painted once.) */
 html.scroll .card__flip { position: absolute; inset: 0; backface-visibility: hidden; will-change: transform; }
 html.scroll .card__shadow { will-change: transform, opacity; }
+html.scroll .card__shade { will-change: opacity; }
 html.scroll .card__paper { will-change: transform; }
 html.scroll .card__caption, html.scroll .card__finish { will-change: opacity; }
 html.scroll .table.is-full .card__flip, html.scroll .table.is-full .card__shadow, html.scroll .table.is-full .card__paper, html.scroll .table.is-full .card__caption, html.scroll .table.is-full .card__finish { will-change: auto; }
@@ -134,7 +135,7 @@ html.scroll.at-card #stage { cursor: pointer; }
 
 /* The paper and its shadow: the picture's rectangle plus the border, sized once (postcard.js
    sets --cw, --ch, --b, --bb) and scaled about the middle of the picture as the window opens. */
-.card__paper, .card__shadow { position: absolute; left: calc(50% - var(--cw) / 2 - var(--b)); top: calc(50% - var(--ch) / 2 - var(--b)); width: calc(var(--cw) + 2 * var(--b)); height: calc(var(--ch) + var(--b) + var(--bb)); border-radius: calc(var(--cw) * 0.005); transform-origin: 50% calc(var(--b) + var(--ch) / 2); }
+.card__paper, .card__shadow, .card__shade { position: absolute; left: calc(50% - var(--cw) / 2 - var(--b)); top: calc(50% - var(--ch) / 2 - var(--b)); width: calc(var(--cw) + 2 * var(--b)); height: calc(var(--ch) + var(--b) + var(--bb)); border-radius: calc(var(--cw) * 0.005); transform-origin: 50% calc(var(--b) + var(--ch) / 2); }
 /* Glossy card stock: smooth and white, no tooth (Sam: "I don't really like the texture on the
    postcard... more like a glossy paper"). A hair of thickness on the shadow side, and the band
    of light that crosses the picture crosses the border too (--sheen, set by postcard.js). */
@@ -142,19 +143,28 @@ html.scroll.at-card #stage { cursor: pointer; }
   box-shadow: calc(var(--cw) * 0.0008) calc(var(--cw) * 0.0016) 0 #ddd8cc; }
 .card__paper::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background: linear-gradient(112deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 70%) var(--sheen, 50%) 0 / 300% 100% no-repeat; }
-/* Noon sun, almost overhead, from the top left: a tight shadow under the edge, a soft one
-   beyond it, and the sand a shade darker all round. The far corner sits a little proud. */
-/* (The shadow's own box is clear and sits square under the paper: with a fill and a slight
-   turn, as it first had, it showed as a dark lip along the card's top and right edges. The
-   first of its shadows is all round, wide and faint, so the top and the left edge are grounded
-   too. A tight one there as well drew a dark rim of sand along the white border: Sam saw it
-   as "texture of the sand in the border".) */
-.card__shadow {
-  box-shadow: 0 0 calc(var(--cw) * 0.04) calc(var(--cw) * 0.004) rgba(58, 36, 14, 0.2),
-    calc(var(--cw) * 0.004) calc(var(--cw) * 0.007) calc(var(--cw) * 0.008) calc(var(--cw) * -0.003) rgba(58, 36, 14, 0.5),
-    calc(var(--cw) * 0.018) calc(var(--cw) * 0.036) calc(var(--cw) * 0.045) calc(var(--cw) * -0.012) rgba(58, 36, 14, 0.4),
-    calc(var(--cw) * 0.035) calc(var(--cw) * 0.07) calc(var(--cw) * 0.16) calc(var(--cw) * -0.02) rgba(58, 36, 14, 0.28); }
-.card__caption { position: absolute; left: var(--b); right: var(--b); bottom: 0; height: var(--bb); margin: 0; display: flex; align-items: center; justify-content: space-between;
+/* The card's shadow on the sand. Noon sun, almost overhead, from the top left: the sand a
+   shade darker all round (wide and faint, so the top and the left edge are grounded too), a
+   tight shadow under the edge away from the sun, a soft one beyond it and a long faint one.
+   Each is a slab of shadow of its own, filled, with a soft edge, lying under the card:
+   --e how far its filled middle is set in from the paper's edge, --g how far the soft edge
+   reaches past it, --blur how soft, --x and --y how far it has slid from the sun (all shares
+   of the card's width), --c how dark.
+   (They were one box's four box-shadows first, the box the paper's own size. A box-shadow is
+   not drawn inside its box, so the middle was hollow. With the card lying square on it nobody
+   could tell. When the card leaned to the pointer a strip of sand with no shadow on it showed
+   along an edge, as straight as the box: Sam's "delimitation of the sand". When the card
+   turned over at the end the whole hollow showed beside it as a pale rectangle. A tight dark
+   one on the sunny side, tried in round 8, read as a rim of sand along the white border.) */
+.card__shadow i { position: absolute; inset: calc(var(--cw) * var(--e)); translate: calc(var(--cw) * var(--x, 0)) calc(var(--cw) * var(--y, 0)); background: var(--c);
+  box-shadow: 0 0 calc(var(--cw) * var(--blur)) calc(var(--cw) * (var(--e) + var(--g))) var(--c); }
+.card__shadow i:nth-child(1) { --c: rgba(58, 36, 14, 0.2); --blur: 0.04; --g: 0.004; --e: 0.056; }
+.card__shadow i:nth-child(2) { --c: rgba(58, 36, 14, 0.5); --blur: 0.008; --g: -0.003; --e: 0.015; --x: 0.004; --y: 0.007; }
+.card__shadow i:nth-child(3) { --c: rgba(58, 36, 14, 0.4); --blur: 0.045; --g: -0.012; --e: 0.08; --x: 0.018; --y: 0.036; }
+.card__shadow i:nth-child(4) { --c: rgba(58, 36, 14, 0.28); --blur: 0.16; --g: -0.02; --e: 0.26; --x: 0.035; --y: 0.07; }
+/* The face of the card going dark as it turns from the light (postcard.js sets how much). */
+.card__shade { background: #1d140b; opacity: 0; pointer-events: none; }
+.card__caption { user-select: none; -webkit-user-select: none; position: absolute; left: var(--b); right: var(--b); bottom: 0; height: var(--bb); margin: 0; display: flex; align-items: center; justify-content: space-between;
   font: 500 calc(var(--cw) * 0.0158)/1 var(--type); letter-spacing: 0.22em; text-transform: uppercase; color: #3b342a; text-shadow: 0 calc(var(--cw) * 0.0008) 0 rgba(255, 255, 255, 0.8); }
 .card__caption span:last-child { font-variant-numeric: tabular-nums; color: #6d6252; }
 /* The gloss over the picture: a soft light from the top left and a band of it that moves
@@ -170,20 +180,21 @@ html.scroll.at-card #stage { cursor: pointer; }
 .table.words-right .table__light { background: radial-gradient(58% 78% at 80% 46%, rgba(255, 238, 206, 0.5), rgba(255, 238, 206, 0.22) 45%, rgba(255, 238, 206, 0) 78%), radial-gradient(130% 120% at 72% 18%, rgba(0, 0, 0, 0) 58%, rgba(64, 40, 14, 0.24) 100%); }
 /* The ending: the tide's edge in evening light. The sun is low, so the card's shadow is long
    and falls to the right, and there is no pool of light for words on the left. */
-.table.is-end .card__shadow {
-  box-shadow: calc(var(--cw) * 0.005) calc(var(--cw) * 0.006) calc(var(--cw) * 0.008) calc(var(--cw) * -0.002) rgba(70, 40, 12, 0.55),
-    0 0 calc(var(--cw) * 0.04) calc(var(--cw) * 0.004) rgba(70, 40, 12, 0.2),
-    calc(var(--cw) * 0.058) calc(var(--cw) * 0.024) calc(var(--cw) * 0.022) calc(var(--cw) * -0.008) rgba(70, 40, 12, 0.5),
-    calc(var(--cw) * 0.08) calc(var(--cw) * 0.05) calc(var(--cw) * 0.14) calc(var(--cw) * -0.02) rgba(70, 40, 12, 0.24); }
+.table.is-end .card__shadow i:nth-child(1) { --c: rgba(70, 40, 12, 0.2); }
+.table.is-end .card__shadow i:nth-child(2) { --c: rgba(70, 40, 12, 0.55); --g: -0.002; --e: 0.014; --x: 0.005; --y: 0.006; }
+.table.is-end .card__shadow i:nth-child(3) { --c: rgba(70, 40, 12, 0.5); --blur: 0.022; --g: -0.008; --e: 0.041; --x: 0.058; --y: 0.024; }
+.table.is-end .card__shadow i:nth-child(4) { --c: rgba(70, 40, 12, 0.24); --blur: 0.14; --g: -0.02; --e: 0.23; --x: 0.08; --y: 0.05; }
 .table.is-end .table__light { background: radial-gradient(130% 120% at 28% 18%, rgba(0, 0, 0, 0) 60%, rgba(64, 40, 14, 0.2) 100%); }
-.table.is-end .back { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75), inset 0 0 40px rgba(120, 92, 52, 0.12), 3px 4px 6px rgba(70, 40, 12, 0.45), 46px 19px 18px -6px rgba(70, 40, 12, 0.46), 64px 40px 110px -14px rgba(70, 40, 12, 0.22); }
-.table.is-full .ground, .table.is-full .card__paper, .table.is-full .card__shadow, .table.is-full .card__finish, .table.is-full .table__light { visibility: hidden; }
+.table.is-full .ground, .table.is-full .card__paper, .table.is-full .card__shadow, .table.is-full .card__shade, .table.is-full .card__finish, .table.is-full .table__light { visibility: hidden; }
 
 /* ------------------------------------------------------------ the back of the card */
 
 .back { position: absolute; z-index: 3; visibility: hidden; backface-visibility: hidden; container-type: size; color: var(--ink); border-radius: 0.5cqw;
   background: linear-gradient(135deg, #fffefb 0%, #fcf9f1 55%, #f5f0e4 100%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75), inset 0 0 40px rgba(120, 92, 52, 0.12), 2px 4px 5px rgba(66, 44, 20, 0.42), 14px 26px 46px rgba(66, 44, 20, 0.3), 0 0 110px rgba(66, 44, 20, 0.2); }
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75), inset 0 0 40px rgba(120, 92, 52, 0.12); }
+/* (It casts no shadow of its own: the card's shadow on the sand stays under it through the
+   turn. And it comes round dark, as the front went: postcard.js sets --shade.) */
+.back::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: #1d140b; opacity: var(--shade, 0); pointer-events: none; }
 .back__in { position: absolute; inset: 0; display: grid; grid-template-columns: 1.06fr 1fr; padding: 11cqh 5.2cqw 7.5cqh; }
 .back__in::before { content: ""; position: absolute; left: 51.4%; top: 15cqh; bottom: 9cqh; width: 1px; background: rgba(20, 18, 14, 0.32); transform-origin: 50% 0; transform: scaleY(var(--rule, 1)); }
 .back__head { position: absolute; left: 0; right: 0; top: 4.6cqh; margin: 0; text-align: center; font: 500 max(9px, 1.05cqw)/1 var(--type); letter-spacing: 0.56em; text-indent: 0.56em; text-transform: uppercase; color: rgba(20, 18, 14, 0.55); }
@@ -300,16 +311,29 @@ html.scroll.at-card #stage { cursor: pointer; }
 .in-scene .hud__nav { font: 500 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; }
 .in-scene .hud__nav a:not(.hud__cta), .in-scene .hud__mark span { display: none; }
 
-/* The altimeter: a rule that draws down the right edge from the railing to the water, a dot
-   per stop, the height beside the marker. */
-.rail { position: fixed; z-index: 10; right: var(--gutter); top: 24vh; bottom: 24vh; width: 1px; pointer-events: none; opacity: 0; visibility: hidden; }
+/* The altimeter, down the right edge from the railing to the sea, drawn like the scale of an
+   instrument: a hairline, a long tick at each stop and short ones between, all of them faint
+   until the walk has passed them. A ring rides down it with the height beside it, and the
+   two ends are named. One colour (the paper's), and the accent only in the ring's centre.
+   (It was a rule that filled with terracotta and a black dot at each stop.) */
+.rail { position: fixed; z-index: 10; right: var(--gutter); top: 27vh; bottom: 27vh; width: 1px; pointer-events: none; opacity: 0; visibility: hidden; color: var(--cream); }
 .rail__line, .rail__fill { position: absolute; left: 0; top: 0; bottom: 0; width: 1px; }
-.rail__line { background: rgba(243, 239, 230, 0.35); }
-.rail__fill { background: var(--accent); transform-origin: 50% 0; transform: scaleY(0); }
-.rail__stop { position: absolute; left: -3px; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%; background: var(--ink); box-shadow: inset 0 0 0 1px rgba(243, 239, 230, 0.7); transition: background 0.6s var(--ease), box-shadow 0.6s var(--ease); }
-.rail__stop.passed { background: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
-.rail__mark { position: absolute; left: 0; top: 0; width: 13px; height: 1px; margin-left: -6px; background: var(--cream); }
-.rail__mark span { position: absolute; right: 22px; top: -6px; font: 500 11px/1 var(--sans); letter-spacing: 0.14em; white-space: nowrap; font-variant-numeric: tabular-nums; text-shadow: var(--shadow); }
+/* (Every part has a hair of dark beside it, as if engraved: over the evening's white sky the
+   paper colour alone was lost.) */
+.rail__line { background: rgba(243, 239, 230, 0.34); box-shadow: 1px 0 0 rgba(10, 9, 7, 0.16); }
+.rail__fill { background: var(--cream); box-shadow: 1px 0 0 rgba(10, 9, 7, 0.42); transform-origin: 50% 0; transform: scaleY(0); }
+.rail__tick, .rail__stop { position: absolute; right: 0; height: 1px; background: currentColor; box-shadow: 0 1px 0 rgba(10, 9, 7, 0.4); opacity: 0.4; transition: opacity 0.6s var(--ease), width 0.6s var(--ease); }
+.rail__tick { width: 5px; }
+.rail__stop { width: 11px; }
+.rail__tick.passed { opacity: 0.85; }
+.rail__stop.passed { opacity: 1; width: 15px; }
+.rail__mark { position: absolute; left: 0; top: 0; width: 1px; height: 0; }
+.rail__mark::before { content: ""; position: absolute; left: -6px; top: -6.5px; width: 11px; height: 11px; border: 1px solid var(--cream); border-radius: 50%; background: rgba(18, 17, 14, 0.55); box-shadow: 0 0 0 1px rgba(10, 9, 7, 0.3), 0 0 10px rgba(10, 9, 7, 0.3); }
+.rail__mark::after { content: ""; position: absolute; left: -1.5px; top: -2px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+.rail__mark span { position: absolute; right: 26px; top: -7px; font: 500 13px/1 var(--type); letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; font-variant-numeric: tabular-nums; text-shadow: 0 0 1px rgba(10, 9, 7, 0.7), 0 1px 4px rgba(10, 9, 7, 0.55), 0 2px 26px rgba(10, 9, 7, 0.4); }
+.rail__end { position: absolute; right: -0.24em; margin: 0; font: 500 9px/1 var(--type); letter-spacing: 0.24em; text-transform: uppercase; white-space: nowrap; opacity: 0.8; text-shadow: 0 0 1px rgba(10, 9, 7, 0.7), 0 1px 4px rgba(10, 9, 7, 0.55), 0 2px 26px rgba(10, 9, 7, 0.4); }
+.rail__end--top { bottom: calc(100% + 18px); }
+.rail__end--foot { top: calc(100% + 18px); }
 
 /* ------------------------------------------------------------ the words */
 
@@ -324,34 +348,38 @@ html.scroll.at-card #stage { cursor: pointer; }
 .hero .display em { color: var(--accent-deep); }
 .hero .body { color: rgba(20, 18, 14, 0.82); max-width: 29rem; }
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 30px; margin-top: 6px; }
-/* "Scroll into the postcard": in the hand, like a note in the margin, and an arrow drawn with
-   the same pen towards the card. */
-.cue { display: flex; align-items: center; gap: 14px; margin: 0; font: 400 2.34rem/1 var(--hand); color: var(--pen); transform: rotate(-5deg); }
+/* "Scroll into the postcard": in the hand, a note on the sand under the card's lower left
+   corner, written along its edge, with an arrow drawn in the same pen up into the picture.
+   (It was under the button, a column away from the thing it points at.) */
+.cue { position: absolute; left: calc(var(--card-left, 50vw) - var(--gutter) + 5.4vw); top: calc(var(--card-bottom, 80vh) + 12px); display: flex; align-items: center; gap: 14px; margin: 0; white-space: nowrap; font: 400 2.34rem/1 var(--hand); color: var(--pen); rotate: -6deg; transform-origin: 0 50%; }
 .cue__arrow { flex: none; width: 66px; height: 29px; overflow: visible; fill: none; stroke: currentColor; stroke-width: 3.3; stroke-linecap: round; stroke-linejoin: round; animation: cue 2.8s ease-in-out infinite; }
 @keyframes cue { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(8px, -3px); } }
 
 /* The notes on the way down: one thing each, each in its own place and at its own size. They
-   are inside the picture, so their type is the clean pair: the serif for the line (its word
-   that matters in italic), the sans for the tag and the sentence. */
+   are inside the picture, so their type is clean, and it is all the one sans: the line large
+   and tight, its word that matters in the accent, the tag and the sentence small. (The lines
+   were in the serif, with that word in italic, until Sam asked for a sans here. The hand is
+   only for the paper.) */
 .note { display: grid; gap: clamp(12px, 1.8vh, 20px); text-shadow: var(--shadow); }
-.note .display { font-family: var(--serif); }
-.note .display em { font-style: italic; display: inline; }
-/* (A serif keeps to its line box: a tight mask, and the lines travel 105% of their height.) */
-.note .line-mask { clip-path: inset(-0.1em -0.25em -0.14em -0.25em); }
+.note .display { font-family: var(--type); font-weight: 500; }
+.note .display em { font-style: normal; display: inline; }
+/* (A clean face keeps to its line box: a tight mask, and the lines travel 105% of their height.) */
+.note .line-mask { clip-path: inset(-0.1em -0.25em -0.16em -0.25em); }
 .note .label { font: 500 11px/1.3 var(--sans); letter-spacing: 0.2em; }
 .note .body { font: 400 clamp(0.95rem, 0.9rem + 0.2vw, 1.06rem)/1.55 var(--sans); }
 /* A soft dark patch behind each, so the words read over sky, sea and scrub alike. */
 .note::before { content: ""; position: absolute; inset: -24% -18%; z-index: -1; background: radial-gradient(closest-side, rgba(12, 11, 9, 0.5), rgba(12, 11, 9, 0.22) 55%, rgba(12, 11, 9, 0)); opacity: 0; transition: opacity 1.2s var(--ease); pointer-events: none; }
 .note.is-on::before { opacity: 1; }
-/* (Over the sand, with its bright ripples, a deeper one.) */
-.note.on-light::before { inset: -34% -10%; background: radial-gradient(closest-side, rgba(12, 11, 9, 0.7), rgba(12, 11, 9, 0.38) 60%, rgba(12, 11, 9, 0)); }
+/* (Over the sand, with its bright ripples, a wider one. It was much deeper, 0.7 at its middle,
+   and Sam saw it as a dark glow behind the words.) */
+.note.on-light::before { inset: -40% -14%; background: radial-gradient(closest-side, rgba(12, 11, 9, 0.3), rgba(12, 11, 9, 0.15) 58%, rgba(12, 11, 9, 0)); }
 .note.on-light .body { color: var(--cream); }
 .note .label { display: flex; align-items: baseline; gap: 14px; color: var(--cream); }
 .note .label b { position: relative; padding-left: 20px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .note .label b::before { content: ""; position: absolute; left: 0; top: 50%; width: 12px; height: 1px; background: var(--accent); }
 .note .label span { opacity: 0.86; }
-.note--xl .display { font-size: clamp(3rem, 0.8rem + 7.6vw, 10.2rem); line-height: 0.86; letter-spacing: -0.028em; margin-left: -0.04em; }
-.note--m .display { font-size: clamp(2.3rem, 1.2rem + 2.6vw, 4.1rem); line-height: 0.95; letter-spacing: -0.014em; }
+.note--xl .display { font-size: clamp(2.3rem, 0.6rem + 5.6vw, 7.6rem); line-height: 0.96; letter-spacing: -0.035em; margin-left: -0.045em; }
+.note--m .display { font-size: clamp(1.9rem, 1rem + 2.1vw, 3.3rem); line-height: 1; letter-spacing: -0.03em; }
 .at-c .display { margin-left: 0; }
 .note--xl .body { max-width: 28rem; }
 .at-bl { left: var(--gutter); bottom: clamp(36px, 8.5vh, 104px); max-width: min(70rem, calc(100vw - 2 * var(--gutter) - 80px)); }
@@ -368,9 +396,10 @@ html.scroll.at-card #stage { cursor: pointer; }
 .bright-light .note.on-light .body { color: var(--ink-dim); }
 
 /* The foot of the page, on the sand under the card's back. */
-.foot { left: var(--gutter); right: var(--gutter); bottom: max(20px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: 1fr 1.25fr auto; align-items: end; gap: clamp(18px, 4vw, 64px); color: rgba(20, 18, 14, 0.86); font: 400 12.5px/1.5 var(--type); }
-.foot p { margin: 0; max-width: 34rem; }
-.foot b { font-weight: 500; color: var(--ink); }
+.foot { left: var(--gutter); right: var(--gutter); bottom: max(22px, env(safe-area-inset-bottom)); display: flex; justify-content: space-between; align-items: center; gap: 24px; color: rgba(20, 18, 14, 0.8); font: 500 10.5px/1.4 var(--type); letter-spacing: 0.2em; text-transform: uppercase; }
+.foot p { margin: 0; color: var(--ink); }
+/* (The map's credit stays, small: the terrain is made from OpenStreetMap's data.) */
+.foot p span { margin-left: 18px; padding-left: 18px; border-left: 1px solid rgba(20, 18, 14, 0.3); color: rgba(20, 18, 14, 0.62); }
 .foot a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .foot__top { appearance: none; border: 0; border-bottom: 1px solid currentColor; padding: 6px 0; background: none; color: var(--ink); cursor: pointer; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; white-space: nowrap; }
 .foot__top:focus-visible { outline: 2px solid var(--accent-deep); outline-offset: 4px; }
@@ -405,16 +434,15 @@ html.scroll.at-card #stage { cursor: pointer; }
   .time-of-day span { padding: 0 9px 0 0; }
   .rail { right: auto; bottom: auto; left: 0; top: 0; width: 100vw; height: 2px; }
   .rail__line, .rail__fill { top: 0; bottom: auto; left: 0; right: 0; width: auto; height: 2px; }
-  .rail__line { background: rgba(243, 239, 230, 0.2); }
+  .rail__line { background: rgba(243, 239, 230, 0.2); box-shadow: none; }
   .rail__fill { transform-origin: 0 50%; transform: scaleX(0); }
-  .rail__stop, .rail__mark { display: none; }
+  .rail__stop, .rail__tick, .rail__mark, .rail__end { display: none; }
   .at-bl { bottom: max(26px, calc(env(safe-area-inset-bottom) + 18px)); max-width: calc(100vw - 2 * var(--gutter)); }
   .at-r { right: var(--gutter); left: var(--gutter); top: auto; bottom: max(26px, calc(env(safe-area-inset-bottom) + 18px)); translate: none; width: auto; padding-left: 16px; }
   .at-c { bottom: max(30px, calc(env(safe-area-inset-bottom) + 22px)); }
-  .note--xl .display { font-size: clamp(2.9rem, 14.5vw, 4.6rem); }
-  .foot { grid-template-columns: 1fr; gap: 8px; font-size: 10.5px; line-height: 1.45; }
-  .foot__credits { display: none; }
-  .foot__top { justify-self: start; }
+  .note--xl .display { font-size: clamp(2.2rem, 11vw, 3.5rem); }
+  .foot { flex-direction: column; align-items: flex-start; gap: 8px; font-size: 9px; letter-spacing: 0.16em; }
+  .foot p span { margin-left: 10px; padding-left: 10px; }
 }
 
 /* A tall screen: the words above the card, the way in below it. */
@@ -425,8 +453,7 @@ html.scroll.at-card #stage { cursor: pointer; }
   .hero__actions { position: absolute; left: 0; right: 0; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 16px); margin: 0; justify-content: space-between; flex-wrap: nowrap; }
   .hero__actions .button { padding: 6px 6px 6px 20px; gap: 12px; }
   .button::after { width: 32px; height: 32px; }
-  .cue { white-space: nowrap; font-size: 1.7rem; }
-  .cue { gap: 8px; }
+  .cue { left: auto; right: 4px; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 22px); font-size: 1.7rem; gap: 8px; rotate: -5deg; transform-origin: 100% 50%; }
   .cue__arrow { width: 40px; height: 18px; rotate: 100deg; }
   /* The back of the card stands upright: the message, then the lines to fill in. */
   .back__in { grid-template-columns: 1fr; grid-template-rows: auto 1fr; padding: 8.5cqh 7cqw 5cqh; row-gap: 3.4cqh; }
@@ -466,13 +493,14 @@ html.scroll.at-card #stage { cursor: pointer; }
     <div class="world">
       <canvas class="ground" aria-hidden="true"></canvas>
       <div class="card">
-        <div class="card__shadow"></div>
+        <div class="card__shadow"><i></i><i></i><i></i><i></i></div>
         <div class="card__flip">
           <div class="card__paper">
             <p class="card__caption"><span>Kelingking Beach, Nusa Penida</span><span>8°45′S 115°28′E</span></p>
           </div>
           <div id="stage"><img id="ref" alt=""></div>
           <div class="card__finish"></div>
+          <div class="card__shade"></div>
         </div>
       </div>
     </div>
@@ -544,7 +572,7 @@ html.scroll.at-card #stage { cursor: pointer; }
     <section class="sp sp--beach" data-hold="beach" data-caption="Above the beach, 55 m" aria-label="The beach">
       <div class="sp__text">
         <p class="label sp__label"><b>The beach</b><span>07:10 to 17:40</span></p>
-        <h2 class="display sp__head"><span class="sp__mask"><span class="sp__ln">Then a whole day</span></span><span class="sp__mask"><span class="sp__ln">of <em>nothing</em>.</span></span></h2>
+        <h2 class="display sp__head"><span class="sp__mask"><span class="sp__ln">Then a whole</span></span><span class="sp__mask"><span class="sp__ln">day of <em>nothing</em>.</span></span></h2>
         <i class="sp__rule"></i>
         <dl class="sp__rows">
           <div><dt>07:10</dt><dd>Breakfast on the sand</dd></div>
@@ -581,9 +609,11 @@ html.scroll.at-card #stage { cursor: pointer; }
 
     <!-- The altimeter: from the railing (150 m) to the water. -->
     <aside class="rail" aria-hidden="true">
+      <p class="rail__end rail__end--top">The railing</p>
       <div class="rail__line"></div>
       <div class="rail__fill"></div>
       <div class="rail__mark"><span></span></div>
+      <p class="rail__end rail__end--foot">The sea</p>
     </aside>
 
     <!-- The words. data-hero: while the card is that far up off the sand (0 at rest, 1 full
@@ -595,8 +625,8 @@ html.scroll.at-card #stage { cursor: pointer; }
         <p class="body">They take the photo and go back to the car park. The beach is another 150 metres down. We walk you there at first light, and a boat brings you out.</p>
         <div class="hero__actions">
           <a class="button" href="#reserve" data-go="reserve">Reserve a morning</a>
-          <p class="cue"><span>Scroll<span class="wide-only"> into the postcard</span></span><svg class="cue__arrow" viewBox="0 0 92 40" aria-hidden="true"><path d="M4 31 C 26 37, 56 31, 85 10"/><path d="M67 8 L86 9 L78 27"/></svg></p>
         </div>
+        <p class="cue"><span>Scroll<span class="wide-only"> into the postcard</span></span><svg class="cue__arrow" viewBox="0 0 92 40" aria-hidden="true"><path d="M4 31 C 26 37, 56 31, 85 10"/><path d="M67 8 L86 9 L78 27"/></svg></p>
       </section>
 
       <section class="note note--xl at-bl" id="walk" data-tau="0.972,1.03">
@@ -640,8 +670,7 @@ html.scroll.at-card #stage { cursor: pointer; }
       </section>
 
       <footer class="foot" data-end="0.82,2">
-        <p class="foot__concept"><b>A concept page.</b> Turun, its prices and the boat pick-up are invented. The real surf at Kelingking is dangerous and swimming is banned.</p>
-        <p class="foot__credits">A real place, rebuilt in three.js. Terrain from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> data, © OpenStreetMap contributors. Rock, sand and path textures from Poly Haven (CC0). The plants and the boat are made in code.</p>
+        <p class="foot__credits">Built with three.js<span>Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</span></p>
         <button class="foot__top" type="button" data-top>Back up to the railing</button>
       </footer>
     </main>
@@ -93544,6 +93573,311 @@ ${shape.proxies.filter((p) => p.under).map((p) => `          owHit(ro, rB * Tw, 
 
 return { "createOnWater": createOnWater };
 })();
+// src/boat/mooring.js
+__m["src/boat/mooring.js"] = (function () {
+"use strict";
+// The mooring (v35): what ties the jukung to the beach. The boat lies to its anchor, bow to
+// the swell, and a stern line runs ashore to a post, the way a boat is held just off a beach.
+//
+//   the post      a bamboo pole stood in the first shallows, a little off plumb and never quite
+//                 straight: cut on the slant above its top node, the hollow showing; a few turns
+//                 of the line round it under the top, the end left hanging.
+//   the line      hemp, three strands, as thick as a wrist. Forty metres of it do not hang in the
+//                 air: it drops from the turns to the water a few metres out, lies on the bottom
+//                 for most of the way and comes up to a strop round the boat's stern. So it is
+//                 two pieces. One is fixed, from the post down onto the seabed. The other is in
+//                 the boat's own frame, from the strop down under the water, and rides with the
+//                 hull: neither needs anything worked out per frame.
+//   on the ground the post stands on the terrain's own height at its place, the line follows the
+//                 bottom from where it touches down. Both go on below what can be seen (into
+//                 the sand, under the sea), so a wave drawing back uncovers more of the same.
+//   the look      the boat's material and light (jukung.js), three more kinds of surface. What is
+//                 wet is wet by its height above the still water: the sea is at 0, the waves
+//                 reach REACH above it, and what they reach stays dark and green.
+//
+// Nothing here knows the boat's shape: jukung.js hands over its builder, its material and the
+// strop's place on the hull. The surfaces below are spliced into its shader and use its helpers
+// (jkN3, jkSee, jkBump, jkLin and the globals they set), so they are written in its terms.
+
+const THREE = __m["vendor/three.module.js"];
+const { sample } = __m["src/terrain/terrain-mesh.js"];
+
+const DEG = Math.PI / 180, TAU = Math.PI * 2;
+const clamp = (x, a, b) => Math.min(Math.max(x, a), b);
+const add = (a, b, k = 1) => [a[0] + b[0] * k, a[1] + b[1] * k, a[2] + b[2] * k];
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const norm = (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+const f = (v) => Number(v).toFixed(4);
+const v3 = (a) => `vec3(${a.map(f).join(', ')})`;
+
+// What its parts are made of: the shader's ids, after the boat's own (jukung.js, 0 to 12).
+const MOOR_POST = 13, MOOR_LASH = 14, MOOR_LINE = 15;
+
+// ---------------------------------------------------------------- the shape, in numbers
+
+// Where the post stands (east, north): in the shallows to the right of the boat as the walk's
+// last frame sees it, 13.5 m from where the walk ends and 6 degrees to the right of the line of
+// sight to the boat. From there the eye is 4.7 m over the water, so anything nearer than 11 m is
+// under the bottom of the frame, and on a phone the words take the bottom quarter: this is the
+// nearest place that is clear of both. The ground there is 1.2 m under the still water.
+const PLACE = [86.75, 160.55];   // (a metre left of where it first stood: clear of the page's light chooser on a wide screen)
+// (The sea at the post lies half a metre under its still level most of the time, drawn down
+// ahead of each breaker, and a bore runs past at about +0.2: so 2.8 m of pole shows, then 2.)
+const TOP = 2.2;                   // the post's top over the still water (over the sand, stood dry)
+const BURIED = 0.5;                // and how much of it is in the sand
+const R_FOOT = 0.054, R_TOP = 0.041;
+const LEAN = 5 * DEG, LEAN_TO = 215;   // off plumb, toward this compass bearing
+const BOW = 0.028;                 // how far out of straight it is at half height
+const CUT = Math.tan(17 * DEG);    // the slant of the cut at the top
+const SIDES = 12;
+const ROPE_R = 0.021;              // the line's radius
+const LAY = 0.05;                  // one strand to the next, along it
+const LASH = { from: 0.3, turns: 5 };  // the turns round the post: metres under its top
+const TAIL = 0.4;                  // the end left hanging
+const REACH = 0.55;                // how far over the still water the waves keep things wet
+// The line touches the bottom this far from the post. (At 16 m it leaves the turns at about 28
+// degrees and is under the still water 4 m out, 5 m in a trough: some weight on it, as there
+// is on the boat's end.)
+const TOUCH = 16;
+// The boat's end: off the strop at `slope`, easing by `sag` per metre, and under the still
+// water some three and a half metres out. From `dive` on it is taken steeply down.
+const STERN = { slope: 0.24, sag: 0.011, dive: 3.3, sink: 0.34, length: 6.5 };
+// What the white water and the pale sand around the post send back up, on top of the open
+// sea's own (the boat's uWaterAlb): out there a shaded side sees dark water, in the shallows it
+// sees foam and sand in the sun.
+const SHALLOWS = [0.3, 0.24, 0.17];
+
+// ---------------------------------------------------------------- geometry
+
+// The post, the turns round it, the hanging end and the line down to the seabed, in the post's
+// frame: the origin where it enters the ground, x level toward the boat, y up.
+// sea: the still water's height there. ground(s): the ground's, s metres toward the boat.
+// toBoat: the boat's compass bearing from the post, radians.
+function buildShore(B, { sea, ground, toBoat }) {
+  const d = LEAN_TO * DEG - toBoat;
+  const axis = [Math.sin(LEAN) * Math.cos(d), Math.cos(LEAN), Math.sin(LEAN) * Math.sin(d)];
+  const e1 = norm(sub([1, 0, 0], axis.map((v) => v * axis[0]))), e2 = cross(axis, e1);
+  const top = (Math.max(sea, 0) + TOP) / axis[1], length = top + BURIED;
+  // a: metres down the post from its top.
+  const centre = (a) => add(axis.map((v) => v * (top - a)), e2, -BOW * Math.sin(Math.PI * clamp(1 - a / top, 0, 1)));
+  const radius = (a) => R_TOP + (R_FOOT - R_TOP) * clamp(a / length, 0, 1);
+  const at = (a, ang, r) => { const c = centre(a); return [0, 1, 2].map((k) => c[k] + r * (Math.cos(ang) * e1[k] + Math.sin(ang) * e2[k])); };
+  // (Cut so that the end grain faces the beach and the evening sun, between the two.)
+  const cut = (ang, r) => -CUT * r * Math.cos(ang - 0.93);
+
+  // The pole: a ring every third of a metre down to where no trough uncovers it, then one at
+  // the bottom.
+  const rings = [0, 0.05];
+  const dry = Math.min(top - (Math.max(sea, 0) - 0.9) / axis[1], length);
+  for (let n = Math.ceil((dry - 0.05) / 0.36), k = 1; k <= n; k++) rings.push(0.05 + ((dry - 0.05) * k) / n);
+  if (length - dry > 0.05) rings.push(length);
+  const mid = rings.length >> 1;
+  B.rand(0.44);
+  B.grid(rings.length, SIDES + 1, MOOR_POST, (i, j) => {
+    const ang = (j / SIDES) * TAU, r = radius(rings[i]);
+    return [...at(rings[i] + (i === 0 ? cut(ang, r) : 0), ang, r), rings[i], ang, 1];
+  }, { wrap: true, probe: [mid, 0], facing: (x, y, z) => sub([x, y, z], centre(rings[mid])) });
+  // The cut: the wall's end grain (a = -1), and the hollow inside it (a = -2).
+  const bore = R_TOP * 0.64;
+  B.grid(2, SIDES + 1, MOOR_POST, (i, j) => {
+    const ang = (j / SIDES) * TAU, r = i ? bore : R_TOP;
+    return [...at(cut(ang, r), ang, r), -1, ang, 1];
+  }, { facing: () => axis });
+  B.grid(3, SIDES + 1, MOOR_POST, (i, j) => {
+    const ang = (j / SIDES) * TAU;
+    return [...at(i === 0 ? cut(ang, bore) : 0.075, ang, i === 2 ? bore * 0.03 : bore), -2, ang, i ? 0.12 : 0.45];
+  }, { wrap: true, probe: [1, 0], facing: (x, y, z) => sub(add(centre(0.075), axis, 0.2), [x, y, z]) });
+
+  // The turns of the line round it: a sleeve, proud at each turn's back and drawn in between
+  // them. (The turns themselves are the shader's.)
+  const lashLen = LASH.turns * 2 * ROPE_R;
+  B.rand(0.31);
+  B.tube(MOOR_LASH, (t) => centre(LASH.from + t * lashLen), (t) => {
+    const k = Math.round(t * 2 * LASH.turns), r = radius(LASH.from + t * lashLen);
+    return k === 0 || k === 2 * LASH.turns ? r + 0.002 : r + ROPE_R * (k % 2 ? 1.92 : 0.9);
+  }, 2 * LASH.turns, 8, { caps: 0, up: e1 });
+
+  // The end, left hanging from the lowest turn on the side away from the line.
+  {
+    const a0 = LASH.from + lashLen - ROPE_R, out = norm(add(e1.map((v) => v * -0.45), e2, -0.9));
+    const p0 = add(centre(a0), out, radius(a0) + ROPE_R);
+    B.rand(0.63);
+    B.tube(MOOR_LINE, (t) => add(add(p0, [0, -1, 0], TAIL * t), out, 0.05 * t ** 1.3), (t) => ROPE_R * (1 + 0.35 * clamp((t - 0.75) / 0.25, 0, 1) ** 2), 4, 6, { caps: 2, up: e1 });
+  }
+
+  // The line itself: off the second turn from the bottom, on the left of the post as the boat
+  // sees it, hanging to where it touches the bottom and then lying on it. Over a bottom that
+  // slopes evenly that is a catenary with its lowest point where it touches.
+  {
+    const a0 = LASH.from + lashLen - 3 * ROPE_R;
+    const p0 = add(centre(a0), e2, radius(a0) + ROPE_R);
+    const g = (s) => ground(p0[0] + s), g0 = g(0), gT = g(TOUCH);
+    const h0 = Math.max(p0[1] - g0 - ROPE_R, 0.05);
+    let lo = 0.2, hi = 2000;
+    for (let n = 0; n < 60; n++) { const m = Math.sqrt(lo * hi); if (m * (Math.cosh(TOUCH / m) - 1) > h0) lo = m; else hi = m; }
+    const c = Math.sqrt(lo * hi), run = TOUCH + 2.5;
+    B.rand(0.18);
+    B.tube(MOOR_LINE, (t) => {
+      const s = run * t ** 1.4;
+      const hang = s < TOUCH ? g0 + ((gT - g0) * s) / TOUCH + c * (Math.cosh((TOUCH - s) / c) - 1) : -Infinity;
+      return [p0[0] + s, Math.max(hang, g(s)) + ROPE_R, p0[2]];
+    }, () => ROPE_R, 16, 6, { caps: 0 });
+  }
+}
+
+// The boat's end, in the boat's frame (x forward, y up, z to starboard): a strop round the
+// stern and the line from under it, away toward the post and down. strop: { x, top, bot, rz }.
+// to: the level direction of the post from there [x, z].
+function buildStern(B, { strop, to }) {
+  const mid = (strop.top + strop.bot) / 2, half = (strop.top - strop.bot) / 2;
+  const loop = (t) => [strop.x + 0.04 * Math.cos(t * TAU), mid + half * Math.cos(t * TAU), strop.rz * Math.sin(t * TAU)];
+  B.rand(0.52);
+  B.tube(MOOR_LINE, loop, () => ROPE_R, 12, 5, { caps: 0, up: [1, 0, 0] });
+  // It leaves the strop high on the side the post is on, over the rail.
+  const fair = loop(to[1] < 0 ? 0.875 : 0.125);
+  B.rand(0.18);
+  // (A line with some weight on it, lifting out of the troughs and dipping into the crests.
+  // Past where it goes under it is taken down far faster than a rope hangs: the swell here
+  // stands a metre and a half over the still water and falls a metre under it, and a piece
+  // that rides with the hull must not be found lying in the air by a trough. The post is
+  // nearly in line with the beach's view of the boat, so that view sees it end on, a line
+  // straight down from the stern, and never its profile.)
+  B.tube(MOOR_LINE, (t) => {
+    const s = STERN.length * t;
+    return [fair[0] + to[0] * s, fair[1] - STERN.slope * s + STERN.sag * s * s - STERN.sink * Math.max(s - STERN.dive, 0) ** 2, fair[2] + to[1] * s];
+  }, () => ROPE_R, 9, 6, { caps: 0 });
+}
+
+// ---------------------------------------------------------------- material
+
+// One more branch for jkSurface (jukung.js): spliced in after its last one, before the flame.
+// Here a is metres along the piece and b the angle round it; the post's a runs down from its
+// top (below -0.5: the cut, the hollow). jkBounce and jkFuzz are jukung.js's, for this.
+const MOORING_SURFACE = /* glsl */ ` else if (id >= ${MOOR_POST}) {
+  // (The post's end of it stands in the shallows, 40 m from the boat.)
+  jkBounce = ${v3(SHALLOWS)} * smoothstep(14.0, 30.0, length((uBoatInv * vec4(vWorldPos, 1.0)).xz));
+  if (id == ${MOOR_POST}) {
+    // The post: bamboo some seasons in the sea. Straw gone grey, a dark ring at every node,
+    // split along the grain here and there; bleached toward the top, weed and wet as far up
+    // as the waves reach.
+    if (a < -0.5) {
+      col = a < -1.5 ? jkLin(vec3(0.12, 0.1, 0.075)) : jkLin(vec3(0.63, 0.57, 0.45)) * (0.72 + 0.45 * jkN3(vWorldPos * 80.0));
+      jkRough = 0.9;
+    } else {
+      vec3 cyl = vec3(a, cos(b), sin(b));
+      // (The joints come closer together toward the foot.)
+      float q = (a - 0.045) / 0.37 * (1.0 + 0.04 * a);
+      float sd = (fract(q + 0.5) - 0.5) * 0.37 / (1.0 + 0.08 * a);
+      float node = (1.0 - smoothstep(0.004, 0.02, abs(sd))) * jkSee(25.0, fp);
+      float streak = jkN3(cyl * vec3(2.7, 2.1, 2.1) + 4.0);
+      float fib = mix(0.5, jkN3(cyl * vec3(2.0, 7.0, 7.0)) * 0.6 + jkN3(cyl * vec3(6.0, 15.0, 15.0) + 3.0) * 0.4, jkSee(10.0, fp));
+      col = mix(jkLin(vec3(0.7, 0.62, 0.45)), jkLin(vec3(0.61, 0.59, 0.54)), smoothstep(0.3, 0.7, streak)) * (0.84 + 0.2 * streak) * (0.84 + 0.3 * fib);
+      // A split: a few millimetres wide, wandering a little, two joints long. (Drawn no finer
+      // than a pixel, and paler for it: finer, it comes out as a row of dashes.)
+      float cell = b * 1.1141, cid = floor(cell);
+      float wide = max(0.05, fwidth(cell));
+      float split = step(0.5, jkH(vec2(cid, floor(q * 0.5 + 0.37 * cid))))
+        * (1.0 - smoothstep(0.35 * wide, wide, abs(fract(cell) - 0.5 + 0.16 * (jkN(vec2(a * 4.0, cid)) - 0.5)))) * min(1.0, 0.05 / wide);
+      col *= (1.0 - 0.45 * split) * (1.0 - 0.45 * node);
+      col *= mix(1.0, 1.1, smoothstep(0.0, 0.04, -sd) * (1.0 - smoothstep(0.04, 0.12, -sd)));
+      // Greyed by the sun from the top down, and stained under the turns of the line.
+      col = mix(col, vec3(dot(col, vec3(0.3333))) * vec3(1.06, 1.02, 0.95), 0.4 * smoothstep(1.3, 0.0, a));
+      col *= 1.0 - 0.28 * smoothstep(${f(LASH.from + LASH.turns * 2 * ROPE_R + 0.3)}, ${f(LASH.from + LASH.turns * 2 * ROPE_R)}, a) * step(${f(LASH.from)}, a) * (0.4 + 0.6 * streak);
+      float edge = vWorldPos.y + 0.24 * (jkN3(cyl * vec3(1.6, 2.0, 2.0) + 11.0) - 0.5);
+      col = mix(col, col * vec3(0.5, 0.56, 0.35), smoothstep(${f(REACH + 0.3)}, ${f(REACH - 0.2)}, edge) * 0.75);
+      col = mix(col, jkLin(vec3(0.14, 0.17, 0.1)), smoothstep(${f(REACH * 0.55)}, -0.2, edge) * 0.7);
+      // (Barnacles, where it is under more often than not.)
+      col = mix(col, jkLin(vec3(0.62, 0.6, 0.54)), smoothstep(0.72, 0.8, jkN3(cyl * vec3(38.0, 9.0, 9.0))) * smoothstep(0.3, 0.05, edge) * jkSee(38.0, fp) * 0.7);
+      float wet = smoothstep(${f(REACH + 0.05)}, ${f(REACH - 0.3)}, edge);
+      col *= mix(1.0, 0.58, wet);
+      jkNormal = jkBump(N, node * 0.003);
+      jkRough = mix(0.56, 0.3, wet);
+      jkGloss = mix(0.18, 0.75, wet);
+    }
+  } else {
+    // The mooring line: hemp, three strands laid up, gone grey-brown in the salt; dark where
+    // the sea keeps it wet, with a little weed on what lies in the water.
+    float lap = 1.0, tw;
+    if (id == ${MOOR_LASH}) {
+      // Round the post, turn beside turn: each turn's back and the dark between two of them.
+      float turns = a / ${f(2 * ROPE_R)};
+      lap = mix(0.7, sin(3.1416 * fract(turns)), 1.0 - smoothstep(0.5, 2.0, fwidth(turns)));
+      tw = b * 1.4324 + fract(turns) * 1.2;
+    } else {
+      tw = a / ${f(LAY)} + b * 0.4775;
+    }
+    float see = 1.0 - smoothstep(0.5, 2.0, fwidth(tw));
+    float strand = 0.5 + 0.5 * cos(6.2832 * tw);
+    col = jkLin(vec3(0.6, 0.53, 0.41)) * (0.68 + 0.44 * mix(0.5, strand, see)) * (0.84 + 0.3 * jkN(vec2(a * 2.3 + vRand * 9.0, vRand * 5.0)));
+    col = mix(col, vec3(dot(col, vec3(0.3333))), 0.25);
+    col *= 0.45 + 0.55 * lap;
+    float wl = vWorldPos.y + 0.12 * (jkN(vec2(a * 3.0, vRand * 7.0)) - 0.5);
+    float wet = id == ${MOOR_LASH} ? 0.0 : smoothstep(${f(REACH * 0.75)}, 0.12, wl);
+    col = mix(col, col * vec3(0.6, 0.66, 0.46), smoothstep(0.3, 0.0, wl) * wet * 0.6);
+    col *= mix(1.0, 0.5, wet);
+    jkNormal = jkBump(N, (strand * 0.004 + lap * 0.006) * see);
+    jkRough = mix(0.93, 0.45, wet);
+    jkGloss = 0.35 * wet;
+    // (Dry hemp is hairy, and the hairs light up against the sun. Wet, they lie flat.)
+    jkFuzz = 0.3 * (1.0 - wet);
+  }
+  }`;
+
+// ---------------------------------------------------------------- the mooring
+
+// createBuilder and material: the boat's (jukung.js). boat: { east, north, heading }, where it
+// lies. strop: where the line is made fast, in the boat's frame { x, top, bot, rz }. place:
+// 'east,north' to stand the post somewhere else.
+function createMooring({ createBuilder, material, boat, strop, place = null }) {
+  const given = place ? String(place).split(',').map(Number) : [];
+  const [east, north] = given.length >= 2 && given.every(Number.isFinite) ? given : PLACE;
+
+  // The post and its end of the line stand in the world: the boat's group carries them only so
+  // that they come and go with it.
+  const post = new THREE.Mesh(new THREE.BufferGeometry(), material);
+  post.name = 'boat-mooring-post';
+  post.matrixAutoUpdate = false; post.matrixWorldAutoUpdate = false;
+  // The boat's end is in the boat's frame and moves with it.
+  const line = new THREE.Mesh(new THREE.BufferGeometry(), material);
+  line.name = 'boat-mooring-line';
+  post.visible = line.visible = false;   // until there is ground to stand on
+
+  const state = { foot: 0, triangles: 0 };
+  const X = new THREE.Vector3(), Y = new THREE.Vector3(0, 1, 0), Z = new THREE.Vector3();
+  // hf: the terrain, as the worker (or the bake) hands it over.
+  function plant(hf) {
+    const groundAt = (x, y) => sample(hf.heights, hf.N, hf.cell, hf.extent.x0, hf.extent.y0, x, y);
+    const foot = groundAt(east, north);
+    const de = boat.east - east, dn = boat.north - north, far = Math.hypot(de, dn) || 1;
+    const te = de / far, tn = dn / far;
+    let B = createBuilder();
+    buildShore(B, { sea: -foot, toBoat: Math.atan2(te, tn), ground: (s) => groundAt(east + te * s, north + tn * s) - foot });
+    post.geometry.dispose();
+    post.geometry = B.geometry();
+    X.set(te, 0, -tn);
+    Z.crossVectors(X, Y);
+    post.matrixWorld.makeBasis(X, Y, Z).setPosition(east, foot, -north);
+
+    // The post as the boat sees it (x forward, z to starboard), from where the line leaves.
+    const h = boat.heading * DEG;
+    const px = -de * Math.sin(h) - dn * Math.cos(h) - strop.x, pz = -de * Math.cos(h) + dn * Math.sin(h);
+    const l = Math.hypot(px, pz) || 1;
+    B = createBuilder();
+    buildStern(B, { strop, to: [px / l, pz / l] });
+    line.geometry.dispose();
+    line.geometry = B.geometry();
+    post.visible = line.visible = true;
+    state.foot = foot;
+    state.triangles = (post.geometry.index.count + line.geometry.index.count) / 3;
+  }
+
+  return { east, north, post, line, plant, state };
+}
+
+return { "MOORING_SURFACE": MOORING_SURFACE, "createMooring": createMooring };
+})();
 // src/boat/jukung.js
 __m["src/boat/jukung.js"] = (function () {
 "use strict";
@@ -93571,6 +93905,8 @@ __m["src/boat/jukung.js"] = (function () {
 //   the lantern   lit when the sun is low in the west or gone. Its brightness is set on screen
 //                 and divided by the exposure, which runs over fifteen stops between noon and
 //                 night: a real flame would vanish in one and burn out the other.
+//   the mooring   mooring.js: a bamboo post in the shallows and a stern line to it. Built with
+//                 this file's builder and drawn with its material.
 //
 // The boat's frame: x forward, y up, z to starboard, the origin amidships on the waterline.
 
@@ -93580,6 +93916,7 @@ const { CLOUD_SHADOW_GLSL } = __m["src/sky/clouds.js"];
 const { SUN_SHADOW_GLSL } = __m["src/terrain/sun-shadow.js"];
 const { createSea } = __m["src/boat/sea.js"];
 const { createOnWater } = __m["src/boat/on-water.js"];
+const { createMooring, MOORING_SURFACE } = __m["src/boat/mooring.js"];
 
 const DEG = Math.PI / 180, TAU = Math.PI * 2;
 const clamp = (x, a, b) => Math.min(Math.max(x, a), b);
@@ -93636,6 +93973,8 @@ const STROP_X = 3.2;
 const FAIR = (() => { const u = STROP_X / HALF; return [STROP_X, keel(u) - 0.012, 0]; })();
 const LINE_ANGLE = 20 * DEG;           // the line's slope down to the anchor
 const LINE_SAG = 0.3;
+// And the strop round the stern, for the line ashore (mooring.js): clear of the lantern over it.
+const STERN_X = -3.25;
 
 // ---------------------------------------------------------------- geometry
 
@@ -93993,6 +94332,8 @@ float jkInside = 0.0;    // down in the well: no light off the sea
 float jkSun = 1.0;       // the island's and the clouds' shadow here
 float jkShadow = 1.0;    // those and the boat's own
 vec3 jkEmis = vec3(0.0);
+vec3 jkBounce = vec3(0.0); // what the ground about it sends up, over the open sea's (the mooring, in the shallows)
+float jkFuzz = 0.0;      // fibres that light up against the sun (the mooring's hemp)
 
 float jkH(vec2 p) { vec3 p3 = fract(vec3(p.xyx) * 0.1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
 float jkH3(vec3 p) { p = fract(p * 0.1031); p += dot(p, p.zyx + 31.32); return fract((p.x + p.y) * p.z); }
@@ -94202,7 +94543,7 @@ vec3 jkSurface(vec3 P, vec3 N, float fp, int id) {
     jkRough = 0.45;
     jkGloss = 0.6;
     jkF0 = 0.3;
-  } else {
+  }${MOORING_SURFACE} else {
     col = vec3(0.01);
     jkEmis = uFlame * (0.55 + 0.45 * smoothstep(-0.305, -0.275, P.y));
   }
@@ -94235,8 +94576,13 @@ const FRAG_LIGHT = /* glsl */ `
   reflectedLight.indirectDiffuse *= jkAO;
   reflectedLight.directDiffuse *= mix(1.0, jkAO, 0.35);
   // Light off the sea below: a white hull over shallow water is turquoise underneath.
-  vec3 seaUp = uWaterAlb * (uSunIrr * max(uSunDir.y, 0.0) * jkSun + uSkyUp);
+  vec3 seaUp = (uWaterAlb + jkBounce) * (uSunIrr * max(uSunDir.y, 0.0) * jkSun + uSkyUp);
   reflectedLight.indirectDiffuse += seaUp * 0.5 * (1.0 - nW.y) * (1.0 - jkInside) * jkAO * BRDF_Lambert(material.diffuseColor);
+  // Rope against the light: its fuzz carries a low sun round both edges toward the eye.
+  if (jkFuzz > 0.0) {
+    float back = max(dot(-vW, uSunDir), 0.0), rim = 1.0 - clamp(dot(nW, vW), 0.0, 1.0);
+    reflectedLight.directDiffuse += jkFuzz * uSunIrr * jkShadow * rim * rim * back * back * BRDF_Lambert(material.diffuseColor);
+  }
   // The lantern.
   vec3 toL = uLampPos - vWorldPos;
   float d2 = dot(toL, toL);
@@ -94259,10 +94605,11 @@ function createBoatMaterial(lightUniforms, gradeUniforms, uniforms) {
     shader.vertexShader = [
       ['#include <common>', '#include <common>\n' + VERT_PARS],
       // (The beams bend: nothing at the rail, all of it at the float. The lantern and the anchor
-      // line share this material and lie within the rail's width of their own origins.)
+      // line share this material and lie within the rail's width of their own origins. The
+      // mooring's parts, the ids after the flame's, reach further and are left alone.)
       ['#include <begin_vertex>', `#include <begin_vertex>
         vPart = aPart; vRand = aRand; vLocal = position;
-        { float bend = smoothstep(${f(BEND[0])}, ${f(BEND[1])}, abs(position.z));
+        { float bend = smoothstep(${f(BEND[0])}, ${f(BEND[1])}, abs(position.z)) * step(aPart.x, ${FLAMEID}.5);
           vec2 fl = position.z > 0.0 ? uFlex.zw : uFlex.xy;
           transformed.y += bend * bend * clamp(fl.x + fl.y * position.x, -0.14, 0.14); }`],
       ['#include <project_vertex>', '#include <project_vertex>\nvWorldPos = (modelMatrix * vec4(transformed, 1.0)).xyz;\naerialVertex(vWorldPos);'],
@@ -94357,8 +94704,9 @@ function createHaloMaterial(uniforms) {
 
 // renderer, water (createWater's), lightUniforms and gradeUniforms as every lit material gets
 // them, shared: { uExtent, uSunShadow } (the ground's). place: 'east,north[,heading]' or
-// nothing for the anchorage below.
-function createJukung({ renderer, water, lightUniforms = {}, gradeUniforms = {}, shared = {}, place = null }) {
+// nothing for the anchorage below. mooring: '0' for no post and stern line, 'east,north' to
+// stand the post somewhere else (mooring.js).
+function createJukung({ renderer, water, lightUniforms = {}, gradeUniforms = {}, shared = {}, place = null, mooring = null }) {
   // Off the south end of the beach, in four metres of water, 50 m outside the break and 30 m
   // clear of the white water at the rock's foot: bearing 252 degrees and 74 m from where the
   // walk ends. Bow to the swell.
@@ -94414,6 +94762,10 @@ function createJukung({ renderer, water, lightUniforms = {}, gradeUniforms = {},
   const onWater = createOnWater({ water, lightUniforms, gradeUniforms, uniforms,
     shape: { proxies: boatProxies(), half: HALF, beam: BEAM, bend: BEND, sheer: SHEER_GLSL, floats: { z: ZF, r: FLOAT_R, x0: -2.5, x1: 3.1 }, beams: BEAMS.map((bm) => bm.x) } });
   for (const o of [halo, onWater.mesh]) { o.matrixAutoUpdate = false; o.matrixWorldAutoUpdate = false; group.add(o); }
+  // The post ashore and the stern line to it.
+  const moorings = String(mooring) === '0' ? null : createMooring({ createBuilder, material, place: mooring, boat: { east, north, heading },
+    strop: (() => { const u = STERN_X / HALF; return { x: STERN_X, top: sheer(u) + 0.035, bot: keel(u) - 0.03, rz: halfBeam(u) + 0.046 }; })() });
+  if (moorings) group.add(moorings.post, moorings.line);
 
   // ---- afloat
   const sea = createSea(water);
@@ -94451,6 +94803,7 @@ function createJukung({ renderer, water, lightUniforms = {}, gradeUniforms = {},
     line.name = 'boat-anchor-line';
     line.matrixAutoUpdate = false; line.matrixWorldAutoUpdate = false;
     group.add(line);
+    moorings?.plant(hf);
     group.visible = true;
   }
 
@@ -94544,7 +94897,7 @@ function createJukung({ renderer, water, lightUniforms = {}, gradeUniforms = {},
   return {
     group, east, north, heading, update, sea, state, uniforms, material, onWater,
     lantern: { group: lantern, position: lampW },
-    anchor,
+    anchor, mooring: moorings,
   };
 }
 
@@ -94786,6 +95139,7 @@ __m["src/app.js"] = (function () {
 //                      step counts and shape constants, for timing (tools/cloud-bench.mjs)
 //   trail=0            no path (v6): the ground uncarved, no steps, rails or plants cleared for it
 //   boat=0             no jukung (v35); boat=east,north[,heading] moors it somewhere else
+//   moor=0             no mooring post and stern line; moor=east,north stands the post elsewhere
 //   faceStep=0.55      spacing of the face strips' vertices near the headland (metres)
 //   vegDetail=1        (v7) how far the full plants reach before their lighter level (0: none)
 //   vegHide=near:grass,impostor   (v7) leave out plant meshes by the start of their names
@@ -95008,8 +95362,9 @@ function createApp({ params, capture = false, keepBuffer = false, maxPixelRatio 
   trail.ready.then(() => { trailReady = true; emit('trail'); checkLoaded(); });
   // The jukung at anchor off the beach (src/boat/, v35), lit the same way and afloat on the
   // sea's own waves. boat=0 leaves it out; boat=east,north[,heading] moors it somewhere else.
+  // With it, its mooring: a post in the shallows and a stern line (moor=0 leaves those out).
   const boat = params.get('boat') === '0' ? null : createJukung({ renderer, water, lightUniforms, gradeUniforms: grade.uniforms,
-    shared: { uExtent: terrain.uniforms.uExtent, uSunShadow: water.uniforms.uSunShadow }, place: params.get('boat') });
+    shared: { uExtent: terrain.uniforms.uExtent, uSunShadow: water.uniforms.uSunShadow }, place: params.get('boat'), mooring: params.get('moor') });
   if (boat) scene.add(boat.group);
   for (const name of hidden) {
     if (name === 'trail') trail.group.visible = false;
@@ -95824,6 +96179,11 @@ const POSES = {
 const BORDER = 0.042, FOOT = 0.108;
 // How far the eye is from the card for the tilt and the flip, in screen pixels.
 const EYE = 1900;
+// Turning over at the end: the card is picked up as it turns, this share of its own width at
+// the highest (edge-on), tips this many degrees towards the eye and twists this many in its
+// own plane on the way, as a hand would do it and a hinge would not. Its two faces darken by
+// up to SHADE as they turn from the light.
+const LIFT = 0.16, TIP = -5, TWIST = 2.2, SHADE = 0.36;
 // The sand is laid a little larger than the screen at rest: on the way up the card's world
 // turns and slides against it, and an edge of the photograph must never come into view. How
 // much larger is worked out for each pose and screen (sandOver), plus this much to spare.
@@ -95837,7 +96197,7 @@ function createPostcard({ reduced = false, captions = {}, onPose = null } = {}) 
   const html = document.documentElement;
   const table = $('.table'), world = $('.world'), ground = $('.ground'), card = $('.card'), flipEl = $('.card__flip');
   const finish = $('.card__finish'), light = $('.table__light'), stage = $('#stage'), back = $('.back');
-  const paper = $('.card__paper'), shadow = $('.card__shadow'), caption = $('.card__caption');
+  const paper = $('.card__paper'), shadow = $('.card__shadow'), shade = $('.card__shade'), caption = $('.card__caption');
   const captionEls = [...caption.querySelectorAll('span')], captionOwn = captionEls.map((e) => e.textContent);
   let L = null, last = '', posed = null;
   const tilt = { x: 0, y: 0, tx: 0, ty: 0, nx: 0, tnx: 0, live: 0 };
@@ -95967,26 +96327,37 @@ function createPostcard({ reduced = false, captions = {}, onPose = null } = {}) 
     finish.style.visibility = f > 0.003 ? 'visible' : 'hidden';
     light.style.opacity = f.toFixed(3);
     light.style.visibility = f > 0.003 ? 'visible' : 'hidden';
-    card.style.setProperty('--sheen', `${(34 + tilt.nx * 30).toFixed(1)}%`);
+    // (The band of gloss moves with the lean, and sweeps right across as the card turns over.)
+    card.style.setProperty('--sheen', `${(34 + tilt.nx * 30 + 70 * Math.sin(Math.PI * Math.min(state.flip, 0.5))).toFixed(1)}%`);
     // (No fading of the picture's colour: the first iteration desaturated it to look printed,
     // and Sam read the whole page as washed out. The paper, the sheen and the stillness say
     // "print"; the colour stays the scene's.)
 
-    // The card itself: leaning a little to the pointer at rest, and turning over at the end
-    // (it lifts off the sand as it goes).
-    const lift = 1 + 0.06 * Math.sin(Math.PI * flip);
-    const turned = flip > 0.5;
+    // The card itself: leaning a little to the pointer at rest, and turning over at the end.
+    // It is picked up to turn (towards the eye, so it grows), tipped and twisted a little on
+    // the way, and each face goes darker as it turns edge-on to the light. The front and the
+    // back are two elements given the same motion, half a turn apart: one hands over to the
+    // other when the card is edge-on and neither can be seen.
+    const up = Math.sin(Math.PI * flip), turned = flip > 0.5;
+    const high = LIFT * (cw + 2 * b) * s * up;                       // screen pixels off the sand
+    const hand = `rotateZ(${(TWIST * up).toFixed(3)}deg) rotateX(${(tilt.x + TIP * up).toFixed(3)}deg)`;
     flipEl.style.visibility = turned ? 'hidden' : 'visible';
     flipEl.style.transform = (flip > 0 || tilt.x || tilt.y)
-      ? `perspective(${(EYE / s).toFixed(0)}px) rotateX(${tilt.x.toFixed(3)}deg) rotateY(${(tilt.y + 180 * flip).toFixed(3)}deg) scale(${lift.toFixed(4)})`
+      ? `perspective(${(EYE / s).toFixed(0)}px) translateZ(${(high / s).toFixed(1)}px) ${hand} rotateY(${(tilt.y + 180 * flip).toFixed(3)}deg)`
       : 'none';
     back.style.visibility = turned ? 'visible' : 'hidden';
-    if (turned) back.style.transform = `translate(-50%, -50%) rotate(${L.P.end.rz}deg) perspective(${EYE}px) rotateY(${(180 * flip - 180).toFixed(3)}deg) scale(${lift.toFixed(4)})`;
-    // The shadow on the sand narrows with the card as it turns and slides out a little as it
-    // lifts. Once turned, the back brings its own.
-    const far = (lift - 1) * cw;
-    shadow.style.transform = `translate(${(far * 0.5).toFixed(1)}px, ${far.toFixed(1)}px) scale(${(sx * Math.abs(Math.cos(Math.PI * flip))).toFixed(5)}, ${sy.toFixed(5)})`;
-    shadow.style.opacity = turned ? '0' : (1 - 3 * (lift - 1)).toFixed(3);
+    if (turned) back.style.transform = `translate(-50%, -50%) rotate(${L.P.end.rz}deg) perspective(${EYE}px) translateZ(${high.toFixed(1)}px) ${hand} rotateY(${(180 * flip - 180).toFixed(3)}deg)`;
+    const dark = (SHADE * Math.pow(up, 1.3)).toFixed(3);
+    shade.style.opacity = turned ? '0' : dark;
+    back.style.setProperty('--shade', turned ? dark : '0');
+    // The shadow stays on the sand through the whole turn, under both faces: it narrows with
+    // the card, slides away from the low sun as the card comes up, and thins out.
+    const away = (high / s) * 0.62;
+    shadow.style.transform = `translate(${away.toFixed(1)}px, ${(away * 0.42).toFixed(1)}px) scale(${(sx * Math.max(Math.abs(Math.cos(Math.PI * flip)), 0.07)).toFixed(5)}, ${sy.toFixed(5)})`;
+    shadow.style.opacity = (1 - 0.45 * up).toFixed(3);
+    // (And goes soft: a thing held off the ground has no sharp shadow. Only while it turns,
+    // when nothing else on the page is being drawn.)
+    shadow.style.filter = up > 0.01 ? `blur(${((high / s) * 0.06).toFixed(1)}px)` : 'none';
   }
 
   // The lean toward the pointer: a card on sand is never quite flat. Only near rest, and not
@@ -96223,9 +96594,15 @@ const SPREAD = { in: 0.9, rest: 0.9, out: 1.05, easeIn: 0.6, easeOut: 0.2 };
 // card turning over.
 const OUTRO = 2.6, OUT_CARD = [0, 0.46], OUT_FLIP = [0.5, 0.8], OUT_WORDS = 0.6, OUT_STAMP = 0.79;
 // Turning to the boat at the water's edge: over this stretch, to put it this far across. The
-// eye comes up a little as it does (from 1.6 m above the swash a breaking wave stands as high
-// as the horizon and hides the hull each time it rears), and the lens closes in.
-const BOAT_PAN = [4.72, 4.985], BOAT_X = { wide: 0.64, tall: 0.58 }, BOAT_RISE = 2.3, BOAT_LENS = 16;
+// eye comes up as it does (from 1.6 m above the swash a breaking wave stands as high as the
+// horizon and hides the hull each time it rears), the view tips down to keep the boat where
+// it is, and the lens closes in. `wide`, `tall`: for the screen's shape.
+// (Wide screens got a longer lens and a higher eye on 7 October: Sam found the boat too small,
+// and at 2.3 m of rise a wave still hid its hull a quarter of the time, sampled over 14 s.
+// At 3.5 m it is half hidden for about one second in eight. The mooring post, src/boat/, stands
+// in the foreground of this frame. A phone keeps the first numbers, or the post's foot would
+// run into the words.)
+const BOAT_PAN = [4.72, 4.985], BOAT_X = { wide: 0.64, tall: 0.58 }, BOAT_RISE = { wide: 3.5, tall: 2.3 }, BOAT_LENS = { wide: 26, tall: 16 }, BOAT_TIP = { wide: -3.8, tall: 0 };
 
 const clamp01 = (x) => Math.min(Math.max(x, 0), 1);
 const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
@@ -96238,12 +96615,6 @@ function startScroll({ params }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const html = document.documentElement;
   if (params.has('notext')) html.classList.add('notext');
-  // (Demo, for Sam to compare in the page. ?scene=sans: the lines inside the picture in the
-  // sans, not the serif. Without it the page is as it is.)
-  if (params.get('scene') === 'sans') {
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('./type-options.css', location.href).href; document.head.append(l);
-    html.classList.add('scene-sans');
-  }
   const $ = (s) => document.querySelector(s);
   const loaderEl = $('.loader');
 
@@ -96555,11 +96926,12 @@ function startScroll({ params }) {
       const w = smooth(BOAT_PAN[0], BOAT_PAN[1], cam.tau);
       if (w > 0) {
         const bearing = (Math.atan2(app.boat.east - p.pos[0], app.boat.north - p.pos[1]) * 180) / Math.PI;
-        const fov = p.fov - BOAT_LENS * w;
+        const shape = camera.aspect < 0.85 ? 'tall' : 'wide';
+        const fov = p.fov - BOAT_LENS[shape] * w;
         const half = Math.tan((fovFor(fov, camera.aspect) * Math.PI) / 360) * camera.aspect;
-        const off = (Math.atan(((camera.aspect < 0.85 ? BOAT_X.tall : BOAT_X.wide) - 0.5) * 2 * half) * 180) / Math.PI;
+        const off = (Math.atan((BOAT_X[shape] - 0.5) * 2 * half) * 180) / Math.PI;
         const turn = Math.min(Math.max(angleDelta(bearing - off - p.yaw), -50), 50);
-        p = { ...p, yaw: p.yaw + turn * w, pos: [p.pos[0], p.pos[1], p.pos[2] + BOAT_RISE * w], fov };
+        p = { ...p, yaw: p.yaw + turn * w, pitch: p.pitch + BOAT_TIP[shape] * w, pos: [p.pos[0], p.pos[1], p.pos[2] + BOAT_RISE[shape] * w], fov };
       }
     }
     cam.pose = p;
@@ -96743,7 +97115,7 @@ function startScroll({ params }) {
   const blocks = [...document.querySelectorAll('.words > *')].map((el) => {
     const kind = 'hero' in el.dataset ? 'hero' : 'tau' in el.dataset ? 'tau' : 'end';
     const [a, b] = (el.dataset[kind] ?? '0,0').split(',').map(Number);
-    const after = [...el.querySelectorAll('.label, .body, .hero__actions, .foot > *')];
+    const after = [...el.querySelectorAll('.label, .body, .hero__actions, .cue, .foot > *')];
     const k = { el, kind, a, b, off: el.classList.contains('note') ? LINE_OFF_CLEAN : LINE_OFF, lines: [], byEl: new Map(), after, drift: kind === 'tau' ? el.querySelector('.display') : null, on: false, tl: null };
     // (Split again whenever the lines break differently: a font arriving, the window resized.)
     for (const d of el.querySelectorAll('[data-lines]')) {
@@ -96834,14 +97206,16 @@ function startScroll({ params }) {
   const altEl = $('.hud__alt'), latEl = $('.hud__lat'), lonEl = $('.hud__lon');
   const railFill = $('.rail__fill'), railMark = $('.rail__mark'), railLabel = $('.rail__mark span'), railEl = $('.rail');
   // The altimeter runs from the railing (tau 1) to the water (tau 5).
-  const RAIL = STOPS.slice(1);
-  const stops = RAIL.map((_, i) => {
-    const d = document.createElement('div');
-    d.className = 'rail__stop';
-    d.style.top = `${(i / (RAIL.length - 1)) * 100}%`;
+  // A scale like an instrument's: a long tick at each stop, four short ones between.
+  const RAIL = STOPS.slice(1), FINE = 5;
+  const stops = [];
+  for (let k = 0; k <= (RAIL.length - 1) * FINE; k++) {
+    const d = document.createElement('i');
+    d.className = k % FINE === 0 ? 'rail__stop' : 'rail__tick';
+    d.style.top = `${(k / ((RAIL.length - 1) * FINE)) * 100}%`;
     railEl.append(d);
-    return d;
-  });
+    stops.push(d);
+  }
   const dms = (v, pos, neg) => {
     const a = Math.abs(v), d = Math.floor(a), m = Math.floor((a - d) * 60), s = Math.floor(((a - d) * 60 - m) * 60);
     return `${d}°${String(m).padStart(2, '0')}′${String(s).padStart(2, '0')}″${v >= 0 ? pos : neg}`;
@@ -96887,7 +97261,7 @@ function startScroll({ params }) {
       railFill.style.transform = `scaleY(${u})`;
       railMark.style.transform = `translateY(${u * railEl.clientHeight}px)`;
     }
-    stops.forEach((d, i) => d.classList.toggle('passed', cam.tau >= i + 1 - 0.001));
+    stops.forEach((d, k) => d.classList.toggle('passed', cam.tau >= 1 + k / FINE - 0.001));
   }
 
   // ---------------------------------------------------------------- loading
