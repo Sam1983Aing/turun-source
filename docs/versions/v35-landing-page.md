@@ -78,6 +78,18 @@ are already in `vendor/fonts/` for the standalone file).
 - Still open: which headline (the page keeps "Most people stop at the railing."), a prop or
   two, the sand image's credit.
 
+## Round 7 (6 October 2026, night)
+
+- The sand under the hero and the spreads: Sam's third variation (finer, paler).
+- The hand "only near the postcard, not inside the postcard": over the scene the lines are
+  back in the serif, with the sans for the small type. Two other clean faces are behind
+  `?scene=sans` and `?scene=typed` for him to compare.
+- The time lapse moved: it runs while the camera walks from the ridge to the cove, and the
+  cove is reached in evening light at 17:40, with a clock in the frame.
+- The ending lies on his "05 tide line" concept: the tide's edge, evening sand. The concept's
+  painted card is taken out by `tools/prepare-ending-sand.mjs`.
+- Open: his sentence about "the tag" was cut off. Which headline. The pictures' credit.
+
 ## Found by other versions
 
 Nothing yet.

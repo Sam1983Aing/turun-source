@@ -34,7 +34,7 @@ const POSES = {
     hero: { x: 0.705, y: 0.5, w: 0.4, h: 0.52, rz: -6 },
     walk: { x: 0.71, y: 0.5, w: 0.39, h: 0.5, rz: 3.5 },      // the first spread: card right, words left
     beach: { x: 0.29, y: 0.5, w: 0.39, h: 0.5, rz: 5 },       // the second: card left, words right
-    end: { x: 0.5, y: 0.492, rz: -2 },
+    end: { x: 0.57, y: 0.492, rz: -4 },                       // the ending: right of the tide's edge
   },
   tall: {
     shape: 0.66,
@@ -83,8 +83,9 @@ function noiseTile(size, rgb, gain, bias, seed, soft = false) {
 }
 
 // captions: what is printed under the picture in each pose, { pose: [left, right] } (the hero's
-// is in the page's markup and stands for any pose not named).
-export function createPostcard({ reduced = false, captions = {} } = {}) {
+// is in the page's markup and stands for any pose not named). onPose(pose): called when the
+// card takes a new pose, behind the full-screen picture (the caller lays the right sand).
+export function createPostcard({ reduced = false, captions = {}, onPose = null } = {}) {
   const $ = (s) => document.querySelector(s);
   const html = document.documentElement;
   // (Soft and faint. As fine specks it sparkled at the card's resting size and read as
@@ -189,6 +190,7 @@ export function createPostcard({ reduced = false, captions = {} } = {}) {
       const text = captions[posed] ?? captionOwn;
       captionEls.forEach((el, i) => { el.textContent = text[i] ?? captionOwn[i]; });
       table.classList.toggle('is-end', posed === 'end');
+      onPose?.(posed);
       table.classList.toggle('words-right', posed === 'beach' && !L.tall);
     }
 

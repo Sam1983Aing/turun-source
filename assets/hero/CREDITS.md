@@ -20,4 +20,22 @@
   **Still for Sam to confirm before this ships publicly:** which product's image generator
   that is, and that its terms allow publishing the output in a public repository.
 
-It is the one picture on the page that the scene did not draw.
+- `sand-end.jpg`: the sand under the card at the end of the page (fine sand in evening light,
+  the tide's foam in the top left corner). From Sam Aing's concept picture for the ending,
+  `ending-concept-05-tide-line.png` ("THE LAST WAVE", 6 October 2026; his notes in
+  `output/ending-concept-prompts.txt`: "Created with built-in image_gen. Exports upscaled to
+  3840 x 2400 pixels."). The concept has a postcard painted into it. The page lays its own, so
+  `node tools/prepare-ending-sand.mjs` takes the painted one and its shadow out and resurfaces
+  that part (47% of the picture) with sand worked out from the rest of the same picture.
+
+  A cleaner plate would be the same picture generated without the card. A prompt for that:
+  "Recreate this exact image at the same size (3840 x 2400) with the postcard and its shadow
+  removed, leaving only the sand. Keep everything else the same: the foam and the thin strip of
+  aqua water in the top left corner, the fine pale damp sand, the low golden afternoon light
+  from the upper left. Sharp focus across the whole image. No objects, no text, no people."
+  Saved as `assets/hero/sand-end.jpg` it replaces this one as is.
+
+  **Same question as above before this ships publicly:** which product's image generator, and
+  its terms.
+
+These two are the only pictures on the page that the scene did not draw.

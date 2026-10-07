@@ -131,8 +131,10 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
 - **Pacing** is a monotone curve through `PACE` knots (screens of scroll against `tau`), with
   beats at the stops where the camera slows almost to a stop while the words come in. About
   19 screens top to bottom.
-- **The lettering** (v35). The lines are in a hand (Vujahday Script, a brush pen), everything
-  small is typed (Courier Prime), and Instrument Serif is left for the wordmark. The hand's
+- **The lettering** (v35), two worlds. On the paper (the sand screens: the hero, the spreads,
+  the card's back) the lines are in a hand (Vujahday Script, a brush pen) and everything small
+  is typed (Courier Prime). Inside the picture, over the scene, the type is clean: Instrument
+  Serif for the lines, Inter for the small type. The hand's
   sizes were set by measuring it against the serif it replaced, and the masks its lines rise
   out of clip well outside the line box, because a hand swings outside it (`LINE_OFF`).
 - **The page layer** (`scroll.js`, `page.css`): Lenis for a weighted smooth scroll, GSAP for
@@ -164,8 +166,9 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   starts and the camera sets off from `tau` 0.5, while the card is still small: you see the
   scene turn inside the picture before it grows (the flight before `tau` 0.5 is no longer on
   the page).
-- **The sand** is a photograph (`assets/hero/sand.jpg`, the one picture on the page the scene
-  did not draw). It lies in the card's world with the inverse of the world's resting
+- **The sand** is a photograph: `assets/hero/sand.jpg` (palm shadows on pale sand) under the
+  hero and the spreads, `assets/hero/sand-end.jpg` (the tide's edge in evening light) under the
+  ending. They are the only pictures on the page the scene did not draw. It lies in the card's world with the inverse of the world's resting
   transform, so at rest it fills the screen as it was composed, and on the way up it grows
   and turns with the card. How much larger than the screen it has to be for no edge to show
   on the way is worked out for each pose and screen size (`sandOver`). It is drawn into a
@@ -178,11 +181,11 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   (`POSES` in `postcard.js`: hero, walk, beach, end) and changes pose only while its picture
   is the whole screen.
 - **The day** (v35). The page sets the sun from where the scroll is (`DAY`, `LAPSE` in
-  `scroll.js`). It opens in morning light. At `tau` 2.2, over the cove from 88 m, the scroll
-  holds the camera for 1.8 screens and turns the sun instead, from morning through noon to
+  `scroll.js`). It opens in morning light. From the ridge to the view over the cove (`tau` 1.75
+  to 2.17) the scroll turns the sun as it walks the camera, from morning through noon to
   evening, and it is evening from there to the end. The sun moves every other frame, and it
-  runs backwards with the scroll. The clock on that line reads the story's day (07:10 to
-  17:40), not the sun's hours.
+  runs backwards with the scroll. A clock in the frame runs with it and reads the story's day
+  (06:20 on the ridge, 17:40 at the cove), not the sun's hours.
 - **The ending.** The frame goes back to a card once more, and the card turns over: its back
   is a second, unscaled element laid over the first, so its type stays sharp.
 - **The page in screens** (`page` in `scroll.js`): stretches of scroll in which the camera goes
@@ -534,8 +537,8 @@ caught.
   (`src/veg/grow/`, v7). v1 to v6 used three Poly Haven tree scans.
 - three.js 0.186 (MIT), GSAP 3.15 with SplitText (GreenSock's no-charge standard licence) and
   Lenis 1.3.26 (MIT) are in `vendor/`, with the fonts Vujahday Script, Courier Prime and
-  Instrument Serif (SIL Open Font License, from Google Fonts), each next to its licence. (Inter
-  and the serif's italic are still there from before v35; the page no longer uses them.) The tools' panel (lil-gui) loads from jsDelivr.
+  Instrument Serif and Inter (SIL Open Font License, from Google Fonts), each next to its
+  licence. The tools' panel (lil-gui) loads from jsDelivr.
 
 ## Licence
 

@@ -163,12 +163,15 @@ const code = ['var __m = {};', ...order.map(transform),
 // ---------------------------------------------------------------- the page
 
 const b64 = (p) => readFileSync(join(root, p)).toString('base64');
-// The page's fonts, inlined (v35: the hand and the typewriter; the serif is the wordmark's).
+// The page's fonts, inlined (v35: the hand and the typewriter for the paper, the serif and
+// the sans for inside the picture).
 // One that is not in vendor/fonts/ yet is linked from Google Fonts instead, and the build says
 // so: the file then needs a network for its lettering, and falls back to the system's own
 // script and Courier without one.
 const FONTS = [
-  ['Instrument Serif', 'normal', '400', 'vendor/fonts/InstrumentSerif-latin.woff2', 'Instrument+Serif'],
+  ['Instrument Serif', 'normal', '400', 'vendor/fonts/InstrumentSerif-latin.woff2', 'Instrument+Serif:ital@0;1'],
+  ['Instrument Serif', 'italic', '400', 'vendor/fonts/InstrumentSerif-italic-latin.woff2', 'Instrument+Serif:ital@0;1'],
+  ['Inter', 'normal', '400 500', 'vendor/fonts/Inter-latin.woff2', 'Inter:wght@400;500'],
   ['Vujahday Script', 'normal', '400', 'vendor/fonts/VujahdayScript-latin.woff2', 'Vujahday+Script'],
   ['Courier Prime', 'normal', '400', 'vendor/fonts/CourierPrime-400-latin.woff2', 'Courier+Prime:wght@400;700'],
   ['Courier Prime', 'normal', '700', 'vendor/fonts/CourierPrime-700-latin.woff2', 'Courier+Prime:wght@400;700'],

@@ -1,0 +1,27 @@
+/* Options for the lines inside the picture (demo, 6 October 2026, behind ?scene=): Sam wants the
+   hand only on the paper and something cleaner over the scene. The page's own answer is the
+   serif (page.css). These are the two other clean voices, set from faces already in vendor/fonts:
+     ?scene=sans    Inter for the lines too: modern, the plainest
+     ?scene=typed   Courier Prime Bold for the lines, the small type typed as on the paper
+   Sizes are scaled so the widest line is as wide as it is in the serif. */
+
+.scene-sans .note .display { font-family: var(--sans); font-weight: 500; }
+.scene-sans .note .display em { font-style: normal; }
+.scene-sans .note--xl .display { font-size: calc(clamp(3rem, 0.8rem + 7.6vw, 10.2rem) * 0.72); line-height: 0.94; letter-spacing: -0.05em; margin-left: -0.05em; }
+.scene-sans .note--m .display { font-size: calc(clamp(2.3rem, 1.2rem + 2.6vw, 4.1rem) * 0.78); line-height: 1; letter-spacing: -0.04em; }
+.scene-sans .at-c .display { margin-left: 0; }
+
+.scene-typed .note .display { font-family: var(--type); font-weight: 700; }
+.scene-typed .note .display em { font-style: normal; }
+.scene-typed .note--xl .display { font-size: calc(clamp(3rem, 0.8rem + 7.6vw, 10.2rem) * 0.6); line-height: 0.98; letter-spacing: -0.075em; margin-left: -0.03em; }
+.scene-typed .note--m .display { font-size: calc(clamp(2.3rem, 1.2rem + 2.6vw, 4.1rem) * 0.7); line-height: 1.02; letter-spacing: -0.06em; }
+.scene-typed .at-c .display { margin-left: 0; }
+.scene-typed .note .label, .scene-typed .rail__mark span, .scene-typed .time-of-day::before, .scene-typed .time-of-day span, .scene-typed.in-scene .hud__where { font: 700 12px/1.3 var(--type); letter-spacing: 0.09em; }
+.scene-typed .note .label span { font-weight: 400; }
+.scene-typed .note .body { font: 400 clamp(0.95rem, 0.9rem + 0.2vw, 1.06rem)/1.6 var(--type); }
+.scene-typed.in-scene .hud__nav { font: 400 14.5px/1 var(--type); letter-spacing: 0.02em; text-transform: none; }
+
+@media (max-width: 720px) {
+  .scene-sans .note--xl .display { font-size: calc(clamp(2.9rem, 14.5vw, 4.6rem) * 0.72); }
+  .scene-typed .note--xl .display { font-size: calc(clamp(2.9rem, 14.5vw, 4.6rem) * 0.6); }
+}

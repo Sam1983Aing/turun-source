@@ -10,7 +10,7 @@
   <script>document.documentElement.className = /[?&](shot|capture|cam)(=|&|$)/.test(location.search) ? 'tool' : 'scroll';</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Vujahday+Script&family=Courier+Prime:wght@400;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&family=Vujahday+Script&family=Courier+Prime:wght@400;700&display=swap">
   <link rel="stylesheet" href="src/scroll/page.css">
   <script type="importmap">
     {
@@ -130,7 +130,7 @@
         <a href="#boat" data-go="boat">The boat</a>
         <a href="#reserve" data-go="reserve" class="hud__cta">Reserve</a>
       </nav>
-      <p class="hud__where"><span class="hud__lat">8°45′07″S</span><span class="hud__lon">115°28′24″E</span><span class="hud__alt">1,096 m</span></p>
+      <p class="hud__where"><span class="hud__lat">8°45′07″S</span><span class="hud__lon">115°28′24″E</span><span class="hud__alt">1,096 m</span><span class="hud__clock clock">06:10</span></p>
     </header>
 
     <div class="scene-controls">
@@ -179,17 +179,19 @@
         <p class="body">The photo gets taken from this platform. Then it's the car park and the fast boat home. You're going the other way.</p>
       </section>
 
-      <section class="note note--m at-r" data-tau="1.42,1.98">
-        <p class="label"><b>06:20</b><span>The ridge · 95 m</span></p>
+      <!-- The day's time lapse runs from here to the cove (LAPSE in scroll.js): the clock on this
+           line, and the one in the frame, run with it. -->
+      <section class="note note--m at-r" data-tau="1.42,2.06">
+        <p class="label"><b class="clock">06:20</b><span>The ridge · 95 m</span></p>
         <h2 class="display" data-lines>We leave at first <em>light</em>.</h2>
         <p class="body">Before the day boats land and the heat sets in. Six walkers, and a guide who has done this a thousand times.</p>
       </section>
 
-      <!-- The day's time lapse: the camera holds here and the scroll turns the sun (LAPSE). -->
+      <!-- Where the time lapse arrives: evening over the cove (the camera rests here, COVE). -->
       <section class="note note--xl at-bl" data-tau="2.17,2.235">
-        <p class="label"><b class="clock">07:10</b><span>One day in the cove</span></p>
+        <p class="label"><b>17:40</b><span>The cove · 88 m</span></p>
         <h2 class="display" data-lines>Stay until the light <em>turns</em>.</h2>
-        <p class="body">Keep scrolling. You're turning the sun.</p>
+        <p class="body">By half past five the cove has gone gold. That's when the boat comes for you.</p>
       </section>
 
       <section class="note note--xl at-bl" data-tau="2.32,3.02">

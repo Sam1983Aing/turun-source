@@ -3802,3 +3802,88 @@ stand off it more. Only the file changed (`assets/hero/sand.jpg`). Checked on ev
 screen at desktop and phone size (`captures/r8-sand03.jpg`, `captures/r8-sand03-p.jpg`).
 His notes with the image name its tool as "built-in image_gen" and give the prompt, both now
 in `assets/hero/CREDITS.md`. Which product that is, and its terms, are still his to confirm.
+
+## v35, round 7: the hand stays on the paper, the day walks, the tide (2026-10-06, night)
+
+### "Only near the postcard, not inside the postcard"
+
+Sam, with two screenshots (the hero, and the railing's line over the scene): the hand belongs
+next to the card, and inside the picture he wants "something a little bit more cleaner".
+That is a better rule than the one I had applied (the hand for every line): handwriting is
+something that happens on paper. Over the scene the lines are back in Instrument Serif with
+the word that matters in italic, and the small type there is Inter again (tag, sentence,
+altimeter, the beach's light switch, the frame while in the scene). The menu changes face
+while it is faded out in the middle of each dive. Two more clean faces are set up from fonts
+already in `vendor/fonts/` for him to compare in the page (`src/scroll/scene-type-options.css`,
+`?scene=sans`, `?scene=typed`), sized from measured line widths (Inter 0.72, Courier Prime
+Bold 0.6 of the serif's size).
+
+The lines' masks are now per world: the hand's clip half an em outside the line box and its
+lines travel 235%, the serif's are tight and travel 105% (`LINE_OFF`, `LINE_OFF_CLEAN`).
+
+His message ended mid-sentence ("And I think for the tag, the..."). Asked.
+
+### The time lapse walks
+
+"Start around where we see in the first screenshot [the ridge] and do a time-lapse, and when
+we reach the section 'Stay until the light turns' we arrive around 5:40 p.m." So the sun no
+longer turns while the camera stands over the cove. It turns while the camera walks, from
+`tau` 1.75 (as the picture fills the screen again after the first spread) to 2.17, evenly in
+scroll (1.9 screens; evenly in distance walked would have stalled it where the camera slows
+on the ridge). The camera then rests 0.7 screens over the cove in the evening light, which is
+the frame he likes.
+
+- A clock in the frame, next to the altitude, and on the ridge's own line: 06:10 at the
+  railing, 06:20 where the lapse starts, 17:40 where it ends. He said "from seven a.m.". I
+  kept the ridge's 06:20, because the page already says the walk leaves at 06:10 and is on
+  the sand by 07:10. One number to change if he wants 07:00 (`DAY.clock`).
+- The cove's line is no longer an instruction ("Keep scrolling. You're turning the sun."):
+  the light has turned by then. It says what it means for the trip.
+- Timings on this machine are still noise (his own tab is on the page: the plain walk
+  measured 18 of 223 frames slow in one pass and 109 of 131 in the next). In the quieter pass
+  the lapse stretch had about a third of its frames over 25 ms, where the walk had a twelfth.
+  Moving the sun while the camera moves costs more than moving it while the camera stands.
+  To be measured on a quiet machine, and if it holds, the sun can move every third frame.
+
+### The ending on the tide
+
+Sam made five concepts for the ending and chose "05 tide line": fine sand in low golden
+light, a line of foam and a strip of aqua water in the top left corner, the card to the right
+of it. The concept is a finished picture with the card painted in. The page needs the
+surface alone.
+
+- `tools/prepare-ending-sand.mjs` takes the painted card and its shadow out. The colour under
+  it is filled from its surroundings (the picture in 16 px cells, the hole's cells relaxed to
+  the mean of their neighbours), the grain is lifted from a clean patch of the same sand and
+  laid as overlapping tiles from random places in the patch. The first try mirrored the
+  tiles and left kaleidoscope figures at every seam. Cross-fading random tiles would
+  normally wash the grain out where they overlap, so the sum is divided by the root of the
+  sum of the squared weights, which keeps a noise's strength. No image library on this
+  machine: it is plain JavaScript on raw pixels through ffmpeg, and runs in two seconds.
+- What comes out is flat fine sand without the hollows the real picture has around it. The
+  live card lies on that very place, so it only shows for the second the card takes to turn.
+  A plate generated without the card would be better: the prompt is in `assets/hero/CREDITS.md`.
+- The page has two sands now. `postcard.js` tells `scroll.js` when the card takes a new pose
+  (always behind the full-screen picture) and the canvas is redrawn from the other photograph.
+  The ending's is fetched after the page has loaded.
+- The ending's card sits right of the foam, turned 4 degrees, with a long shadow to the right
+  for the low sun. On a phone the photograph's left side is used, so the tide is in frame.
+
+### Also
+
+- The sand under the hero and the spreads is Sam's third variation (finer, paler, calmer).
+
+### Checked
+
+- Driven for real: the lapse forwards and backwards (14:35 on the clock mid-way both times,
+  17:40 and Evening at the cove), both spreads, Reserve, the menu, the rewind. Console clean.
+- The ending frame by frame at desktop and phone size (`captures/r10-ending.jpg`,
+  `captures/r10-ending-p.jpg`), and the card's turn shows plain sand under it.
+- `kelingking.html` rebuilt, opened from `file://`: no errors.
+
+### Still weak
+
+- When the last frame becomes the card, the sea stops wherever it is. Sometimes that is with
+  a wave standing in front of the boat.
+- The hero's sand is morning and the second spread's scene is evening, on the same sand.
+- Over the scene the accent word in terracotta is hard to read on green ("back." at the railing).

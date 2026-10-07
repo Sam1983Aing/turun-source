@@ -16,8 +16,9 @@
 //   the descent     path.js, from TAU0 (the card's picture) to 5 (the water's edge)
 //   the spreads     twice the frame goes back to being a postcard on the sand (the dive run
 //                   backwards), words beside it, and then the dive again (spreads.js)
-//   the day         at LAPSE.tau it holds it again, over the cove from 88 m, and the scroll
-//                   turns the sun instead: morning through noon to evening
+//   the day         from the ridge to the view over the cove (LAPSE) the scroll turns the sun
+//                   as it walks the camera: morning through noon to evening. It rests a moment
+//                   over the cove in that evening light (COVE)
 //   the ending      the frame goes back to being a card on the sand, and turns over
 //
 // URL switches (the scene's own are in app.js):
@@ -50,10 +51,11 @@ gsap.registerPlugin(SplitText);
 // One motion personality for the page: this ease and this length for every reveal.
 const EASE = 'expo.out';
 const REVEAL = 1.1;
-// How far a line travels to be out of its mask, in percent of its own height. The lines are in
-// a hand that swings well outside its line box, so the masks clip further out (page.css) and
-// the lines have further to go than the 105 a serif needed.
-const LINE_OFF = 235;
+// How far a line travels to be out of its mask, in percent of its own height. On the paper the
+// lines are in a hand that swings well outside its line box, so the masks clip further out
+// (page.css) and the lines have further to go. Inside the picture they are in a serif, which
+// keeps to its box.
+const LINE_OFF = 235, LINE_OFF_CLEAN = 105;
 // How quickly the camera catches up with the scroll (per second): Lenis already smooths the
 // wheel, this only takes the edge off jumps (keys, the scrollbar, a touch fling).
 const FOLLOW = 9;
@@ -74,13 +76,19 @@ const WAKE = [0.015, 0.22];
 // The day. The page opens in morning light: about ten on the photo's day, the first hour the
 // beach is out of the headland's shadow (the scene's own Morning, eight o'clock, leaves the whole
 // bay dark: it faces west under 150 m of cliff). `ev`: exposure compensation in stops at the
-// start, at noon and at the end (the end is the scene's Evening preset). `clock`: what the
-// page's clock reads over the time lapse. That is the story's day (on the sand at 07:10, the
+// start, at noon and at the end (the end is the scene's Evening preset). `leave`, `clock`: what
+// the page's clock reads. That is the story's day (the railing at 06:10, the ridge at 06:20, the
 // boat at 17:40), not the sun's hours: the light is a picture of a day, not a simulation of it.
-const DAY = { from: 10.3, noon: 12, to: 17, ev: [0.15, 0, 0.5], clock: [7 + 10 / 60, 17 + 40 / 60] };
-// Where the scroll holds the camera and turns the sun through that day instead, and for how
-// many screens (the cove from 88 m, at the top of the switchbacks).
-const LAPSE = { tau: 2.2, len: 1.8, easeIn: 0.3, easeOut: 0.3 };
+const DAY = { from: 10.3, noon: 12, to: 17, ev: [0.15, 0, 0.5], leave: 6 + 10 / 60, clock: [6 + 20 / 60, 17 + 40 / 60] };
+// The day's time lapse: over this stretch of the way down, from the ridge to the view over the
+// cove, the scroll turns the sun as it walks the camera. (Sam: "start around [the ridge] and do
+// a time-lapse, and when we reach 'Stay until the light turns' we arrive around 5:40 p.m." The
+// first version held the camera over the cove and turned the sun there.) The clock reads
+// DAY.leave at the railing, DAY.clock[0] where the lapse starts and DAY.clock[1] where it ends.
+const LAPSE = { from: 1.75, to: 2.17 };
+// The rest over the cove at the end of it, in that evening light, for its line to be read:
+// where, and for how many screens.
+const COVE = { tau: 2.2, len: 0.7, easeIn: 0.3, easeOut: 0.3 };
 // The spreads: where on the way down the frame goes back to being a card on the sand (the hero's
 // dive in reverse), rests with its words, and is dived into again. In screens: `in` for the
 // card to come down, `rest` at rest, `out` to go back in. The camera keeps walking while the
@@ -107,6 +115,12 @@ export function startScroll({ params }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const html = document.documentElement;
   if (params.has('notext')) html.classList.add('notext');
+  // (Demo: another clean face for the lines inside the picture, ?scene=sans or ?scene=typed.
+  // Without it they are in the serif.)
+  if (['sans', 'typed'].includes(params.get('scene'))) {
+    html.classList.add(`scene-${params.get('scene')}`);
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('./scene-type-options.css', import.meta.url).href; document.head.append(l);
+  }
   const $ = (s) => document.querySelector(s);
   const loaderEl = $('.loader');
 
@@ -123,7 +137,7 @@ export function startScroll({ params }) {
   const stage = $('#stage');
   stage.prepend(renderer.domElement);
   if (params.has('pr')) app.governor.on = false;
-  const post = createPostcard({ reduced, captions: spreadCaptions() });
+  const post = createPostcard({ reduced, captions: spreadCaptions(), onPose: (pose) => { sandWanted = pose === 'end' ? 'end' : 'day'; drawSand(); } });
   // Frames owed (the picture stands still at rest, so frames are only drawn when asked; two,
   // as the haze settles over a frame).
   let dirty = 2;
@@ -135,9 +149,9 @@ export function startScroll({ params }) {
   const sStart = BARE ? 0 : pace.screensAt(TAU0), sEnd = pace.screens;
   const heroLen = BARE ? 0 : HERO, outLen = BARE ? 0 : OUTRO;
   // Where the scroll holds the camera still: while a spread's card rests on the sand, and for
-  // the day's time lapse. s: where on the path. len: for how many screens. easeIn, easeOut: the
+  // a moment over the cove. s: where on the path. len: for how many screens. easeIn, easeOut: the
   // screens over which the camera slows into it and picks up out of it. y: where on the page.
-  const holds = (BARE ? [] : [...SPREADS.map((h) => ({ ...h, card: true, len: SPREAD.rest, easeIn: SPREAD.easeIn, easeOut: SPREAD.easeOut })), { id: 'lapse', ...LAPSE }])
+  const holds = (BARE ? [] : [...SPREADS.map((h) => ({ ...h, card: true, len: SPREAD.rest, easeIn: SPREAD.easeIn, easeOut: SPREAD.easeOut })), { id: 'cove', ...COVE }])
     .map((h) => ({ ...h, s: pace.screensAt(h.tau) })).sort((a, b) => a.s - b.s);
   // The page as stretches of scroll: the camera going at the scroll's own speed ('go'), standing
   // in a hold, or easing between the two ('up', 'down': its speed a smoothstep, so it covers
@@ -154,7 +168,7 @@ export function startScroll({ params }) {
     cruise(sEnd);
     return y;
   })();
-  const lapse = holds.find((h) => h.id === 'lapse') ?? null, cards = holds.filter((h) => h.card);
+  const cards = holds.filter((h) => h.card);
   const page = {
     screens: yOut + outLen,
     holds,
@@ -253,9 +267,13 @@ export function startScroll({ params }) {
     dirty = 2;
   }
   // The hour for a place on the page: morning down to the time lapse, which the scroll turns
-  // (a little slack at each end of its hold), evening after it.
-  const lapseU = (y) => (lapse ? clamp01((y - lapse.y - 0.12) / (lapse.len - 0.24)) : 0);
-  const hourAt = (y) => { const u = lapseU(y); return DAY.from + (DAY.to - DAY.from) * (u * u * (3 - 2 * u)); };
+  // (evenly in scroll, not in distance walked: the camera slows on the ridge), evening after it.
+  const lapseY = BARE ? null : [page.screensAt(LAPSE.from), page.screensAt(LAPSE.to)], yRail = BARE ? 0 : page.screensAt(1);
+  const lapseU = (y) => (lapseY ? smooth(lapseY[0], lapseY[1], y) : 0);
+  const hourAt = (y) => DAY.from + (DAY.to - DAY.from) * lapseU(y);
+  // And what the page's clock reads there.
+  const clockAt = (y) => (!lapseY ? DAY.clock[1] : y <= lapseY[0] ? DAY.leave + (DAY.clock[0] - DAY.leave) * clamp01((y - yRail) / (lapseY[0] - yRail))
+    : DAY.clock[0] + (DAY.clock[1] - DAY.clock[0]) * lapseU(y));
   if (!fixedLight) { setSun(DAY.from); syncLighting(); }
   lightInputs.forEach((input) => input.addEventListener('change', () => chooseLighting(input.value)));
   addEventListener('wheel', stopDissolve, { passive: true });
@@ -285,7 +303,7 @@ export function startScroll({ params }) {
     track.style.height = `${page.screens * unit + innerHeight}px`;
     post.layout();
     spreads?.layout(post);
-    drawSand();
+    drawSand(true);
     dirty = 2;
     if (walk && Math.abs(w / h / descent.aspect - 1) > 0.03) build();
     if (retained !== null) jumpTo(retained);
@@ -301,30 +319,42 @@ export function startScroll({ params }) {
   }
 
   // The sand under the card: a photograph (assets/hero/, generated for this page), laid in the
-  // card's world by postcard.js. It is drawn into a canvas at the photograph's own size, not
-  // set as a background: the browser draws a background once at the size the element has on
-  // the page and stretches that as the world grows, where a canvas is sampled afresh at every
-  // size, so the sand stays sharp all the way into the card. If the photograph cannot be had,
-  // the table's plain sand colour stands in.
-  let sandImg = null;
-  function drawSand() {
-    if (!sandImg || !size[0]) return;
-    const c = post.ground, iw = sandImg.naturalWidth, ih = sandImg.naturalHeight, shape = size[0] / size[1];
-    // The middle of the photograph, in the screen's shape (a phone takes a tall strip of it).
+  // card's world by postcard.js. Two of them: palm shadows on pale sand for the hero and the
+  // spreads, and the tide's edge in evening light for the ending (postcard.js says which, as
+  // the card changes pose behind the full-screen picture). The one in use is drawn into a
+  // canvas at the photograph's own size, not set as a background: the browser draws a
+  // background once at the size the element has on the page and stretches that as the world
+  // grows, where a canvas is sampled afresh at every size, so the sand stays sharp all the way
+  // into the card. If a photograph cannot be had, the table's plain sand colour stands in.
+  const sands = { day: null, end: null };
+  let sandWanted = 'day', sandDrawn = '';
+  function drawSand(force = false) {
+    const img = sands[sandWanted] ?? sands.day;
+    if (!img || !size[0]) return;
+    const key = `${img.src}|${size[0]}x${size[1]}`;
+    if (!force && key === sandDrawn) return;
+    sandDrawn = key;
+    const c = post.ground, iw = img.naturalWidth, ih = img.naturalHeight, shape = size[0] / size[1];
+    // The photograph in the screen's shape: its middle, or for the ending on a tall screen its
+    // left side, where the tide is.
     const sw = Math.min(iw, ih * shape), sh = sw / shape;
+    const sx = img === sands.end && shape < 0.85 ? 0 : (iw - sw) / 2;
     const k = Math.min(1, Math.sqrt((size[0] < 720 ? 4.2e6 : 9.3e6) / (sw * sh)));
     c.width = Math.round(sw * k); c.height = Math.round(sh * k);
     const g = c.getContext('2d');
     g.imageSmoothingQuality = 'high';
-    g.drawImage(sandImg, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
+    g.drawImage(img, sx, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
   }
-  const sandReady = BARE ? Promise.resolve() : new Promise((done) => {
+  const loadSand = (which, src) => new Promise((done) => {
     const img = new Image();
-    img.onload = () => { (img.decode?.() ?? Promise.resolve()).catch(() => {}).then(() => { sandImg = img; drawSand(); done(); }); };
-    img.onerror = () => { console.warn('the hero\'s sand did not load: plain sand instead'); done(); };
-    img.src = ASSETS.hero;
+    img.onload = () => { (img.decode?.() ?? Promise.resolve()).catch(() => {}).then(() => { sands[which] = img; drawSand(); done(); }); };
+    img.onerror = () => { console.warn(`the sand (${which}) did not load: ${which === 'day' ? 'plain sand' : 'the hero\'s'} instead`); done(); };
+    img.src = src;
     setTimeout(done, 8000);
   });
+  const sandReady = BARE ? Promise.resolve() : loadSand('day', ASSETS.hero);
+  // (The ending's is not needed for a long while: fetched once the page has begun.)
+  if (!BARE) app.on('loaded', () => loadSand('end', ASSETS.heroEnd));
 
   // ---------------------------------------------------------------- scroll
 
@@ -506,7 +536,7 @@ export function startScroll({ params }) {
   // The curtain: blank paper drawn over the page for a jump from the menu.
   const curtain = { a: 0 };
   let traveling = false, coverShown = -1, tickNo = 0;
-  const clockEl = $('.clock');
+  const clockEls = [...document.querySelectorAll('.clock')];
   let clockShown = '';
   function updateStory() {
     if (BARE) return;
@@ -517,9 +547,9 @@ export function startScroll({ params }) {
     app.timeCtl.paused = wake <= 0;
     app.timeCtl.speed = wake;
 
-    // The day. The sun follows the page's place: while the scroll is inside the time lapse it
-    // moves with it (every other frame is plenty for light, and moving it costs about half a
-    // frame), and a jump lands on the right hour at once. A light picked by hand on the beach
+    // The day. The sun follows the page's place: through the time lapse it moves with the
+    // scroll (every other frame is plenty for light, and moving it costs about half a frame),
+    // and a jump lands on the right hour at once. A light picked by hand on the beach
     // stays until the beach is left.
     tickNo++;
     if (!fixedLight) {
@@ -530,13 +560,10 @@ export function startScroll({ params }) {
         const h = hourAt(cam.y), far = sunNow === null ? 9 : Math.abs(h - sunNow);
         if (h !== sunNow && (h === DAY.from || h === DAY.to || far > 0.5 || (far > 1e-4 && tickNo % 2 === 0))) { setSun(h); syncLighting(); }
       }
-      // The clock on the time lapse's line.
-      if (clockEl) {
-        const u = lapseU(cam.y), m = Math.round((DAY.clock[0] + (DAY.clock[1] - DAY.clock[0]) * (u * u * (3 - 2 * u))) * 12) * 5;
-        const t = `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
-        if (t !== clockShown) { clockShown = t; clockEl.textContent = t; }
-      }
     }
+    // The clock (in the frame, and on the ridge's line), to five minutes.
+    const mins = Math.round(clockAt(cam.y) * 12) * 5, clock = `${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
+    if (clock !== clockShown) { clockShown = clock; for (const e of clockEls) e.textContent = clock; }
     spreads?.update(cam.card, cam.up, !wordsOn || rewinding || traveling);
     if (curtain.a !== coverShown) {
       coverShown = curtain.a;
@@ -581,14 +608,14 @@ export function startScroll({ params }) {
     const kind = 'hero' in el.dataset ? 'hero' : 'tau' in el.dataset ? 'tau' : 'end';
     const [a, b] = (el.dataset[kind] ?? '0,0').split(',').map(Number);
     const after = [...el.querySelectorAll('.label, .body, .hero__actions, .facts > div, .foot > *')];
-    const k = { el, kind, a, b, lines: [], byEl: new Map(), after, drift: kind === 'tau' ? el.querySelector('.display') : null, on: false, tl: null };
+    const k = { el, kind, a, b, off: el.classList.contains('note') ? LINE_OFF_CLEAN : LINE_OFF, lines: [], byEl: new Map(), after, drift: kind === 'tau' ? el.querySelector('.display') : null, on: false, tl: null };
     // (Split again whenever the lines break differently: a font arriving, the window resized.)
     for (const d of el.querySelectorAll('[data-lines]')) {
       SplitText.create(d, { type: 'lines', mask: 'lines', linesClass: 'line', autoSplit: true, onSplit: (self) => {
         k.byEl.set(d, self.lines);
         k.lines = [...k.byEl.values()].flat();
         k.tl?.progress(1);
-        gsap.set(self.lines, { yPercent: k.on ? 0 : LINE_OFF });
+        gsap.set(self.lines, { yPercent: k.on ? 0 : k.off });
       } });
     }
     gsap.set(after, { autoAlpha: 0, y: 14 });
@@ -640,10 +667,10 @@ export function startScroll({ params }) {
     const t = (k.tl = gsap.timeline());
     k.el.classList.remove('is-on');
     const d = reduced ? 0 : 0.7;
-    if (k.lines.length) t.to(k.lines, { yPercent: -LINE_OFF, duration: d, ease: EASE, stagger: 0.04 }, 0);
+    if (k.lines.length) t.to(k.lines, { yPercent: -k.off, duration: d, ease: EASE, stagger: 0.04 }, 0);
     t.to(k.after, { autoAlpha: 0, y: -8, duration: d * 0.8, ease: EASE }, 0);
     t.set(k.el, { visibility: 'hidden' });
-    if (k.lines.length) t.set(k.lines, { yPercent: LINE_OFF });
+    if (k.lines.length) t.set(k.lines, { yPercent: k.off });
     t.set(k.after, { y: 14 });
   }
   let wordsOn = false;
