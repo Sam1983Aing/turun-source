@@ -5,8 +5,8 @@
   "theme": {
     "bg": "#12110e", "fg": "#f3efe6", "accent": "#d9774f",
     "display": { "family": "Instrument Serif", "src": "../../vendor/fonts/InstrumentSerif-latin.woff2" },
-    "body": { "family": "Inter", "src": "../../vendor/fonts/Inter-latin.woff2" },
-    "mono": { "family": "Inter", "src": "../../vendor/fonts/Inter-latin.woff2", "weight": 500 }
+    "body": { "family": "Jost", "src": "../../vendor/fonts/Jost-latin.woff2" },
+    "mono": { "family": "Jost", "src": "../../vendor/fonts/Jost-latin.woff2", "weight": 500 }
   },
   "options": [
     { "n": "00", "name": "Now", "line": "Three big lines over the walk, and the offer says nothing between the railing and the sand.", "desktop": "clips/now-d.mp4", "phone": "clips/now-p.mp4" },

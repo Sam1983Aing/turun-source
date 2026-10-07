@@ -3955,3 +3955,33 @@ to Google Fonts left in it, and opened from `file://` with the network blocked i
 errors. Courier Prime and Inter are out of `vendor/fonts/`, nothing uses them. The `?small=`
 switch is gone. `?scene=sans` stays until he has chosen the face inside the picture.
 
+### Three more shots for the first postcard (6 October, waiting for Sam's pick)
+
+"Can you provide three more shots for the first postcard? I'm not sure yet for this one."
+The shot in the page looks straight down, like a map.
+
+Found by putting the camera at 24 poses with the card at rest on the sand and looking at
+each in the real card, which crops the frame to its middle three quarters
+(`captures/shots-a.jpg`, `-b`, `-c`). Three were built behind `?card=`, in
+`src/scroll/card-options.js`:
+
+- **drone**: `tau` 0.75 on the path as it is. A three-quarter view, the headland and its beach
+  fill the card, sea all round, no mainland and none of its shadows.
+- **horizon**: `tau` 0.85 with the view tilted up 4 degrees, so the horizon and the sky are in
+  the card: the photograph everyone takes.
+- **cove**: `tau` 0.6 through a lens of 35 degrees where the path's is 57: the beach itself.
+
+A shot that is not the path's own view is the path's pose with an offset laid on it, taken off
+again over the dive (fast at first, softly at the end), so the camera is on its path by the
+time the picture is the screen. A first railing shot from 16 m behind the platform flew low
+over the stone steps and they filled a third of the card halfway in: dropped.
+
+A shot further down the path has less of it left before the first spread, so each option
+slows the camera on that stretch (0.56 to 0.68 of the scroll, where the page's is 0.85) to
+keep it as long as Sam asked for: the first spread at screen 5.46, 5.48 and 5.58, against
+5.41 now. The price is a slower camera through the stop at the railing.
+
+Recorded next to the page as it is, same scroll plan, desktop and phone
+(`demo/card/`, plan and reel script kept, the videos are local). Stills of the four:
+`captures/card-options.jpg`.
+

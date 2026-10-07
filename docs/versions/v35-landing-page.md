@@ -103,6 +103,10 @@ are already in `vendor/fonts/` for the standalone file).
 - Postcards two and three are to lie on something other than the hero's sand. Ideas shown as
   mock-ups on his own concepts (limestone, linen). The plates are his to generate.
 
+- Then: "three more shots for the first postcard, I'm not sure yet for this one". Drone,
+  Horizon and Cove are behind `?card=` (`src/scroll/card-options.js`), recorded in
+  `demo/card/`. His pick is open. The losers and the switch go once he has chosen.
+
 ## Found by other versions
 
 Nothing yet.

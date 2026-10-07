@@ -38,6 +38,7 @@ import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText.js';
 import Lenis from 'lenis';
 import { createApp, ASSETS } from '../app.js';
+import { cardShot } from './card-options.js';
 import { buildPanel } from '../debug.js';
 import { SHOTS } from '../shots.js';
 import { ORIGIN } from '../terrain/geo.js';
@@ -125,6 +126,9 @@ export function startScroll({ params }) {
     const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('./type-options.css', import.meta.url).href; document.head.append(l);
     html.classList.add('scene-sans');
   }
+  // (Demo: another shot for the hero's card, ?card=drone|horizon|cove, card-options.js.)
+  const shot = cardShot(params.get('card'));
+  const tau0 = shot?.tau ?? TAU0;
   const $ = (s) => document.querySelector(s);
   const loaderEl = $('.loader');
 
@@ -150,7 +154,7 @@ export function startScroll({ params }) {
   // ---------------------------------------------------------------- the page in screens
 
   const pace = makePace();
-  const sStart = BARE ? 0 : pace.screensAt(TAU0), sEnd = pace.screens;
+  const sStart = BARE ? 0 : pace.screensAt(tau0), sEnd = pace.screens;
   const heroLen = BARE ? 0 : HERO, outLen = BARE ? 0 : OUTRO;
   // Where the scroll holds the camera still: while a spread's card rests on the sand, and for
   // a moment over the cove. s: where on the path. len: for how many screens. easeIn, easeOut: the
@@ -168,7 +172,7 @@ export function startScroll({ params }) {
     const add = (kind, len, E = 0, k = 1) => { if (len > 0) segs.push({ kind, y0: y, y1: y + len, s0: at, E, k }); y += Math.max(len, 0); };
     const cruise = (to, k) => { add('go', (to - at) / k, 0, k); at = Math.max(at, to); };
     const turn = (kind, E, k) => { add(kind, E, E, k); at += (k * E) / 2; };
-    let k = BARE ? 1 : FIRST_LEG;
+    let k = BARE ? 1 : shot?.leg ?? FIRST_LEG;
     turn('up', BARE ? 0 : START_EASE, k);
     for (const h of holds) { cruise(h.s - (k * h.easeIn) / 2, k); turn('down', h.easeIn, k); h.y = y; add('hold', h.len); k = 1; turn('up', h.easeOut, k); }
     cruise(sEnd, k);
@@ -413,7 +417,7 @@ export function startScroll({ params }) {
   // y: the page's place, in screens. screens: the camera's, in path.js's. hero: how far into the
   // dive. out: how far into the ending. card, up: which card the page is at and how far up it is
   // from rest (cardAt).
-  const cam = { y: 0, screens: sStart, tau: BARE ? 0 : TAU0, pose: null, hero: BARE ? 1 : 0, out: 0, card: BARE ? null : 'hero', up: BARE ? 1 : 0 };
+  const cam = { y: 0, screens: sStart, tau: BARE ? 0 : tau0, pose: null, hero: BARE ? 1 : 0, out: 0, card: BARE ? null : 'hero', up: BARE ? 1 : 0 };
   const inScene = () => cam.up >= 1;
   function placeCamera(dt, snap = false) {
     if (!(unit > 0)) return;
@@ -431,6 +435,7 @@ export function startScroll({ params }) {
     [cam.card, cam.up] = cardAt(cam.y, cam.out);
     if (!descent) return;
     let p = descent.poseAt(cam.tau);
+    if (shot && !BARE) p = shot.pose(p, cam.hero);
     // At the water's edge the head turns to the boat.
     if (app.boat && !BARE) {
       const w = smooth(BOAT_PAN[0], BOAT_PAN[1], cam.tau);
@@ -805,7 +810,7 @@ export function startScroll({ params }) {
     const frame = () => new Promise((r) => requestAnimationFrame(r));
     const gl = renderer.getContext(), px = new Uint8Array(4);
     const timed = [];
-    const first = BARE ? 0 : TAU0;
+    const first = BARE ? 0 : tau0;
     const at = [first, ...[0.4, 0.7, 0.9, 1, 1.4, 1.8, 2, 2.3, 2.6, 3, 3.3, 3.6, 4, 4.5, 5].filter((t) => t > first)];
     for (const t of at) {
       const p = descent.poseAt(t);
