@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 97c63ac. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
+  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 80cda1a. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Turun · The walk down to Kelingking Beach</title>
@@ -96438,12 +96438,16 @@ function startScroll({ params }) {
   let size = [0, 0];
   function resize(force = false) {
     const w = stage.clientWidth, h = stage.clientHeight;
+    // (A page opened where it has no size yet, a hidden preview pane for one, waits for one:
+    // every measure here is a share of the screen, and of nothing they all came out as NaN,
+    // which then stuck, since the camera eases toward the scroll from where it is.)
+    if (!w || !h) return;
     // A phone resizes the window as its address bar slides; the stage does not, so only a real
     // change of size re-sizes the canvas.
     if (!force && w === size[0] && Math.abs(h - size[1]) < 2) return;
     // Retain the route beat when rotating a phone: the scroll is measured in stage
     // heights, so keeping the old pixel offset would move to another part of the trail.
-    const retained = descent ? cam.y : null;
+    const retained = descent && size[1] && Number.isFinite(cam.y) ? cam.y : null;
     size = [w, h];
     app.setSize(w, h);
     unit = h;
@@ -96452,7 +96456,7 @@ function startScroll({ params }) {
     spreads?.layout(post);
     drawSand(true);
     dirty = 2;
-    if (walk && Math.abs(w / h / descent.aspect - 1) > 0.03) build();
+    if (walk && !(Math.abs(w / h / descent.aspect - 1) <= 0.03)) build();
     if (retained !== null) jumpTo(retained);
   }
   app.governor.onChange = () => { app.setSize(size[0], size[1]); dirty = 2; };
@@ -96525,7 +96529,8 @@ function startScroll({ params }) {
   // The flight's start depends on the screen's shape (path.js), so the path is rebuilt when
   // that changes.
   function build() {
-    const aspect = size[0] / size[1];
+    // (Before the page has a size: a landscape screen's shape, and built again once it has.)
+    const aspect = size[1] ? size[0] / size[1] : 16 / 9;
     descent = buildDescent({ walk, groundAt: app.groundAt, shots: SHOTS, view: { aspect, fov: fovFor(SHOTS.viewpoint.fov, aspect) }, extent: app.layout.extent });
     descent.aspect = aspect;
   }
@@ -96547,8 +96552,9 @@ function startScroll({ params }) {
   const cam = { y: 0, screens: sStart, tau: BARE ? 0 : TAU0, pose: null, hero: BARE ? 1 : 0, out: 0, card: BARE ? null : 'hero', up: BARE ? 1 : 0 };
   const inScene = () => cam.up >= 1;
   function placeCamera(dt, snap = false) {
+    if (!(unit > 0)) return;
     const target = scrollY() / unit;
-    cam.y = (snap || reduced) ? target : cam.y + (target - cam.y) * (1 - Math.exp(-FOLLOW * dt));
+    cam.y = (snap || reduced || !Number.isFinite(cam.y)) ? target : cam.y + (target - cam.y) * (1 - Math.exp(-FOLLOW * dt));
     if (Math.abs(target - cam.y) < 1e-4) cam.y = target;
     cam.screens = page.camAt(cam.y);
     const tauWas = cam.tau;

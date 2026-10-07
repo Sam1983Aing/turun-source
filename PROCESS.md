@@ -3887,3 +3887,18 @@ surface alone.
   a wave standing in front of the boat.
 - The hero's sand is morning and the second spread's scene is evening, on the same sand.
 - Over the scene the accent word in terracotta is hard to read on green ("back." at the railing).
+
+### A page opened with no size (6 October)
+
+Sam asked for the preview to be opened. In the app's browser pane, hidden behind something
+else, the page gets a window of 0 x 0. Every measure on this page is a share of the screen,
+so the scroll position came out as 0 / 0, and it stuck: the camera eases toward the scroll
+from where it is, and from NaN it never arrives. The page reported itself at the first
+spread with nothing valid behind it, and would have stayed that way once shown. v34 had the
+same weakness.
+
+Now the page waits for a real size before it measures anything (`resize`), the camera takes
+the scroll's place outright if its own is not a number (`placeCamera`), and the path is built
+for a landscape screen until the real shape is known, then built again. Checked in the pane:
+loaded at 0 x 0 it sits at the hero, valid, and given 1280 x 800 it lays itself out (card,
+sand, words, path for 1.6). Desktop and phone in headless Chrome as before.
