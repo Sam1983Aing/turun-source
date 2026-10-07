@@ -18,6 +18,13 @@
 //
 //   node tools/prepare-ending-sand.mjs [source.png]      needs ffmpeg
 //
+// The same can be done to any other concept picture of a card on a surface, to try the surface
+// under the page's own card before a clean one is generated (a mock-up: where the surface has
+// lines or folds, they stop at the hole):
+//   --out=captures/surfaces/limestone.jpg
+//   --hole="614,413 3014,269 ..."     the painted card and its shadow, corner by corner
+//   --grain=80,1200,540,700           x, y, width, height of a clean patch of the surface
+//
 // The best version of this picture is one generated without the card in it (the prompt is in
 // assets/hero/CREDITS.md). Drop that in as assets/hero/sand-end.jpg and this tool is not needed.
 
@@ -26,14 +33,16 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const SRC = process.argv[2] ?? join(root, 'ending-concept-05-tide-line.png');
-const OUT = join(root, 'assets/hero/sand-end.jpg');
+const opt = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3);
+const SRC = process.argv.slice(2).find((a) => !a.startsWith('--')) ?? join(root, 'ending-concept-05-tide-line.png');
+const OUT = opt('out') ? join(root, opt('out')) : join(root, 'assets/hero/sand-end.jpg');
 const W = 3840, H = 2400, CELL = 16;
 
 // The painted card and its shadow, with room to spare (pixels in the 3840 x 2400 picture).
-const HOLE = [[950, 520], [3080, 345], [3190, 400], [3480, 2120], [3300, 2170], [1090, 2170], [1040, 2110]];
+const HOLE = opt('hole') ? opt('hole').trim().split(/\s+/).map((p) => p.split(',').map(Number))
+  : [[950, 520], [3080, 345], [3190, 400], [3480, 2120], [3300, 2170], [1090, 2170], [1040, 2110]];
 // A clean patch of the same sand to take the grain from (the lower left corner).
-const GRAIN = { x: 130, y: 1700, w: 860, h: 670 };
+const GRAIN = opt('grain') ? (([x, y, w, h]) => ({ x, y, w, h }))(opt('grain').split(',').map(Number)) : { x: 130, y: 1700, w: 860, h: 670 };
 // How far the mask's edge is softened, in pixels each way.
 const FEATHER = 16;
 
@@ -117,6 +126,7 @@ for (let y = 0; y < GRAIN.h; y++) for (let x = 0; x < GRAIN.w; x++) {
 // Laid across the hole's bounding box as tiles of TILE px on a grid of half that, so every
 // pixel is under four of them.
 const TILE = 320, STEP = TILE / 2;
+if (GRAIN.w <= TILE || GRAIN.h <= TILE) throw new Error(`the grain patch has to be larger than ${TILE} px each way`);
 let bx0 = W, by0 = H, bx1 = 0, by1 = 0;
 for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (mask[y * W + x] > 0.002) { if (x < bx0) bx0 = x; if (x > bx1) bx1 = x; if (y < by0) by0 = y; if (y > by1) by1 = y; }
 const BW = bx1 - bx0 + 1, BH = by1 - by0 + 1;

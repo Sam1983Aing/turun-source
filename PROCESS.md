@@ -3902,3 +3902,46 @@ the scroll's place outright if its own is not a number (`placeCamera`), and the 
 for a landscape screen until the real shape is known, then built again. Checked in the pane:
 loaded at 0 x 0 it sits at the hero, valid, and given 1280 x 800 it lays itself out (card,
 sand, words, path for 1.6). Desktop and phone in headless Chrome as before.
+
+### Round 8: the hero, from Sam's notes (6 October, late)
+
+The hand and its colour stay ("I love it"). Everything else in the hero was on his list.
+
+- **The card is glossy now.** He did not like the paper's texture, and saw a coloured edge on
+  the left. Both were the tooth: a noise tile multiplied over a cream paper, which at the
+  card's rim read as a tinted line. The noise is gone (`noiseTile` out of `postcard.js`, the
+  grain out of the print finish and the table's light). The paper is white, with one broad
+  soft band of light across it that moves with the tilt, the same band that crosses the
+  picture, so border and print read as one coated sheet.
+- **Shadow all round.** It only fell to the right and below. A tight one and a soft one with
+  no offset are added under the three that fall away from the sun. Measured, not judged by
+  eye: the sand goes from 218 to 185 over 12 px at the left edge, 227 to 176 at the top, and
+  the paper's edge is a clean step to 251 with no line of another colour in it.
+- **The metrics are out** (150 m, 6, 0, bottom left).
+- **The small type is no longer typed.** "It doesn't feel vacation. It feels like a
+  typewriter." Courier Prime is replaced by a geometric sans, Jost, set as travel print sets
+  it: tags in small tracked capitals, sentences plain. One face for everything small now, on
+  the sand and over the scene (`--type`). Three others are behind `?small=figtree`,
+  `?small=cormorant` and `?small=inter` for him to compare, sheet in
+  `captures/h2-small-options.jpg`. Jost is not in `vendor/fonts/` yet (a download, his OK
+  first), so the single file links it from Google Fonts until then.
+- **The first leg is longer, and the whole T-Rex is in the card.** The card's shot is from
+  higher (`TAU0` 0.5 to 0.3: the head, the neck, the stack beside it and the bay), and from
+  the card to the first spread the camera moves at 0.85 of the scroll (`FIRST_LEG`), so the
+  dive has more of the way to cover and takes it more slowly. Each segment of the page now
+  carries its own rate. The first spread is reached at screen 5.41, where it was 4.15.
+- **Each resting place can have its own surface.** He wants postcards two and three on
+  something other than the hero's sand. The page has a slot for each pose now (`ASSETS.hero`,
+  `heroWalk`, `heroBeach`, `heroEnd`), empty ones fall back to the hero's, and
+  `?under=walk:url,beach:url` tries a picture without adding it. Mock-ups were made from his
+  own ending concepts (03 limestone under the walk, 02 linen under the beach) with the card
+  taken out by `tools/prepare-ending-sand.mjs`, which takes a source, a hole and a grain
+  patch now: `captures/h2-surf-a.jpg`. They are stand-ins, the shadows stop at the hole.
+  Clean plates are his to generate.
+
+Checked: every screen in the new face at desktop and phone size (`captures/h2-page.jpg`,
+`captures/h2-phone.jpg`), the card at twice the density (`captures/h2-card-close.jpg`).
+
+Still weak: seen straight down in morning light, the mainland's cliffs throw two large flat
+shadows into the card's picture. That is the scene at that hour and this brief does not
+touch the scene.

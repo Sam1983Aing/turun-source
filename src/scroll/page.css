@@ -7,11 +7,11 @@
                 and the back of the same card to book.
      Mood       sun-bleached and quiet at the top, a long walk down, gold at the end
      Palette    ink on pale sand, cream over the scene, one terracotta accent
-     Type       two worlds. On the paper (the sand screens: the hero, the spreads, the card's
-                back) the lines are in a hand (Vujahday Script, a brush pen) and everything
-                small is typed (Courier Prime). Inside the picture, over the scene, the type is
-                clean: Instrument Serif for the lines, Inter for the small type. Sam's rule:
-                the hand "only near the postcard, not inside the postcard".
+     Type       on the paper (the sand screens: the hero, the spreads, the card's back) the
+                lines are in a hand (Vujahday Script, a brush pen). Inside the picture, over
+                the scene, they are in Instrument Serif. Sam's rule: the hand "only near the
+                postcard, not inside the postcard". Everything small, everywhere, is one clean
+                sans (Jost). It was a typewriter face for a round: "it doesn't feel vacation".
      Motion     one ease (expo.out), reveals of 1.1 s, a heavy smooth scroll */
 
 :root {
@@ -25,17 +25,12 @@
   --accent-deep: #b4532d;     /* on sand, paper and the dark loader */
   --pen: #17253d;             /* the hand's ink, on sand and paper */
   --hand: "Vujahday Script", "Bradley Hand", "Segoe Script", cursive;   /* the lines: a brush pen */
-  --type: "Courier Prime", "Courier New", ui-monospace, monospace;      /* the rest: a typewriter */
+  --type: "Jost", "Avenir Next", "Century Gothic", system-ui, sans-serif;   /* everything small */
   --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;       /* the wordmark, and the lines inside the picture */
-  --sans: "Inter", -apple-system, system-ui, sans-serif;                /* the small type inside the picture */
+  --sans: var(--type);                                                  /* (the small type inside the picture: the same) */
   --gutter: clamp(20px, 5.5vw, 88px);
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --shadow: 0 1px 2px rgba(10, 9, 7, 0.28), 0 2px 30px rgba(10, 9, 7, 0.4);
-  /* Fine noise for paper and print: two small tiles painted once by postcard.js (an SVG
-     turbulence filter as a background was repainted every frame of the dive, and cost half
-     the frame rate). */
-  --tooth: none;
-  --grain: none;
 }
 
 /* ------------------------------------------------------------ the tools (?shot=...) */
@@ -68,12 +63,12 @@ html.scroll.loading { overflow: hidden; }
 .track { position: relative; width: 1px; pointer-events: none; }
 .notext .words, .notext .hud, .notext .rail, .notext .scene-controls, .notext .cover, .notext .sp { display: none !important; }
 
-.label { margin: 0; font: 700 12px/1.3 var(--type); letter-spacing: 0.09em; text-transform: uppercase; }
+.label { margin: 0; font: 500 11.5px/1.3 var(--type); letter-spacing: 0.2em; text-transform: uppercase; }
 /* The lines, in the hand. Its sizes come from measuring it against the serif it replaced
    (the width of the widest line), its line height from the height of its ink. */
 .display { margin: 0; font: 400 clamp(2.5rem, 1.4rem + 3.6vw, 5.4rem)/0.76 var(--hand); text-wrap: balance; }
 .display em { font-style: normal; color: var(--accent); position: relative; display: inline-block; }
-.body { margin: 0; font: 400 clamp(0.95rem, 0.9rem + 0.2vw, 1.06rem)/1.6 var(--type); color: var(--cream-dim); max-width: 30rem; text-wrap: pretty; }
+.body { margin: 0; font: 400 clamp(1.02rem, 0.95rem + 0.26vw, 1.16rem)/1.58 var(--type); color: var(--cream-dim); max-width: 30rem; text-wrap: pretty; }
 /* Masks for the line reveals (SplitText). A hand swings well outside its line box, so the
    masks clip that much further out all round (a clip-path: padding with negative margins
    collapses between the lines and pushes them apart), and the lines travel further to clear
@@ -83,7 +78,7 @@ html.scroll.loading { overflow: hidden; }
 .hero .display em::after, .sp__head em::after { content: ""; position: absolute; left: -3%; right: -6%; bottom: -0.04em; height: 0.16em;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 40 4 110 3 197 7' fill='none' stroke='%23b4532d' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M30 13.5 C 80 9 140 8.5 186 11' fill='none' stroke='%23b4532d' stroke-width='1.6' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
 
-.button { pointer-events: auto; appearance: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 14px; background: var(--ink); color: var(--cream); padding: 16px 22px 15px 24px; font: 400 15px/1 var(--type); letter-spacing: 0.02em; text-decoration: none; transition: background 0.5s var(--ease); }
+.button { pointer-events: auto; appearance: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 14px; background: var(--ink); color: var(--cream); padding: 17px 22px 16px 24px; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; transition: background 0.5s var(--ease); }
 .button::after { content: ""; width: 22px; height: 1px; background: currentColor; box-shadow: 0 0 0 0 currentColor; transform-origin: 0 50%; transition: transform 0.5s var(--ease); }
 .button:hover, .button:focus-visible { background: var(--accent-deep); }
 .button:hover::after, .button:focus-visible::after { transform: scaleX(1.5); }
@@ -120,37 +115,44 @@ html.scroll.at-card #stage { cursor: pointer; }
 /* The paper and its shadow: the picture's rectangle plus the border, sized once (postcard.js
    sets --cw, --ch, --b, --bb) and scaled about the middle of the picture as the window opens. */
 .card__paper, .card__shadow { position: absolute; left: calc(50% - var(--cw) / 2 - var(--b)); top: calc(50% - var(--ch) / 2 - var(--b)); width: calc(var(--cw) + 2 * var(--b)); height: calc(var(--ch) + var(--b) + var(--bb)); border-radius: calc(var(--cw) * 0.005); transform-origin: 50% calc(var(--b) + var(--ch) / 2); }
-.card__paper { background: var(--tooth), linear-gradient(135deg, #fffefa 0%, #fdf9ef 55%, #f6efdf 100%); background-size: calc(var(--cw) * 0.11) auto, auto;
-  box-shadow: inset 0 0 calc(var(--cw) * 0.03) rgba(120, 92, 52, 0.06),
-    calc(var(--cw) * 0.0009) calc(var(--cw) * 0.0018) 0 #e4dac6; }
+/* Glossy card stock: smooth and white, no tooth (Sam: "I don't really like the texture on the
+   postcard... more like a glossy paper"). A hair of thickness on the shadow side, and the band
+   of light that crosses the picture crosses the border too (--sheen, set by postcard.js). */
+.card__paper { background: linear-gradient(135deg, #ffffff 0%, #fcfbf8 55%, #f4f2ec 100%);
+  box-shadow: calc(var(--cw) * 0.0008) calc(var(--cw) * 0.0016) 0 #ddd8cc; }
+.card__paper::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(112deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 70%) var(--sheen, 50%) 0 / 300% 100% no-repeat; }
 /* Noon sun, almost overhead, from the top left: a tight shadow under the edge, a soft one
    beyond it, and the sand a shade darker all round. The far corner sits a little proud. */
 /* (The shadow's own box is clear and sits square under the paper: with a fill and a slight
-   turn, as it first had, it showed as a dark lip along the card's top and right edges.) */
+   turn, as it first had, it showed as a dark lip along the card's top and right edges. The
+   first of its shadows is all round, so the top and the left edge are grounded too.) */
 .card__shadow {
-  box-shadow: calc(var(--cw) * 0.004) calc(var(--cw) * 0.007) calc(var(--cw) * 0.008) calc(var(--cw) * -0.003) rgba(58, 36, 14, 0.6),
-    calc(var(--cw) * 0.018) calc(var(--cw) * 0.036) calc(var(--cw) * 0.045) calc(var(--cw) * -0.012) rgba(58, 36, 14, 0.44),
-    calc(var(--cw) * 0.035) calc(var(--cw) * 0.07) calc(var(--cw) * 0.16) calc(var(--cw) * -0.02) rgba(58, 36, 14, 0.3); }
+  box-shadow: 0 0 calc(var(--cw) * 0.004) 0 rgba(58, 36, 14, 0.32),
+    0 0 calc(var(--cw) * 0.022) calc(var(--cw) * 0.003) rgba(58, 36, 14, 0.36),
+    calc(var(--cw) * 0.004) calc(var(--cw) * 0.007) calc(var(--cw) * 0.008) calc(var(--cw) * -0.003) rgba(58, 36, 14, 0.5),
+    calc(var(--cw) * 0.018) calc(var(--cw) * 0.036) calc(var(--cw) * 0.045) calc(var(--cw) * -0.012) rgba(58, 36, 14, 0.4),
+    calc(var(--cw) * 0.035) calc(var(--cw) * 0.07) calc(var(--cw) * 0.16) calc(var(--cw) * -0.02) rgba(58, 36, 14, 0.28); }
 .card__caption { position: absolute; left: var(--b); right: var(--b); bottom: 0; height: var(--bb); margin: 0; display: flex; align-items: center; justify-content: space-between;
-  font: 400 calc(var(--cw) * 0.024)/1 var(--type); letter-spacing: 0.02em; color: #3b342a; text-shadow: 0 calc(var(--cw) * 0.0008) 0 rgba(255, 255, 255, 0.8); }
+  font: 500 calc(var(--cw) * 0.0158)/1 var(--type); letter-spacing: 0.22em; text-transform: uppercase; color: #3b342a; text-shadow: 0 calc(var(--cw) * 0.0008) 0 rgba(255, 255, 255, 0.8); }
 .card__caption span:last-child { font-variant-numeric: tabular-nums; color: #6d6252; }
-/* The print finish over the picture: a sheen that moves with the tilt, the paper's tooth, a
-   soft edge where the ink meets the border. Lifts as the card comes up. */
-.card__finish { position: absolute; left: calc(50% - var(--cw) / 2); top: calc(50% - var(--ch) / 2); width: var(--cw); height: var(--ch); pointer-events: none; 
-  background: linear-gradient(104deg, rgba(255,255,255,0) 42%, rgba(255,255,255,0.16) 48%, rgba(255,255,255,0.04) 52%, rgba(255,255,255,0) 58%) var(--sheen, 50%) 0 / 300% 100% no-repeat,
-    radial-gradient(130% 120% at 28% 18%, rgba(255, 244, 222, 0.03), rgba(70, 48, 22, 0.04));
-  box-shadow: inset 0 0 0 calc(var(--cw) * 0.0006) rgba(50, 36, 18, 0.16), inset 0 0 calc(var(--cw) * 0.03) rgba(50, 36, 18, 0.08); }
-.card__finish::after { content: ""; position: absolute; inset: 0; background: var(--grain); background-size: calc(var(--cw) * 0.1) auto; opacity: 0.16; }
+/* The gloss over the picture: a soft light from the top left and a band of it that moves
+   with the tilt, and a crisp edge where the picture meets the border. Lifts as the card comes up. */
+.card__finish { position: absolute; left: calc(50% - var(--cw) / 2); top: calc(50% - var(--ch) / 2); width: var(--cw); height: var(--ch); pointer-events: none;
+  background: linear-gradient(112deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.13) 45%, rgba(255,255,255,0.17) 50%, rgba(255,255,255,0.13) 55%, rgba(255,255,255,0) 70%) var(--sheen, 50%) 0 / 300% 100% no-repeat,
+    linear-gradient(128deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 24%, rgba(255,255,255,0) 44%);
+  box-shadow: inset 0 0 0 calc(var(--cw) * 0.0006) rgba(40, 30, 16, 0.16); }
 /* The light on the whole still life: warm from the top left, falling away to the far corner. */
 .table__light { position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(58% 78% at 20% 46%, rgba(255, 238, 206, 0.5), rgba(255, 238, 206, 0.22) 45%, rgba(255, 238, 206, 0) 78%), radial-gradient(130% 120% at 28% 18%, rgba(0, 0, 0, 0) 58%, rgba(64, 40, 14, 0.24) 100%); }
 /* (The pool of light is under the words: on the right when the card is on the left.) */
 .table.words-right .table__light { background: radial-gradient(58% 78% at 80% 46%, rgba(255, 238, 206, 0.5), rgba(255, 238, 206, 0.22) 45%, rgba(255, 238, 206, 0) 78%), radial-gradient(130% 120% at 72% 18%, rgba(0, 0, 0, 0) 58%, rgba(64, 40, 14, 0.24) 100%); }
-.table__light::after { content: ""; position: absolute; inset: 0; background: var(--grain); background-size: 150px auto; opacity: 0.5; }
 /* The ending: the tide's edge in evening light. The sun is low, so the card's shadow is long
    and falls to the right, and there is no pool of light for words on the left. */
 .table.is-end .card__shadow {
   box-shadow: calc(var(--cw) * 0.005) calc(var(--cw) * 0.006) calc(var(--cw) * 0.008) calc(var(--cw) * -0.002) rgba(70, 40, 12, 0.55),
+    0 0 calc(var(--cw) * 0.004) 0 rgba(70, 40, 12, 0.3),
+    0 0 calc(var(--cw) * 0.022) calc(var(--cw) * 0.003) rgba(70, 40, 12, 0.32),
     calc(var(--cw) * 0.058) calc(var(--cw) * 0.024) calc(var(--cw) * 0.022) calc(var(--cw) * -0.008) rgba(70, 40, 12, 0.5),
     calc(var(--cw) * 0.08) calc(var(--cw) * 0.05) calc(var(--cw) * 0.14) calc(var(--cw) * -0.02) rgba(70, 40, 12, 0.24); }
 .table.is-end .table__light { background: radial-gradient(130% 120% at 28% 18%, rgba(0, 0, 0, 0) 60%, rgba(64, 40, 14, 0.2) 100%); }
@@ -160,22 +162,22 @@ html.scroll.at-card #stage { cursor: pointer; }
 /* ------------------------------------------------------------ the back of the card */
 
 .back { position: absolute; z-index: 3; visibility: hidden; backface-visibility: hidden; container-type: size; color: var(--ink); border-radius: 0.5cqw;
-  background: var(--tooth), linear-gradient(135deg, #fffefa 0%, #fdf9ef 55%, #f6efdf 100%); background-size: 200px auto, auto;
+  background: linear-gradient(135deg, #fffefb 0%, #fcf9f1 55%, #f5f0e4 100%);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75), inset 0 0 40px rgba(120, 92, 52, 0.12), 2px 4px 5px rgba(66, 44, 20, 0.42), 14px 26px 46px rgba(66, 44, 20, 0.3), 0 0 110px rgba(66, 44, 20, 0.2); }
 .back__in { position: absolute; inset: 0; display: grid; grid-template-columns: 1.06fr 1fr; padding: 11cqh 5.2cqw 7.5cqh; }
 .back__in::before { content: ""; position: absolute; left: 51.4%; top: 15cqh; bottom: 9cqh; width: 1px; background: rgba(20, 18, 14, 0.32); transform-origin: 50% 0; transform: scaleY(var(--rule, 1)); }
-.back__head { position: absolute; left: 0; right: 0; top: 4.6cqh; margin: 0; text-align: center; font: 700 max(9px, 1.05cqw)/1 var(--type); letter-spacing: 0.5em; text-indent: 0.5em; text-transform: uppercase; color: rgba(20, 18, 14, 0.55); }
+.back__head { position: absolute; left: 0; right: 0; top: 4.6cqh; margin: 0; text-align: center; font: 500 max(9px, 1.05cqw)/1 var(--type); letter-spacing: 0.56em; text-indent: 0.56em; text-transform: uppercase; color: rgba(20, 18, 14, 0.55); }
 .back__msg { padding-right: 5cqw; display: grid; align-content: center; gap: 4.2cqh; }
 .back__note { margin: 0; font: 400 3.7cqw/1 var(--hand); color: var(--pen); text-wrap: pretty; }
-.back__plan { margin: 0; padding: 0; list-style: none; display: grid; gap: 1.5cqh; font: 400 max(11px, 1.36cqw)/1.35 var(--type); color: var(--ink-dim); }
+.back__plan { margin: 0; padding: 0; list-style: none; display: grid; gap: 1.5cqh; font: 400 max(11.5px, 1.46cqw)/1.35 var(--type); color: var(--ink-dim); }
 .back__plan li { display: grid; grid-template-columns: 5.6cqw 1fr; align-items: baseline; }
-.back__plan time { font-weight: 700; color: var(--accent-deep); }
-.back__price { margin: 0; padding-top: 2.6cqh; border-top: 1px solid rgba(20, 18, 14, 0.18); font: 400 max(11px, 1.36cqw)/1.4 var(--type); color: var(--ink-dim); }
-.back__price b { font: 700 2.2cqw/1 var(--type); letter-spacing: -0.03em; color: var(--ink); margin-right: 0.3em; }
+.back__plan time { font-weight: 500; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; color: var(--accent-deep); }
+.back__price { margin: 0; padding-top: 2.6cqh; border-top: 1px solid rgba(20, 18, 14, 0.18); font: 400 max(11.5px, 1.46cqw)/1.4 var(--type); color: var(--ink-dim); text-wrap: balance; }
+.back__price b { font: 500 2.4cqw/1 var(--type); letter-spacing: -0.01em; color: var(--ink); margin-right: 0.3em; }
 .back__addr { position: relative; padding-left: 5cqw; display: grid; align-content: end; gap: 2.5cqh; }
 .back__to { margin: 0 0 0.4cqh; font: 400 2.7cqw/1 var(--hand); color: var(--pen); }
 .field { display: grid; gap: 0.7cqh; border-bottom: 1px solid rgba(20, 18, 14, 0.5); padding-bottom: 0.8cqh; }
-.field span { font: 700 max(9px, 0.98cqw)/1 var(--type); letter-spacing: 0.12em; text-transform: uppercase; color: rgba(20, 18, 14, 0.6); }
+.field span { font: 500 max(9px, 0.98cqw)/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(20, 18, 14, 0.6); }
 .field input, .field select { appearance: none; -webkit-appearance: none; width: 100%; min-height: max(26px, 3.3cqw); border: 0; border-radius: 0; padding: 0; background: none; color: var(--pen); font: 400 max(20px, 2.64cqw)/1.1 var(--hand); }
 .field input:focus-visible, .field select:focus-visible { outline: none; }
 .field:focus-within { border-bottom-color: var(--accent-deep); box-shadow: 0 1px 0 var(--accent-deep); }
@@ -183,16 +185,16 @@ html.scroll.at-card #stage { cursor: pointer; }
 .field--two label { display: grid; gap: 0.7cqh; border-bottom: 1px solid rgba(20, 18, 14, 0.5); padding-bottom: 0.8cqh; }
 .field--two label:focus-within { border-bottom-color: var(--accent-deep); box-shadow: 0 1px 0 var(--accent-deep); }
 .back__addr .button { justify-self: start; margin-top: 1.2cqh; }
-.back__small { margin: 0; min-height: 2.6em; font: 400 max(10.5px, 1.16cqw)/1.4 var(--type); color: var(--ink-dim); }
+.back__small { margin: 0; min-height: 2.6em; font: 400 max(11px, 1.24cqw)/1.4 var(--type); color: var(--ink-dim); }
 .back__small.is-sent { color: var(--accent-deep); }
 /* The stamp and its postmark, top right, as on any card. */
 .stamp { position: absolute; right: 0; top: -5.5cqh; width: 32cqw; height: 17cqw; color: var(--accent-deep); pointer-events: none; }
 .stamp__paper { position: absolute; right: 0; top: 0; width: 12.6cqw; transform: rotate(2.4deg); filter: drop-shadow(0 0.1cqw 0.15cqw rgba(60, 40, 16, 0.3)); }
 .stamp__paper text { fill: currentColor; font-family: var(--type); }
-.stamp__paper .stamp__big { font-weight: 700; font-size: 42px; letter-spacing: -0.05em; }
-.stamp__small { font-size: 8.4px; font-weight: 700; letter-spacing: 0.14em; }
+.stamp__paper .stamp__big { font-weight: 500; font-size: 46px; letter-spacing: -0.02em; }
+.stamp__small { font-size: 8.4px; font-weight: 500; letter-spacing: 0.2em; }
 .stamp__mark { position: absolute; right: 6.4cqw; top: 2.4cqw; width: 25cqw; color: rgba(20, 18, 14, 0.62); transform: rotate(-8deg); mix-blend-mode: multiply; }
-.stamp__mark text { fill: currentColor; font-family: var(--type); font-weight: 700; }
+.stamp__mark text { fill: currentColor; font-family: var(--type); font-weight: 500; }
 .stamp__ring { font-size: 7.6px; letter-spacing: 0.22em; }
 .stamp__date { font-size: 10px; letter-spacing: 0.14em; }
 
@@ -203,7 +205,7 @@ html.scroll.at-card #stage { cursor: pointer; }
 .loader__title { margin: 0; font: 400 clamp(3.8rem, 2.2rem + 7.6vw, 9.4rem)/0.9 var(--hand); }
 .loader__bar { width: min(340px, 60vw); height: 1px; background: rgba(243, 239, 230, 0.16); overflow: hidden; }
 .loader__bar span { display: block; height: 100%; background: var(--accent-deep); transform-origin: 0 50%; transform: scaleX(0); }
-.loader__step { margin: 0; display: flex; gap: 14px; align-items: baseline; justify-content: center; font: 700 12px/1 var(--type); letter-spacing: 0.09em; text-transform: uppercase; color: var(--cream-dim); min-height: 1em; }
+.loader__step { margin: 0; display: flex; gap: 14px; align-items: baseline; justify-content: center; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; color: var(--cream-dim); min-height: 1em; }
 .loader__count { font-variant-numeric: tabular-nums; color: var(--cream); }
 .loader__fail { display: none; max-width: 30rem; font: 400 15px/1.5 var(--type); color: var(--cream-dim); letter-spacing: 0; text-transform: none; }
 .loader.failed .loader__fail { display: block; }
@@ -235,10 +237,10 @@ html.scroll.at-card #stage { cursor: pointer; }
 .sp__rows { margin: 0; display: grid; }
 .sp__rows div { display: grid; grid-template-columns: 8.2rem 1fr; align-items: baseline; padding: 12px 0; border-bottom: 1px solid rgba(20, 18, 14, 0.26); }
 /* (Ink, not the accent: small terracotta type sank into the palm's shadows on the sand.) */
-.sp__rows dt { font: 700 12px/1 var(--type); letter-spacing: 0.09em; text-transform: uppercase; color: rgba(20, 18, 14, 0.86); }
-.sp__rows dd { margin: 0; font: 400 clamp(1rem, 0.9rem + 0.3vw, 1.14rem)/1.35 var(--type); }
-.sp__price { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; font: 400 0.98rem/1.3 var(--type); color: rgba(20, 18, 14, 0.82); }
-.sp__price b { font: 700 1.9rem/1 var(--type); letter-spacing: -0.04em; color: var(--ink); margin-right: -8px; }
+.sp__rows dt { font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(20, 18, 14, 0.86); }
+.sp__rows dd { margin: 0; font: 400 clamp(1.06rem, 0.94rem + 0.4vw, 1.3rem)/1.3 var(--type); }
+.sp__price { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; font: 400 1.04rem/1.3 var(--type); color: rgba(20, 18, 14, 0.82); }
+.sp__price b { font: 500 2rem/1 var(--type); letter-spacing: -0.01em; color: var(--ink); margin-right: -8px; }
 /* A tall screen: the card low and the words above it, then the card high and the words below. */
 @media (max-aspect-ratio: 85/100) {
   .sp .sp__text { left: var(--gutter); right: var(--gutter); width: auto; padding: 0; gap: 10px; }
@@ -246,7 +248,7 @@ html.scroll.at-card #stage { cursor: pointer; }
   .sp--beach .sp__text { top: calc(var(--c-bottom, 50vh) + 12px); bottom: max(14px, env(safe-area-inset-bottom)); }
   .sp__head { font-size: clamp(2.3rem, 11.2vw, 4.2rem); margin: 0.12em 0 0.08em; }
   .sp__rows div { grid-template-columns: 6.4rem 1fr; padding: 8px 0; }
-  .sp__rows dd { font-size: 0.95rem; }
+  .sp__rows dd { font-size: 1.02rem; }
   .sp__price b { font-size: 1.5rem; }
   .sp__price .button { padding: 13px 16px 12px 18px; }
 }
@@ -256,8 +258,8 @@ html.scroll.at-card #stage { cursor: pointer; }
 .hud { position: fixed; z-index: 10; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 44px; padding: max(18px, env(safe-area-inset-top)) var(--gutter) 0; pointer-events: none; color: var(--cream); text-shadow: var(--shadow); opacity: 0; transition: color 0.9s var(--ease), text-shadow 0.9s var(--ease); }
 .hud a { pointer-events: auto; color: inherit; text-decoration: none; }
 .hud__mark { display: flex; align-items: baseline; gap: 14px; font: 400 27px/1 var(--serif); letter-spacing: -0.01em; }
-.hud__mark span { font: 700 11px/1 var(--type); letter-spacing: 0.09em; text-transform: uppercase; opacity: 0.66; }
-.hud__nav { display: flex; align-items: center; gap: clamp(18px, 2.4vw, 36px); font: 400 14.5px/1 var(--type); letter-spacing: 0.02em; }
+.hud__mark span { font: 500 10.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.66; }
+.hud__nav { display: flex; align-items: center; gap: clamp(18px, 2.4vw, 36px); font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; }
 .hud__nav a { position: relative; padding: 12px 0; }
 .hud__nav a:not(.hud__cta)::after { content: ""; position: absolute; left: 0; right: 0; bottom: 6px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: 100% 50%; transition: transform 0.6s var(--ease); }
 .hud__nav a:not(.hud__cta):hover::after, .hud__nav a:not(.hud__cta):focus-visible::after { transform: scaleX(1); transform-origin: 0 50%; }
@@ -265,7 +267,7 @@ html.scroll.at-card #stage { cursor: pointer; }
 .hud__cta:hover, .hud__cta:focus-visible { background: var(--cream); color: var(--ink) !important; border-color: var(--cream); text-shadow: none; }
 .hud a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .hud__nav { order: 3; }
-.hud__where { order: 2; margin: 0 auto 0 clamp(18px, 3vw, 48px); display: none; gap: 14px; font: 700 12px/1 var(--type); letter-spacing: 0.08em; text-transform: uppercase; color: inherit; }
+.hud__where { order: 2; margin: 0 auto 0 clamp(18px, 3vw, 48px); display: none; gap: 14px; font: 500 11px/1 var(--type); letter-spacing: 0.16em; font-variant-numeric: tabular-nums; text-transform: uppercase; color: inherit; }
 .hud__alt { color: var(--accent); min-width: 5em; }
 /* On sand (the hero, the ending): ink, the whole menu. In the scene: cream, where you are,
    and only the way to book. */
@@ -305,11 +307,6 @@ html.scroll.at-card #stage { cursor: pointer; }
 .cue { display: flex; align-items: center; gap: 10px; margin: 0; font: 400 2.34rem/1 var(--hand); color: var(--pen); transform: rotate(-5deg); }
 .cue i { display: block; width: 34px; height: 1.5px; background: currentColor; transform-origin: 0 50%; animation: cue 2.6s var(--ease) infinite; }
 @keyframes cue { 0% { transform: scaleX(0); } 55% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1); opacity: 0; } }
-.facts { position: absolute; left: 0; bottom: clamp(26px, 6vh, 60px); margin: 0; display: flex; gap: clamp(22px, 3vw, 46px); }
-.facts div { display: grid; gap: 8px; padding-left: clamp(14px, 1.4vw, 22px); border-left: 1px solid rgba(20, 18, 14, 0.28); }
-.facts dt { font: 700 clamp(1.8rem, 1.1rem + 1.5vw, 2.7rem)/0.9 var(--type); letter-spacing: -0.05em; }
-.facts dt small { font-size: 0.5em; margin-left: 0.2em; letter-spacing: 0; }
-.facts dd { margin: 0; font: 700 11px/1.3 var(--type); letter-spacing: 0.08em; text-transform: uppercase; color: rgba(20, 18, 14, 0.78); white-space: nowrap; }
 
 /* The notes on the way down: one thing each, each in its own place and at its own size. They
    are inside the picture, so their type is the clean pair: the serif for the line (its word
@@ -349,11 +346,11 @@ html.scroll.at-card #stage { cursor: pointer; }
 .bright-light .note.on-light .body { color: var(--ink-dim); }
 
 /* The foot of the page, on the sand under the card's back. */
-.foot { left: var(--gutter); right: var(--gutter); bottom: max(20px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: 1fr 1.25fr auto; align-items: end; gap: clamp(18px, 4vw, 64px); color: rgba(20, 18, 14, 0.86); font: 400 11.5px/1.55 var(--type); }
+.foot { left: var(--gutter); right: var(--gutter); bottom: max(20px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: 1fr 1.25fr auto; align-items: end; gap: clamp(18px, 4vw, 64px); color: rgba(20, 18, 14, 0.86); font: 400 12.5px/1.5 var(--type); }
 .foot p { margin: 0; max-width: 34rem; }
-.foot b { font-weight: 700; color: var(--ink); }
+.foot b { font-weight: 500; color: var(--ink); }
 .foot a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-.foot__top { appearance: none; border: 0; border-bottom: 1px solid currentColor; padding: 6px 0; background: none; color: var(--ink); cursor: pointer; font: 700 12px/1 var(--type); letter-spacing: 0.09em; text-transform: uppercase; white-space: nowrap; }
+.foot__top { appearance: none; border: 0; border-bottom: 1px solid currentColor; padding: 6px 0; background: none; color: var(--ink); cursor: pointer; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; white-space: nowrap; }
 .foot__top:focus-visible { outline: 2px solid var(--accent-deep); outline-offset: 4px; }
 
 /* ------------------------------------------------------------ scene choices on the beach */
@@ -402,13 +399,12 @@ html.scroll.at-card #stage { cursor: pointer; }
 @media (max-aspect-ratio: 85/100) {
   .hero { left: var(--gutter); right: var(--gutter); width: auto; top: calc(max(18px, env(safe-area-inset-top)) + 54px); bottom: auto; height: calc(var(--card-top, 46vh) - max(18px, env(safe-area-inset-top)) - 62px); padding: 0; gap: 12px; }
   .hero .display { font-size: clamp(2.76rem, 14.2vw, 5.5rem); max-width: none; margin: 0.2em 0 0.16em; }
-  .hero .body { font-size: 0.86rem; line-height: 1.5; }
+  .hero .body { font-size: 0.98rem; line-height: 1.5; }
   .hero__actions { position: absolute; left: 0; right: 0; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 16px); margin: 0; justify-content: space-between; flex-wrap: nowrap; }
   .hero__actions .button { padding: 15px 16px 14px 18px; white-space: nowrap; gap: 10px; }
   .hero__actions .button::after { width: 14px; }
   .cue { white-space: nowrap; font-size: 1.7rem; }
   .cue i { width: 20px; }
-  .facts { display: none; }
   /* The back of the card stands upright: the message, then the lines to fill in. */
   .back__in { grid-template-columns: 1fr; grid-template-rows: auto 1fr; padding: 8.5cqh 7cqw 5cqh; row-gap: 3.4cqh; }
   .back__in::before { display: none; }

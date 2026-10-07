@@ -163,18 +163,16 @@ const code = ['var __m = {};', ...order.map(transform),
 // ---------------------------------------------------------------- the page
 
 const b64 = (p) => readFileSync(join(root, p)).toString('base64');
-// The page's fonts, inlined (v35: the hand and the typewriter for the paper, the serif and
-// the sans for inside the picture).
+// The page's fonts, inlined (v35: the hand for the paper, the serif for inside the picture,
+// one sans for everything small).
 // One that is not in vendor/fonts/ yet is linked from Google Fonts instead, and the build says
 // so: the file then needs a network for its lettering, and falls back to the system's own
 // script and Courier without one.
 const FONTS = [
   ['Instrument Serif', 'normal', '400', 'vendor/fonts/InstrumentSerif-latin.woff2', 'Instrument+Serif:ital@0;1'],
   ['Instrument Serif', 'italic', '400', 'vendor/fonts/InstrumentSerif-italic-latin.woff2', 'Instrument+Serif:ital@0;1'],
-  ['Inter', 'normal', '400 500', 'vendor/fonts/Inter-latin.woff2', 'Inter:wght@400;500'],
   ['Vujahday Script', 'normal', '400', 'vendor/fonts/VujahdayScript-latin.woff2', 'Vujahday+Script'],
-  ['Courier Prime', 'normal', '400', 'vendor/fonts/CourierPrime-400-latin.woff2', 'Courier+Prime:wght@400;700'],
-  ['Courier Prime', 'normal', '700', 'vendor/fonts/CourierPrime-700-latin.woff2', 'Courier+Prime:wght@400;700'],
+  ['Jost', 'normal', '400 500', 'vendor/fonts/Jost-latin.woff2', 'Jost:wght@400;500'],
 ];
 const fonts = FONTS.filter((f) => existsSync(join(root, f[3])))
   .map(([family, style, weight, file]) => `@font-face{font-family:'${family}';font-style:${style};font-weight:${weight};font-display:swap;src:url(data:font/woff2;base64,${b64(file)}) format('woff2');}`).join('\n');

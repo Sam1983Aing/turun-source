@@ -63,8 +63,12 @@ const FOLLOW = 9;
 // it then turns back (a critically damped spring, per second: most of the way in a second).
 const LOOK_HOLD = 0.6, LOOK_BACK = 3.2;
 
-// The card's picture: this far down the flight (high over the bay, the whole headland in it).
-const TAU0 = 0.5;
+// The card's picture: this far down the flight. High over the bay, with the whole headland in
+// it, head and all (at 0.5, where it first was, the head was cut off at the top).
+const TAU0 = 0.3;
+// From the card to the first spread the camera goes this much slower than the scroll (Sam: "it's
+// too quick before we reach the second postcard").
+const FIRST_LEG = 0.85;
 // The dive, in screens of scroll. The camera sets off at the first touch and is up to the
 // scroll's speed within START_EASE screens. (The first iteration held it for 60% of the dive,
 // and Sam's note was that he scrolled and scrolled and nothing moved until the picture was the
@@ -115,11 +119,18 @@ export function startScroll({ params }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const html = document.documentElement;
   if (params.has('notext')) html.classList.add('notext');
-  // (Demo: another clean face for the lines inside the picture, ?scene=sans or ?scene=typed.
-  // Without it they are in the serif.)
-  if (['sans', 'typed'].includes(params.get('scene'))) {
-    html.classList.add(`scene-${params.get('scene')}`);
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('./scene-type-options.css', import.meta.url).href; document.head.append(l);
+  // (Demo, two switches for Sam to compare faces in the page. ?scene=sans: the lines inside the
+  // picture in the sans, not the serif. ?small=figtree|cormorant|inter: another face for
+  // everything small, loaded from Google Fonts. Without them the page is as it is.)
+  const SMALL = { figtree: ['Figtree', 'Figtree:wght@400;500'], cormorant: ['Cormorant Garamond', 'Cormorant+Garamond:wght@500;600'], inter: ['Inter', 'Inter:wght@400;500'] };
+  const addCss = (href) => { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = href; document.head.append(l); };
+  if (params.get('scene') === 'sans' || SMALL[params.get('small')]) addCss(new URL('./type-options.css', import.meta.url).href);
+  if (params.get('scene') === 'sans') html.classList.add('scene-sans');
+  if (SMALL[params.get('small')]) {
+    const [family, spec] = SMALL[params.get('small')];
+    addCss(`https://fonts.googleapis.com/css2?family=${spec}&display=block`);
+    html.style.setProperty('--type', `"${family}", system-ui, sans-serif`);
+    html.classList.add(`small-${params.get('small')}`);
   }
   const $ = (s) => document.querySelector(s);
   const loaderEl = $('.loader');
@@ -137,7 +148,7 @@ export function startScroll({ params }) {
   const stage = $('#stage');
   stage.prepend(renderer.domElement);
   if (params.has('pr')) app.governor.on = false;
-  const post = createPostcard({ reduced, captions: spreadCaptions(), onPose: (pose) => { sandWanted = pose === 'end' ? 'end' : 'day'; drawSand(); } });
+  const post = createPostcard({ reduced, captions: spreadCaptions(), onPose: (pose) => { sandWanted = pose === 'hero' ? 'day' : pose; drawSand(); } });
   // Frames owed (the picture stands still at rest, so frames are only drawn when asked; two,
   // as the haze settles over a frame).
   let dirty = 2;
@@ -160,12 +171,14 @@ export function startScroll({ params }) {
   const segs = [];
   const yOut = (() => {
     let y = 0, at = sStart;
-    const add = (kind, len, E = 0) => { if (len > 0) segs.push({ kind, y0: y, y1: y + len, s0: at, E }); y += Math.max(len, 0); };
-    const cruise = (to) => { add('go', to - at); at = Math.max(at, to); };
-    const turn = (kind, E) => { add(kind, E, E); at += E / 2; };
-    turn('up', BARE ? 0 : START_EASE);
-    for (const h of holds) { cruise(h.s - h.easeIn / 2); turn('down', h.easeIn); h.y = y; add('hold', h.len); turn('up', h.easeOut); }
-    cruise(sEnd);
+    // (k: the camera's speed on a stretch, in path screens for a screen of scroll.)
+    const add = (kind, len, E = 0, k = 1) => { if (len > 0) segs.push({ kind, y0: y, y1: y + len, s0: at, E, k }); y += Math.max(len, 0); };
+    const cruise = (to, k) => { add('go', (to - at) / k, 0, k); at = Math.max(at, to); };
+    const turn = (kind, E, k) => { add(kind, E, E, k); at += (k * E) / 2; };
+    let k = BARE ? 1 : FIRST_LEG;
+    turn('up', BARE ? 0 : START_EASE, k);
+    for (const h of holds) { cruise(h.s - (k * h.easeIn) / 2, k); turn('down', h.easeIn, k); h.y = y; add('hold', h.len); k = 1; turn('up', h.easeOut, k); }
+    cruise(sEnd, k);
     return y;
   })();
   const cards = holds.filter((h) => h.card);
@@ -178,7 +191,7 @@ export function startScroll({ params }) {
         if (y > g.y1) continue;
         if (y <= g.y0) return g.s0;
         const u = (y - g.y0) / (g.y1 - g.y0);
-        return g.kind === 'go' ? g.s0 + (y - g.y0) : g.kind === 'hold' ? g.s0 : g.kind === 'up' ? g.s0 + g.E * ramp(u) : g.s0 + g.E * (0.5 - ramp(1 - u));
+        return g.kind === 'go' ? g.s0 + g.k * (y - g.y0) : g.kind === 'hold' ? g.s0 : g.kind === 'up' ? g.s0 + g.k * g.E * ramp(u) : g.s0 + g.k * g.E * (0.5 - ramp(1 - u));
       }
       return sEnd;
     },
@@ -323,14 +336,17 @@ export function startScroll({ params }) {
   }
 
   // The sand under the card: a photograph (assets/hero/, generated for this page), laid in the
-  // card's world by postcard.js. Two of them: palm shadows on pale sand for the hero and the
-  // spreads, and the tide's edge in evening light for the ending (postcard.js says which, as
-  // the card changes pose behind the full-screen picture). The one in use is drawn into a
+  // card's world by postcard.js. One for each place the card comes to rest, if there is one
+  // (ASSETS.hero, heroWalk, heroBeach, heroEnd): palm shadows on pale sand for the hero, the
+  // tide's edge in evening light for the ending, and the two spreads lie on the hero's until
+  // they have surfaces of their own. postcard.js says which, as the card changes pose behind
+  // the full-screen picture. (?under=walk:url,beach:url tries a picture under a spread without
+  // adding it to the page.) The one in use is drawn into a
   // canvas at the photograph's own size, not set as a background: the browser draws a
   // background once at the size the element has on the page and stretches that as the world
   // grows, where a canvas is sampled afresh at every size, so the sand stays sharp all the way
   // into the card. If a photograph cannot be had, the table's plain sand colour stands in.
-  const sands = { day: null, end: null };
+  const sands = { day: null, walk: null, beach: null, end: null };
   let sandWanted = 'day', sandDrawn = '';
   function drawSand(force = false) {
     const img = sands[sandWanted] ?? sands.day;
@@ -358,7 +374,9 @@ export function startScroll({ params }) {
   });
   const sandReady = BARE ? Promise.resolve() : loadSand('day', ASSETS.hero);
   // (The ending's is not needed for a long while: fetched once the page has begun.)
-  if (!BARE) app.on('loaded', () => loadSand('end', ASSETS.heroEnd));
+  const under = { walk: ASSETS.heroWalk, beach: ASSETS.heroBeach, end: ASSETS.heroEnd };
+  for (const kv of (params.get('under') ?? '').split(',')) { const i = kv.indexOf(':'); if (i > 0 && kv.slice(0, i) in under) under[kv.slice(0, i)] = kv.slice(i + 1); }
+  if (!BARE) app.on('loaded', () => { for (const which in under) if (under[which]) loadSand(which, under[which]); });
 
   // ---------------------------------------------------------------- scroll
 
@@ -613,7 +631,7 @@ export function startScroll({ params }) {
   const blocks = [...document.querySelectorAll('.words > *')].map((el) => {
     const kind = 'hero' in el.dataset ? 'hero' : 'tau' in el.dataset ? 'tau' : 'end';
     const [a, b] = (el.dataset[kind] ?? '0,0').split(',').map(Number);
-    const after = [...el.querySelectorAll('.label, .body, .hero__actions, .facts > div, .foot > *')];
+    const after = [...el.querySelectorAll('.label, .body, .hero__actions, .foot > *')];
     const k = { el, kind, a, b, off: el.classList.contains('note') ? LINE_OFF_CLEAN : LINE_OFF, lines: [], byEl: new Map(), after, drift: kind === 'tau' ? el.querySelector('.display') : null, on: false, tl: null };
     // (Split again whenever the lines break differently: a font arriving, the window resized.)
     for (const d of el.querySelectorAll('[data-lines]')) {

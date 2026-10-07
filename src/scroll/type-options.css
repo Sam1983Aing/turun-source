@@ -1,0 +1,27 @@
+/* Faces for Sam to compare in the page (demo, 6 October 2026, loaded only with a switch).
+
+   ?scene=sans      the lines inside the picture in the page's sans, not the serif
+   ?small=figtree   everything small in Figtree (rounder, friendlier)
+   ?small=cormorant everything small in Cormorant Garamond (a resort's serif)
+   ?small=inter     everything small in Inter (what it was before the typewriter)
+   The page's own small face is Jost. The family is switched on <html> by scroll.js (--type);
+   what is here is only what a face needs set differently. */
+
+.scene-sans .note .display { font-family: var(--type); font-weight: 500; }
+.scene-sans .note .display em { font-style: normal; }
+.scene-sans .note--xl .display { font-size: calc(clamp(3rem, 0.8rem + 7.6vw, 10.2rem) * 0.74); line-height: 0.94; letter-spacing: -0.035em; margin-left: -0.04em; }
+.scene-sans .note--m .display { font-size: calc(clamp(2.3rem, 1.2rem + 2.6vw, 4.1rem) * 0.8); line-height: 1; letter-spacing: -0.03em; }
+.scene-sans .at-c .display { margin-left: 0; }
+@media (max-width: 720px) { .scene-sans .note--xl .display { font-size: calc(clamp(2.9rem, 14.5vw, 4.6rem) * 0.74); } }
+
+/* Figtree and Inter stand wider and taller than Jost: a size down. */
+.small-figtree .body, .small-inter .body { font-size: clamp(0.96rem, 0.9rem + 0.22vw, 1.08rem); }
+.small-figtree .label, .small-inter .label, .small-figtree .button, .small-inter .button, .small-figtree .hud__nav, .small-inter .hud__nav { font-size: 11px; }
+.small-figtree .sp__rows dd, .small-inter .sp__rows dd { font-size: clamp(1rem, 0.9rem + 0.34vw, 1.2rem); }
+
+/* A serif for the small type: larger, heavier in the tags, less tracking. */
+.small-cormorant .body { font-size: clamp(1.2rem, 1.1rem + 0.34vw, 1.4rem); font-weight: 500; line-height: 1.42; }
+.small-cormorant .label, .small-cormorant .button, .small-cormorant .hud__nav, .small-cormorant .sp__rows dt, .small-cormorant .foot__top { font-size: 13.5px; font-weight: 600; letter-spacing: 0.16em; }
+.small-cormorant .sp__rows dd { font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.55rem); font-weight: 500; }
+.small-cormorant .card__caption { font-size: calc(var(--cw) * 0.019); font-weight: 600; letter-spacing: 0.18em; }
+.small-cormorant .foot { font-size: 14.5px; font-weight: 500; }

@@ -132,9 +132,9 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   beats at the stops where the camera slows almost to a stop while the words come in. About
   19 screens top to bottom.
 - **The lettering** (v35), two worlds. On the paper (the sand screens: the hero, the spreads,
-  the card's back) the lines are in a hand (Vujahday Script, a brush pen) and everything small
-  is typed (Courier Prime). Inside the picture, over the scene, the type is clean: Instrument
-  Serif for the lines, Inter for the small type. The hand's
+  the card's back) the lines are in a hand (Vujahday Script, a brush pen). Inside the picture,
+  over the scene, they are in a clean serif (Instrument Serif). Everything small, in both, is
+  one sans (Jost: tags in tracked capitals, sentences plain). The hand's
   sizes were set by measuring it against the serif it replaced, and the masks its lines rise
   out of clip well outside the line box, because a hand swings outside it (`LINE_OFF`).
 - **The page layer** (`scroll.js`, `page.css`): Lenis for a weighted smooth scroll, GSAP for
@@ -163,12 +163,15 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   that transform back to nothing, so at the end of the dive the page is a plain full-screen
   canvas again. Nothing is cross-faded. At rest the camera is stopped and so is the sea's
   clock, and the page draws no frames at all. From the first touch of the scroll the sea
-  starts and the camera sets off from `tau` 0.5, while the card is still small: you see the
-  scene turn inside the picture before it grows (the flight before `tau` 0.5 is no longer on
-  the page).
+  starts and the camera sets off from `tau` 0.3 (`TAU0`: high enough for the whole headland,
+  head and all, to be in the picture), while the card is still small: you see the scene turn
+  inside the picture before it grows. From there to the first spread the camera moves a little
+  slower than the scroll (`FIRST_LEG`).
 - **The sand** is a photograph: `assets/hero/sand.jpg` (palm shadows on pale sand) under the
   hero and the spreads, `assets/hero/sand-end.jpg` (the tide's edge in evening light) under the
-  ending. They are the only pictures on the page the scene did not draw. It lies in the card's world with the inverse of the world's resting
+  ending. They are the only pictures on the page the scene did not draw. Each place the card
+  rests can have its own (`ASSETS.heroWalk`, `heroBeach` in `app.js`, empty for now, and
+  `?under=walk:url,beach:url` tries one). It lies in the card's world with the inverse of the world's resting
   transform, so at rest it fills the screen as it was composed, and on the way up it grows
   and turns with the card. How much larger than the screen it has to be for no edge to show
   on the way is worked out for each pose and screen size (`sandOver`). It is drawn into a
@@ -536,9 +539,9 @@ caught.
   `assets/textures/CREDITS.md`. The plants are not scans: they are grown in code at load
   (`src/veg/grow/`, v7). v1 to v6 used three Poly Haven tree scans.
 - three.js 0.186 (MIT), GSAP 3.15 with SplitText (GreenSock's no-charge standard licence) and
-  Lenis 1.3.26 (MIT) are in `vendor/`, with the fonts Vujahday Script, Courier Prime and
-  Instrument Serif and Inter (SIL Open Font License, from Google Fonts), each next to its
-  licence. The tools' panel (lil-gui) loads from jsDelivr.
+  Lenis 1.3.26 (MIT) are in `vendor/`, with the fonts Vujahday Script and Instrument Serif
+  (SIL Open Font License, from Google Fonts), each next to its licence. The small type, Jost
+  (also OFL), is loaded from Google Fonts for now. The tools' panel (lil-gui) loads from jsDelivr.
 
 ## Licence
 
