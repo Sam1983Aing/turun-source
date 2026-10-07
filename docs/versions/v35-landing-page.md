@@ -73,8 +73,8 @@ are already in `vendor/fonts/` for the standalone file).
   now". Then the dive again.
 - From his mock-ups: a hand-lettered headline and typewriter small type. Sixteen hands were
   shown in the real hero and Sam picked **Vujahday Script**, with Courier Prime for the small
-  type. Both are in the page. Their files are not in `vendor/fonts/` yet (a download for him
-  to OK), so the single file links them from Google Fonts for now.
+  type. Both are in the page, and their files are in `vendor/fonts/` (downloaded from Google
+  Fonts with his OK), so the single file carries them.
 - Still open: which headline (the page keeps "Most people stop at the railing."), a prop or
   two, the sand image's credit.
 

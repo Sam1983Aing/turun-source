@@ -3782,3 +3782,13 @@ network the single file falls back to the system's own script face and Courier.
 - Driven for real as before (spreads both ways, the click on a card, Reserve, the menu, the
   rewind): console clean, and still no frames drawn while a card rests.
 - The single file rebuilt and opened from `file://`: no errors.
+
+### The fonts' files, in (6 October, with Sam's OK)
+
+Downloaded from fonts.gstatic.com into `vendor/fonts/`, the latin subsets: Vujahday Script
+(31,920 bytes), Courier Prime 400 (11,192) and 700 (11,588), the sizes the server had
+announced. Each has its licence next to it, as the other fonts do: the SIL Open Font
+License's text with the copyright notice read out of the font file itself.
+`kelingking.html` rebuilt: four faces inlined, no link to Google Fonts left. Opened from
+`file://` with the network cut, all four are loaded and the headline's computed font is
+Vujahday Script.

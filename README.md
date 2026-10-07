@@ -94,7 +94,8 @@ to the water's edge (v8) and the back of the card. The source needs a local serv
 or start a module worker from `file://`). `kelingking.html` is the same page built to run
 without one. Nothing to install: the source page loads three.js, GSAP and Lenis from jsDelivr
 and the fonts from Google Fonts, and the standalone file carries its own copies (`vendor/`;
-a font not in `vendor/fonts/` yet is linked from Google Fonts instead, and the build says so).
+should a font ever be missing from `vendor/fonts/`, the build links it from Google Fonts
+instead and says so).
 
 The page sets the light itself: morning at the top, a scroll-driven time lapse over the cove,
 evening from there on (v35). On the beach a line at the foot of the screen switches between
@@ -532,8 +533,9 @@ caught.
   `assets/textures/CREDITS.md`. The plants are not scans: they are grown in code at load
   (`src/veg/grow/`, v7). v1 to v6 used three Poly Haven tree scans.
 - three.js 0.186 (MIT), GSAP 3.15 with SplitText (GreenSock's no-charge standard licence) and
-  Lenis 1.3.26 (MIT) are in `vendor/`, with the fonts Instrument Serif and Inter (SIL Open
-  Font License), each next to its licence. The tools' panel (lil-gui) loads from jsDelivr.
+  Lenis 1.3.26 (MIT) are in `vendor/`, with the fonts Vujahday Script, Courier Prime and
+  Instrument Serif (SIL Open Font License, from Google Fonts), each next to its licence. (Inter
+  and the serif's italic are still there from before v35; the page no longer uses them.) The tools' panel (lil-gui) loads from jsDelivr.
 
 ## Licence
 
