@@ -38,7 +38,7 @@
 html.tool, html.tool body { margin: 0; height: 100%; background: #0d0f11; overflow: hidden; font: 12px/1.4 -apple-system, system-ui, sans-serif; color: #ddd; }
 /* The table's wrappers make no boxes for the tools: the stage is the body's again. */
 html.tool .table, html.tool .world, html.tool .card, html.tool .card__flip { display: contents; }
-html.tool .ground, html.tool .card__shadow, html.tool .card__paper, html.tool .card__finish, html.tool .table__light, html.tool .back { display: none; }
+html.tool .ground, html.tool .card__shadow, html.tool .card__shade, html.tool .card__paper, html.tool .card__finish, html.tool .table__light, html.tool .back { display: none; }
 html.tool #stage { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
 html.tool #stage canvas { display: block; }
 html.tool #ref, html.tool #outline { position: absolute; top: 0; left: 0; pointer-events: none; }
@@ -99,6 +99,7 @@ html.scroll .card { position: absolute; inset: 0; }
    shadow's squeeze are then the compositor's work, and the blurred shadow is painted once.) */
 html.scroll .card__flip { position: absolute; inset: 0; backface-visibility: hidden; will-change: transform; }
 html.scroll .card__shadow { will-change: transform, opacity; }
+html.scroll .card__shade { will-change: opacity; }
 html.scroll .card__paper { will-change: transform; }
 html.scroll .card__caption, html.scroll .card__finish { will-change: opacity; }
 html.scroll .table.is-full .card__flip, html.scroll .table.is-full .card__shadow, html.scroll .table.is-full .card__paper, html.scroll .table.is-full .card__caption, html.scroll .table.is-full .card__finish { will-change: auto; }
@@ -118,7 +119,7 @@ html.scroll.at-card #stage { cursor: pointer; }
 
 /* The paper and its shadow: the picture's rectangle plus the border, sized once (postcard.js
    sets --cw, --ch, --b, --bb) and scaled about the middle of the picture as the window opens. */
-.card__paper, .card__shadow { position: absolute; left: calc(50% - var(--cw) / 2 - var(--b)); top: calc(50% - var(--ch) / 2 - var(--b)); width: calc(var(--cw) + 2 * var(--b)); height: calc(var(--ch) + var(--b) + var(--bb)); border-radius: calc(var(--cw) * 0.005); transform-origin: 50% calc(var(--b) + var(--ch) / 2); }
+.card__paper, .card__shadow, .card__shade { position: absolute; left: calc(50% - var(--cw) / 2 - var(--b)); top: calc(50% - var(--ch) / 2 - var(--b)); width: calc(var(--cw) + 2 * var(--b)); height: calc(var(--ch) + var(--b) + var(--bb)); border-radius: calc(var(--cw) * 0.005); transform-origin: 50% calc(var(--b) + var(--ch) / 2); }
 /* Glossy card stock: smooth and white, no tooth (Sam: "I don't really like the texture on the
    postcard... more like a glossy paper"). A hair of thickness on the shadow side, and the band
    of light that crosses the picture crosses the border too (--sheen, set by postcard.js). */
@@ -126,19 +127,28 @@ html.scroll.at-card #stage { cursor: pointer; }
   box-shadow: calc(var(--cw) * 0.0008) calc(var(--cw) * 0.0016) 0 #ddd8cc; }
 .card__paper::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background: linear-gradient(112deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 70%) var(--sheen, 50%) 0 / 300% 100% no-repeat; }
-/* Noon sun, almost overhead, from the top left: a tight shadow under the edge, a soft one
-   beyond it, and the sand a shade darker all round. The far corner sits a little proud. */
-/* (The shadow's own box is clear and sits square under the paper: with a fill and a slight
-   turn, as it first had, it showed as a dark lip along the card's top and right edges. The
-   first of its shadows is all round, wide and faint, so the top and the left edge are grounded
-   too. A tight one there as well drew a dark rim of sand along the white border: Sam saw it
-   as "texture of the sand in the border".) */
-.card__shadow {
-  box-shadow: 0 0 calc(var(--cw) * 0.04) calc(var(--cw) * 0.004) rgba(58, 36, 14, 0.2),
-    calc(var(--cw) * 0.004) calc(var(--cw) * 0.007) calc(var(--cw) * 0.008) calc(var(--cw) * -0.003) rgba(58, 36, 14, 0.5),
-    calc(var(--cw) * 0.018) calc(var(--cw) * 0.036) calc(var(--cw) * 0.045) calc(var(--cw) * -0.012) rgba(58, 36, 14, 0.4),
-    calc(var(--cw) * 0.035) calc(var(--cw) * 0.07) calc(var(--cw) * 0.16) calc(var(--cw) * -0.02) rgba(58, 36, 14, 0.28); }
-.card__caption { position: absolute; left: var(--b); right: var(--b); bottom: 0; height: var(--bb); margin: 0; display: flex; align-items: center; justify-content: space-between;
+/* The card's shadow on the sand. Noon sun, almost overhead, from the top left: the sand a
+   shade darker all round (wide and faint, so the top and the left edge are grounded too), a
+   tight shadow under the edge away from the sun, a soft one beyond it and a long faint one.
+   Each is a slab of shadow of its own, filled, with a soft edge, lying under the card:
+   --e how far its filled middle is set in from the paper's edge, --g how far the soft edge
+   reaches past it, --blur how soft, --x and --y how far it has slid from the sun (all shares
+   of the card's width), --c how dark.
+   (They were one box's four box-shadows first, the box the paper's own size. A box-shadow is
+   not drawn inside its box, so the middle was hollow. With the card lying square on it nobody
+   could tell. When the card leaned to the pointer a strip of sand with no shadow on it showed
+   along an edge, as straight as the box: Sam's "delimitation of the sand". When the card
+   turned over at the end the whole hollow showed beside it as a pale rectangle. A tight dark
+   one on the sunny side, tried in round 8, read as a rim of sand along the white border.) */
+.card__shadow i { position: absolute; inset: calc(var(--cw) * var(--e)); translate: calc(var(--cw) * var(--x, 0)) calc(var(--cw) * var(--y, 0)); background: var(--c);
+  box-shadow: 0 0 calc(var(--cw) * var(--blur)) calc(var(--cw) * (var(--e) + var(--g))) var(--c); }
+.card__shadow i:nth-child(1) { --c: rgba(58, 36, 14, 0.2); --blur: 0.04; --g: 0.004; --e: 0.056; }
+.card__shadow i:nth-child(2) { --c: rgba(58, 36, 14, 0.5); --blur: 0.008; --g: -0.003; --e: 0.015; --x: 0.004; --y: 0.007; }
+.card__shadow i:nth-child(3) { --c: rgba(58, 36, 14, 0.4); --blur: 0.045; --g: -0.012; --e: 0.08; --x: 0.018; --y: 0.036; }
+.card__shadow i:nth-child(4) { --c: rgba(58, 36, 14, 0.28); --blur: 0.16; --g: -0.02; --e: 0.26; --x: 0.035; --y: 0.07; }
+/* The face of the card going dark as it turns from the light (postcard.js sets how much). */
+.card__shade { background: #1d140b; opacity: 0; pointer-events: none; }
+.card__caption { user-select: none; -webkit-user-select: none; position: absolute; left: var(--b); right: var(--b); bottom: 0; height: var(--bb); margin: 0; display: flex; align-items: center; justify-content: space-between;
   font: 500 calc(var(--cw) * 0.0158)/1 var(--type); letter-spacing: 0.22em; text-transform: uppercase; color: #3b342a; text-shadow: 0 calc(var(--cw) * 0.0008) 0 rgba(255, 255, 255, 0.8); }
 .card__caption span:last-child { font-variant-numeric: tabular-nums; color: #6d6252; }
 /* The gloss over the picture: a soft light from the top left and a band of it that moves
@@ -154,20 +164,21 @@ html.scroll.at-card #stage { cursor: pointer; }
 .table.words-right .table__light { background: radial-gradient(58% 78% at 80% 46%, rgba(255, 238, 206, 0.5), rgba(255, 238, 206, 0.22) 45%, rgba(255, 238, 206, 0) 78%), radial-gradient(130% 120% at 72% 18%, rgba(0, 0, 0, 0) 58%, rgba(64, 40, 14, 0.24) 100%); }
 /* The ending: the tide's edge in evening light. The sun is low, so the card's shadow is long
    and falls to the right, and there is no pool of light for words on the left. */
-.table.is-end .card__shadow {
-  box-shadow: calc(var(--cw) * 0.005) calc(var(--cw) * 0.006) calc(var(--cw) * 0.008) calc(var(--cw) * -0.002) rgba(70, 40, 12, 0.55),
-    0 0 calc(var(--cw) * 0.04) calc(var(--cw) * 0.004) rgba(70, 40, 12, 0.2),
-    calc(var(--cw) * 0.058) calc(var(--cw) * 0.024) calc(var(--cw) * 0.022) calc(var(--cw) * -0.008) rgba(70, 40, 12, 0.5),
-    calc(var(--cw) * 0.08) calc(var(--cw) * 0.05) calc(var(--cw) * 0.14) calc(var(--cw) * -0.02) rgba(70, 40, 12, 0.24); }
+.table.is-end .card__shadow i:nth-child(1) { --c: rgba(70, 40, 12, 0.2); }
+.table.is-end .card__shadow i:nth-child(2) { --c: rgba(70, 40, 12, 0.55); --g: -0.002; --e: 0.014; --x: 0.005; --y: 0.006; }
+.table.is-end .card__shadow i:nth-child(3) { --c: rgba(70, 40, 12, 0.5); --blur: 0.022; --g: -0.008; --e: 0.041; --x: 0.058; --y: 0.024; }
+.table.is-end .card__shadow i:nth-child(4) { --c: rgba(70, 40, 12, 0.24); --blur: 0.14; --g: -0.02; --e: 0.23; --x: 0.08; --y: 0.05; }
 .table.is-end .table__light { background: radial-gradient(130% 120% at 28% 18%, rgba(0, 0, 0, 0) 60%, rgba(64, 40, 14, 0.2) 100%); }
-.table.is-end .back { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75), inset 0 0 40px rgba(120, 92, 52, 0.12), 3px 4px 6px rgba(70, 40, 12, 0.45), 46px 19px 18px -6px rgba(70, 40, 12, 0.46), 64px 40px 110px -14px rgba(70, 40, 12, 0.22); }
-.table.is-full .ground, .table.is-full .card__paper, .table.is-full .card__shadow, .table.is-full .card__finish, .table.is-full .table__light { visibility: hidden; }
+.table.is-full .ground, .table.is-full .card__paper, .table.is-full .card__shadow, .table.is-full .card__shade, .table.is-full .card__finish, .table.is-full .table__light { visibility: hidden; }
 
 /* ------------------------------------------------------------ the back of the card */
 
 .back { position: absolute; z-index: 3; visibility: hidden; backface-visibility: hidden; container-type: size; color: var(--ink); border-radius: 0.5cqw;
   background: linear-gradient(135deg, #fffefb 0%, #fcf9f1 55%, #f5f0e4 100%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75), inset 0 0 40px rgba(120, 92, 52, 0.12), 2px 4px 5px rgba(66, 44, 20, 0.42), 14px 26px 46px rgba(66, 44, 20, 0.3), 0 0 110px rgba(66, 44, 20, 0.2); }
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75), inset 0 0 40px rgba(120, 92, 52, 0.12); }
+/* (It casts no shadow of its own: the card's shadow on the sand stays under it through the
+   turn. And it comes round dark, as the front went: postcard.js sets --shade.) */
+.back::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: #1d140b; opacity: var(--shade, 0); pointer-events: none; }
 .back__in { position: absolute; inset: 0; display: grid; grid-template-columns: 1.06fr 1fr; padding: 11cqh 5.2cqw 7.5cqh; }
 .back__in::before { content: ""; position: absolute; left: 51.4%; top: 15cqh; bottom: 9cqh; width: 1px; background: rgba(20, 18, 14, 0.32); transform-origin: 50% 0; transform: scaleY(var(--rule, 1)); }
 .back__head { position: absolute; left: 0; right: 0; top: 4.6cqh; margin: 0; text-align: center; font: 500 max(9px, 1.05cqw)/1 var(--type); letter-spacing: 0.56em; text-indent: 0.56em; text-transform: uppercase; color: rgba(20, 18, 14, 0.55); }
@@ -284,16 +295,29 @@ html.scroll.at-card #stage { cursor: pointer; }
 .in-scene .hud__nav { font: 500 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; }
 .in-scene .hud__nav a:not(.hud__cta), .in-scene .hud__mark span { display: none; }
 
-/* The altimeter: a rule that draws down the right edge from the railing to the water, a dot
-   per stop, the height beside the marker. */
-.rail { position: fixed; z-index: 10; right: var(--gutter); top: 24vh; bottom: 24vh; width: 1px; pointer-events: none; opacity: 0; visibility: hidden; }
+/* The altimeter, down the right edge from the railing to the sea, drawn like the scale of an
+   instrument: a hairline, a long tick at each stop and short ones between, all of them faint
+   until the walk has passed them. A ring rides down it with the height beside it, and the
+   two ends are named. One colour (the paper's), and the accent only in the ring's centre.
+   (It was a rule that filled with terracotta and a black dot at each stop.) */
+.rail { position: fixed; z-index: 10; right: var(--gutter); top: 27vh; bottom: 27vh; width: 1px; pointer-events: none; opacity: 0; visibility: hidden; color: var(--cream); }
 .rail__line, .rail__fill { position: absolute; left: 0; top: 0; bottom: 0; width: 1px; }
-.rail__line { background: rgba(243, 239, 230, 0.35); }
-.rail__fill { background: var(--accent); transform-origin: 50% 0; transform: scaleY(0); }
-.rail__stop { position: absolute; left: -3px; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%; background: var(--ink); box-shadow: inset 0 0 0 1px rgba(243, 239, 230, 0.7); transition: background 0.6s var(--ease), box-shadow 0.6s var(--ease); }
-.rail__stop.passed { background: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
-.rail__mark { position: absolute; left: 0; top: 0; width: 13px; height: 1px; margin-left: -6px; background: var(--cream); }
-.rail__mark span { position: absolute; right: 22px; top: -6px; font: 500 11px/1 var(--sans); letter-spacing: 0.14em; white-space: nowrap; font-variant-numeric: tabular-nums; text-shadow: var(--shadow); }
+/* (Every part has a hair of dark beside it, as if engraved: over the evening's white sky the
+   paper colour alone was lost.) */
+.rail__line { background: rgba(243, 239, 230, 0.34); box-shadow: 1px 0 0 rgba(10, 9, 7, 0.16); }
+.rail__fill { background: var(--cream); box-shadow: 1px 0 0 rgba(10, 9, 7, 0.42); transform-origin: 50% 0; transform: scaleY(0); }
+.rail__tick, .rail__stop { position: absolute; right: 0; height: 1px; background: currentColor; box-shadow: 0 1px 0 rgba(10, 9, 7, 0.4); opacity: 0.4; transition: opacity 0.6s var(--ease), width 0.6s var(--ease); }
+.rail__tick { width: 5px; }
+.rail__stop { width: 11px; }
+.rail__tick.passed { opacity: 0.85; }
+.rail__stop.passed { opacity: 1; width: 15px; }
+.rail__mark { position: absolute; left: 0; top: 0; width: 1px; height: 0; }
+.rail__mark::before { content: ""; position: absolute; left: -6px; top: -6.5px; width: 11px; height: 11px; border: 1px solid var(--cream); border-radius: 50%; background: rgba(18, 17, 14, 0.55); box-shadow: 0 0 0 1px rgba(10, 9, 7, 0.3), 0 0 10px rgba(10, 9, 7, 0.3); }
+.rail__mark::after { content: ""; position: absolute; left: -1.5px; top: -2px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+.rail__mark span { position: absolute; right: 26px; top: -7px; font: 500 13px/1 var(--type); letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; font-variant-numeric: tabular-nums; text-shadow: 0 0 1px rgba(10, 9, 7, 0.7), 0 1px 4px rgba(10, 9, 7, 0.55), 0 2px 26px rgba(10, 9, 7, 0.4); }
+.rail__end { position: absolute; right: -0.24em; margin: 0; font: 500 9px/1 var(--type); letter-spacing: 0.24em; text-transform: uppercase; white-space: nowrap; opacity: 0.8; text-shadow: 0 0 1px rgba(10, 9, 7, 0.7), 0 1px 4px rgba(10, 9, 7, 0.55), 0 2px 26px rgba(10, 9, 7, 0.4); }
+.rail__end--top { bottom: calc(100% + 18px); }
+.rail__end--foot { top: calc(100% + 18px); }
 
 /* ------------------------------------------------------------ the words */
 
@@ -308,34 +332,38 @@ html.scroll.at-card #stage { cursor: pointer; }
 .hero .display em { color: var(--accent-deep); }
 .hero .body { color: rgba(20, 18, 14, 0.82); max-width: 29rem; }
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 30px; margin-top: 6px; }
-/* "Scroll into the postcard": in the hand, like a note in the margin, and an arrow drawn with
-   the same pen towards the card. */
-.cue { display: flex; align-items: center; gap: 14px; margin: 0; font: 400 2.34rem/1 var(--hand); color: var(--pen); transform: rotate(-5deg); }
+/* "Scroll into the postcard": in the hand, a note on the sand under the card's lower left
+   corner, written along its edge, with an arrow drawn in the same pen up into the picture.
+   (It was under the button, a column away from the thing it points at.) */
+.cue { position: absolute; left: calc(var(--card-left, 50vw) - var(--gutter) + 5.4vw); top: calc(var(--card-bottom, 80vh) + 12px); display: flex; align-items: center; gap: 14px; margin: 0; white-space: nowrap; font: 400 2.34rem/1 var(--hand); color: var(--pen); rotate: -6deg; transform-origin: 0 50%; }
 .cue__arrow { flex: none; width: 66px; height: 29px; overflow: visible; fill: none; stroke: currentColor; stroke-width: 3.3; stroke-linecap: round; stroke-linejoin: round; animation: cue 2.8s ease-in-out infinite; }
 @keyframes cue { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(8px, -3px); } }
 
 /* The notes on the way down: one thing each, each in its own place and at its own size. They
-   are inside the picture, so their type is the clean pair: the serif for the line (its word
-   that matters in italic), the sans for the tag and the sentence. */
+   are inside the picture, so their type is clean, and it is all the one sans: the line large
+   and tight, its word that matters in the accent, the tag and the sentence small. (The lines
+   were in the serif, with that word in italic, until Sam asked for a sans here. The hand is
+   only for the paper.) */
 .note { display: grid; gap: clamp(12px, 1.8vh, 20px); text-shadow: var(--shadow); }
-.note .display { font-family: var(--serif); }
-.note .display em { font-style: italic; display: inline; }
-/* (A serif keeps to its line box: a tight mask, and the lines travel 105% of their height.) */
-.note .line-mask { clip-path: inset(-0.1em -0.25em -0.14em -0.25em); }
+.note .display { font-family: var(--type); font-weight: 500; }
+.note .display em { font-style: normal; display: inline; }
+/* (A clean face keeps to its line box: a tight mask, and the lines travel 105% of their height.) */
+.note .line-mask { clip-path: inset(-0.1em -0.25em -0.16em -0.25em); }
 .note .label { font: 500 11px/1.3 var(--sans); letter-spacing: 0.2em; }
 .note .body { font: 400 clamp(0.95rem, 0.9rem + 0.2vw, 1.06rem)/1.55 var(--sans); }
 /* A soft dark patch behind each, so the words read over sky, sea and scrub alike. */
 .note::before { content: ""; position: absolute; inset: -24% -18%; z-index: -1; background: radial-gradient(closest-side, rgba(12, 11, 9, 0.5), rgba(12, 11, 9, 0.22) 55%, rgba(12, 11, 9, 0)); opacity: 0; transition: opacity 1.2s var(--ease); pointer-events: none; }
 .note.is-on::before { opacity: 1; }
-/* (Over the sand, with its bright ripples, a deeper one.) */
-.note.on-light::before { inset: -34% -10%; background: radial-gradient(closest-side, rgba(12, 11, 9, 0.7), rgba(12, 11, 9, 0.38) 60%, rgba(12, 11, 9, 0)); }
+/* (Over the sand, with its bright ripples, a wider one. It was much deeper, 0.7 at its middle,
+   and Sam saw it as a dark glow behind the words.) */
+.note.on-light::before { inset: -40% -14%; background: radial-gradient(closest-side, rgba(12, 11, 9, 0.3), rgba(12, 11, 9, 0.15) 58%, rgba(12, 11, 9, 0)); }
 .note.on-light .body { color: var(--cream); }
 .note .label { display: flex; align-items: baseline; gap: 14px; color: var(--cream); }
 .note .label b { position: relative; padding-left: 20px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .note .label b::before { content: ""; position: absolute; left: 0; top: 50%; width: 12px; height: 1px; background: var(--accent); }
 .note .label span { opacity: 0.86; }
-.note--xl .display { font-size: clamp(3rem, 0.8rem + 7.6vw, 10.2rem); line-height: 0.86; letter-spacing: -0.028em; margin-left: -0.04em; }
-.note--m .display { font-size: clamp(2.3rem, 1.2rem + 2.6vw, 4.1rem); line-height: 0.95; letter-spacing: -0.014em; }
+.note--xl .display { font-size: clamp(2.3rem, 0.6rem + 5.6vw, 7.6rem); line-height: 0.96; letter-spacing: -0.035em; margin-left: -0.045em; }
+.note--m .display { font-size: clamp(1.9rem, 1rem + 2.1vw, 3.3rem); line-height: 1; letter-spacing: -0.03em; }
 .at-c .display { margin-left: 0; }
 .note--xl .body { max-width: 28rem; }
 .at-bl { left: var(--gutter); bottom: clamp(36px, 8.5vh, 104px); max-width: min(70rem, calc(100vw - 2 * var(--gutter) - 80px)); }
@@ -352,9 +380,10 @@ html.scroll.at-card #stage { cursor: pointer; }
 .bright-light .note.on-light .body { color: var(--ink-dim); }
 
 /* The foot of the page, on the sand under the card's back. */
-.foot { left: var(--gutter); right: var(--gutter); bottom: max(20px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: 1fr 1.25fr auto; align-items: end; gap: clamp(18px, 4vw, 64px); color: rgba(20, 18, 14, 0.86); font: 400 12.5px/1.5 var(--type); }
-.foot p { margin: 0; max-width: 34rem; }
-.foot b { font-weight: 500; color: var(--ink); }
+.foot { left: var(--gutter); right: var(--gutter); bottom: max(22px, env(safe-area-inset-bottom)); display: flex; justify-content: space-between; align-items: center; gap: 24px; color: rgba(20, 18, 14, 0.8); font: 500 10.5px/1.4 var(--type); letter-spacing: 0.2em; text-transform: uppercase; }
+.foot p { margin: 0; color: var(--ink); }
+/* (The map's credit stays, small: the terrain is made from OpenStreetMap's data.) */
+.foot p span { margin-left: 18px; padding-left: 18px; border-left: 1px solid rgba(20, 18, 14, 0.3); color: rgba(20, 18, 14, 0.62); }
 .foot a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .foot__top { appearance: none; border: 0; border-bottom: 1px solid currentColor; padding: 6px 0; background: none; color: var(--ink); cursor: pointer; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; white-space: nowrap; }
 .foot__top:focus-visible { outline: 2px solid var(--accent-deep); outline-offset: 4px; }
@@ -389,16 +418,15 @@ html.scroll.at-card #stage { cursor: pointer; }
   .time-of-day span { padding: 0 9px 0 0; }
   .rail { right: auto; bottom: auto; left: 0; top: 0; width: 100vw; height: 2px; }
   .rail__line, .rail__fill { top: 0; bottom: auto; left: 0; right: 0; width: auto; height: 2px; }
-  .rail__line { background: rgba(243, 239, 230, 0.2); }
+  .rail__line { background: rgba(243, 239, 230, 0.2); box-shadow: none; }
   .rail__fill { transform-origin: 0 50%; transform: scaleX(0); }
-  .rail__stop, .rail__mark { display: none; }
+  .rail__stop, .rail__tick, .rail__mark, .rail__end { display: none; }
   .at-bl { bottom: max(26px, calc(env(safe-area-inset-bottom) + 18px)); max-width: calc(100vw - 2 * var(--gutter)); }
   .at-r { right: var(--gutter); left: var(--gutter); top: auto; bottom: max(26px, calc(env(safe-area-inset-bottom) + 18px)); translate: none; width: auto; padding-left: 16px; }
   .at-c { bottom: max(30px, calc(env(safe-area-inset-bottom) + 22px)); }
-  .note--xl .display { font-size: clamp(2.9rem, 14.5vw, 4.6rem); }
-  .foot { grid-template-columns: 1fr; gap: 8px; font-size: 10.5px; line-height: 1.45; }
-  .foot__credits { display: none; }
-  .foot__top { justify-self: start; }
+  .note--xl .display { font-size: clamp(2.2rem, 11vw, 3.5rem); }
+  .foot { flex-direction: column; align-items: flex-start; gap: 8px; font-size: 9px; letter-spacing: 0.16em; }
+  .foot p span { margin-left: 10px; padding-left: 10px; }
 }
 
 /* A tall screen: the words above the card, the way in below it. */
@@ -409,8 +437,7 @@ html.scroll.at-card #stage { cursor: pointer; }
   .hero__actions { position: absolute; left: 0; right: 0; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 16px); margin: 0; justify-content: space-between; flex-wrap: nowrap; }
   .hero__actions .button { padding: 6px 6px 6px 20px; gap: 12px; }
   .button::after { width: 32px; height: 32px; }
-  .cue { white-space: nowrap; font-size: 1.7rem; }
-  .cue { gap: 8px; }
+  .cue { left: auto; right: 4px; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 22px); font-size: 1.7rem; gap: 8px; rotate: -5deg; transform-origin: 100% 50%; }
   .cue__arrow { width: 40px; height: 18px; rotate: 100deg; }
   /* The back of the card stands upright: the message, then the lines to fill in. */
   .back__in { grid-template-columns: 1fr; grid-template-rows: auto 1fr; padding: 8.5cqh 7cqw 5cqh; row-gap: 3.4cqh; }

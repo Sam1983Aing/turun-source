@@ -133,8 +133,8 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   19 screens top to bottom.
 - **The lettering** (v35), two worlds. On the paper (the sand screens: the hero, the spreads,
   the card's back) the lines are in a hand (Vujahday Script, a brush pen). Inside the picture,
-  over the scene, they are in a clean serif (Instrument Serif). Everything small, in both, is
-  one sans (Jost: tags in tracked capitals, sentences plain). The hand's
+  over the scene, everything is one sans (Jost): the lines large and tight, tags in tracked
+  capitals, sentences plain. The serif (Instrument Serif) is only the firm's name. The hand's
   sizes were set by measuring it against the serif it replaced, and the masks its lines rise
   out of clip well outside the line box, because a hand swings outside it (`LINE_OFF`).
 - **The page layer** (`scroll.js`, `page.css`): Lenis for a weighted smooth scroll, GSAP for

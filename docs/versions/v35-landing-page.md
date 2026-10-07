@@ -23,7 +23,8 @@ be the scene we built, not a copy of it, and the change has to be seamless.
   (Changed on 6 October, see below.)
 - **The boat is the offer.** Walk down, sail out, no climb back. One jukung at anchor past the
   break. This is invented (boats do not land at Kelingking and swimming is banned), so the
-  outfitter is fictional and the page says so at its foot.
+  outfitter is fictional and the page says so at its foot. (Round 10: Sam took that note off
+  the page. The form still says nothing was sent, when it is used.)
 
 ## Judge against
 
@@ -114,6 +115,20 @@ are already in `vendor/fonts/` for the standalone file).
 - The hero: no eyebrow, "Kelingking Beach" on the card, the name "a little bit more premium",
   "a better button" without the rule in it, the cue "Scroll into the postcard" with an arrow
   on the right, and no sand-textured rim on the card's left and top edges.
+
+## Round 10 (7 October 2026)
+
+- Leaning to the pointer, the hero's card showed "a delimitation of the sand", straight edges
+  beside it. And at the end, as the card turns over, "look at the effects underneath it...
+  make the rotation feel more realistic".
+- "Scroll into the postcard" closer to the postcard.
+- The altimeter on the right "a little bit more premium".
+- The lines inside the picture in a sans, not the serif.
+- The second spread breaks "Then a whole / day of nothing."
+- The patch behind the words on the sand "is too dark".
+- The boat reads small: "a pole somewhere with a cord that attaches the boat".
+- The foot of the page: the concept note and the credits out, "built with three.js" in. The
+  map's credit stays, small (the licence, and this project's own rule).
 
 ## Found by other versions
 

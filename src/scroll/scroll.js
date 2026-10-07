@@ -126,12 +126,6 @@ export function startScroll({ params }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const html = document.documentElement;
   if (params.has('notext')) html.classList.add('notext');
-  // (Demo, for Sam to compare in the page. ?scene=sans: the lines inside the picture in the
-  // sans, not the serif. Without it the page is as it is.)
-  if (params.get('scene') === 'sans') {
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('./type-options.css', import.meta.url).href; document.head.append(l);
-    html.classList.add('scene-sans');
-  }
   const $ = (s) => document.querySelector(s);
   const loaderEl = $('.loader');
 
@@ -631,7 +625,7 @@ export function startScroll({ params }) {
   const blocks = [...document.querySelectorAll('.words > *')].map((el) => {
     const kind = 'hero' in el.dataset ? 'hero' : 'tau' in el.dataset ? 'tau' : 'end';
     const [a, b] = (el.dataset[kind] ?? '0,0').split(',').map(Number);
-    const after = [...el.querySelectorAll('.label, .body, .hero__actions, .foot > *')];
+    const after = [...el.querySelectorAll('.label, .body, .hero__actions, .cue, .foot > *')];
     const k = { el, kind, a, b, off: el.classList.contains('note') ? LINE_OFF_CLEAN : LINE_OFF, lines: [], byEl: new Map(), after, drift: kind === 'tau' ? el.querySelector('.display') : null, on: false, tl: null };
     // (Split again whenever the lines break differently: a font arriving, the window resized.)
     for (const d of el.querySelectorAll('[data-lines]')) {
@@ -722,14 +716,16 @@ export function startScroll({ params }) {
   const altEl = $('.hud__alt'), latEl = $('.hud__lat'), lonEl = $('.hud__lon');
   const railFill = $('.rail__fill'), railMark = $('.rail__mark'), railLabel = $('.rail__mark span'), railEl = $('.rail');
   // The altimeter runs from the railing (tau 1) to the water (tau 5).
-  const RAIL = STOPS.slice(1);
-  const stops = RAIL.map((_, i) => {
-    const d = document.createElement('div');
-    d.className = 'rail__stop';
-    d.style.top = `${(i / (RAIL.length - 1)) * 100}%`;
+  // A scale like an instrument's: a long tick at each stop, four short ones between.
+  const RAIL = STOPS.slice(1), FINE = 5;
+  const stops = [];
+  for (let k = 0; k <= (RAIL.length - 1) * FINE; k++) {
+    const d = document.createElement('i');
+    d.className = k % FINE === 0 ? 'rail__stop' : 'rail__tick';
+    d.style.top = `${(k / ((RAIL.length - 1) * FINE)) * 100}%`;
     railEl.append(d);
-    return d;
-  });
+    stops.push(d);
+  }
   const dms = (v, pos, neg) => {
     const a = Math.abs(v), d = Math.floor(a), m = Math.floor((a - d) * 60), s = Math.floor(((a - d) * 60 - m) * 60);
     return `${d}°${String(m).padStart(2, '0')}′${String(s).padStart(2, '0')}″${v >= 0 ? pos : neg}`;
@@ -775,7 +771,7 @@ export function startScroll({ params }) {
       railFill.style.transform = `scaleY(${u})`;
       railMark.style.transform = `translateY(${u * railEl.clientHeight}px)`;
     }
-    stops.forEach((d, i) => d.classList.toggle('passed', cam.tau >= i + 1 - 0.001));
+    stops.forEach((d, k) => d.classList.toggle('passed', cam.tau >= 1 + k / FINE - 0.001));
   }
 
   // ---------------------------------------------------------------- loading

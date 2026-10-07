@@ -34,13 +34,14 @@
     <div class="world">
       <canvas class="ground" aria-hidden="true"></canvas>
       <div class="card">
-        <div class="card__shadow"></div>
+        <div class="card__shadow"><i></i><i></i><i></i><i></i></div>
         <div class="card__flip">
           <div class="card__paper">
             <p class="card__caption"><span>Kelingking Beach, Nusa Penida</span><span>8°45′S 115°28′E</span></p>
           </div>
           <div id="stage"><img id="ref" alt=""></div>
           <div class="card__finish"></div>
+          <div class="card__shade"></div>
         </div>
       </div>
     </div>
@@ -112,7 +113,7 @@
     <section class="sp sp--beach" data-hold="beach" data-caption="Above the beach, 55 m" aria-label="The beach">
       <div class="sp__text">
         <p class="label sp__label"><b>The beach</b><span>07:10 to 17:40</span></p>
-        <h2 class="display sp__head"><span class="sp__mask"><span class="sp__ln">Then a whole day</span></span><span class="sp__mask"><span class="sp__ln">of <em>nothing</em>.</span></span></h2>
+        <h2 class="display sp__head"><span class="sp__mask"><span class="sp__ln">Then a whole</span></span><span class="sp__mask"><span class="sp__ln">day of <em>nothing</em>.</span></span></h2>
         <i class="sp__rule"></i>
         <dl class="sp__rows">
           <div><dt>07:10</dt><dd>Breakfast on the sand</dd></div>
@@ -149,9 +150,11 @@
 
     <!-- The altimeter: from the railing (150 m) to the water. -->
     <aside class="rail" aria-hidden="true">
+      <p class="rail__end rail__end--top">The railing</p>
       <div class="rail__line"></div>
       <div class="rail__fill"></div>
       <div class="rail__mark"><span></span></div>
+      <p class="rail__end rail__end--foot">The sea</p>
     </aside>
 
     <!-- The words. data-hero: while the card is that far up off the sand (0 at rest, 1 full
@@ -163,8 +166,8 @@
         <p class="body">They take the photo and go back to the car park. The beach is another 150 metres down. We walk you there at first light, and a boat brings you out.</p>
         <div class="hero__actions">
           <a class="button" href="#reserve" data-go="reserve">Reserve a morning</a>
-          <p class="cue"><span>Scroll<span class="wide-only"> into the postcard</span></span><svg class="cue__arrow" viewBox="0 0 92 40" aria-hidden="true"><path d="M4 31 C 26 37, 56 31, 85 10"/><path d="M67 8 L86 9 L78 27"/></svg></p>
         </div>
+        <p class="cue"><span>Scroll<span class="wide-only"> into the postcard</span></span><svg class="cue__arrow" viewBox="0 0 92 40" aria-hidden="true"><path d="M4 31 C 26 37, 56 31, 85 10"/><path d="M67 8 L86 9 L78 27"/></svg></p>
       </section>
 
       <section class="note note--xl at-bl" id="walk" data-tau="0.972,1.03">
@@ -208,8 +211,7 @@
       </section>
 
       <footer class="foot" data-end="0.82,2">
-        <p class="foot__concept"><b>A concept page.</b> Turun, its prices and the boat pick-up are invented. The real surf at Kelingking is dangerous and swimming is banned.</p>
-        <p class="foot__credits">A real place, rebuilt in three.js. Terrain from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> data, © OpenStreetMap contributors. Rock, sand and path textures from Poly Haven (CC0). The plants and the boat are made in code.</p>
+        <p class="foot__credits">Built with three.js<span>Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</span></p>
         <button class="foot__top" type="button" data-top>Back up to the railing</button>
       </footer>
     </main>

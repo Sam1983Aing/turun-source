@@ -4019,3 +4019,49 @@ Sam picked **Drone** for the first card and gave a list for the hero.
 Checked: nine places at desktop size and seven on a phone (`captures/h3-page.jpg`,
 `captures/h3-phone.jpg`), the hero at twice the density (`captures/h3-hero2x/`).
 
+### Round 10: the card's shadow was hollow (7 October)
+
+Two of Sam's notes were one bug. "When we hover the card, we see like a delimitation of the
+sand, so it feels like straight edges." And, of the card turning over at the end: "look at the
+effects underneath it".
+
+The card's shadow was one element the size of the paper with four `box-shadow`s. A box-shadow
+is not drawn inside its own box, so the shadow was a frame with nothing in the middle. With
+the card lying square on it nobody could tell. When the card leaned to the pointer its edge
+no longer covered the frame's inner edge, and a strip of unshaded sand showed beside it, dead
+straight. When the card turned over and narrowed, the whole empty middle showed next to it
+as a pale rectangle with a dark outline.
+
+- The shadow is four slabs now, each filled, each with a soft edge of its own (`.card__shadow
+  i`, the numbers are the same four shadows as before). Whatever the card uncovers is shadow.
+- The turn itself (`postcard.js`): the card is picked up as it turns (16% of its width at the
+  highest, towards the eye), tips 5 degrees and twists 2 on the way, and each face goes up to
+  36% darker as it turns edge-on. The band of gloss sweeps across the picture. The shadow
+  stays on the sand under both faces, narrows with the card, slides away from the low sun as
+  the card rises, thins and goes soft (a blur, only while the card turns, when nothing else
+  on the page is being drawn). The back used to bring a shadow of its own, which jumped in at
+  the half-way point.
+- The caption on the card could be selected like text (the pink bar in Sam's screenshot). Not
+  any more.
+
+Checked: the card leaning to all four corners at twice the density
+(`captures/h5-hover-sheet.jpg`), the turn frame by frame (`captures/h5-flip-clip-sheet.jpg`).
+
+### Round 10: the rest of the list
+
+- **"Scroll into the postcard"** sits on the sand under the card's lower left corner now,
+  written along its edge, the arrow going up into the picture. It was under the button.
+- **The altimeter** is drawn like an instrument's scale: a hairline, a long tick at each stop
+  and four short ones between, faint until the walk has passed them, a ring that rides down
+  with the height beside it, and the ends named (the railing, the sea). One colour, with the
+  accent only in the ring. Over the evening's white sky the paper colour alone was lost, so
+  every part has a hair of dark beside it, like engraving.
+- **The lines inside the picture are in the sans** (Jost 500, tight), their word in the
+  accent, upright. `?scene=sans` and its file are gone. The serif is left as the firm's name.
+- **"Then a whole / day of nothing."**
+- **The patch behind "Nobody else is here"** was 70% dark at its middle. It is 30%, and wider.
+- **The foot of the page** is one line: "Built with three.js", the map's credit, and the way
+  back up. Sam asked for the concept note and the credits to go. The map's credit stays in
+  small type, because the terrain is OpenStreetMap's data and its licence asks for it (and
+  this project's rules say to keep it). The note that the outfitter is invented is off the
+  page, on Sam's call. The form still answers that nothing was sent.

@@ -49,6 +49,11 @@ const POSES = {
 const BORDER = 0.042, FOOT = 0.108;
 // How far the eye is from the card for the tilt and the flip, in screen pixels.
 const EYE = 1900;
+// Turning over at the end: the card is picked up as it turns, this share of its own width at
+// the highest (edge-on), tips this many degrees towards the eye and twists this many in its
+// own plane on the way, as a hand would do it and a hinge would not. Its two faces darken by
+// up to SHADE as they turn from the light.
+const LIFT = 0.16, TIP = -5, TWIST = 2.2, SHADE = 0.36;
 // The sand is laid a little larger than the screen at rest: on the way up the card's world
 // turns and slides against it, and an edge of the photograph must never come into view. How
 // much larger is worked out for each pose and screen (sandOver), plus this much to spare.
@@ -62,7 +67,7 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
   const html = document.documentElement;
   const table = $('.table'), world = $('.world'), ground = $('.ground'), card = $('.card'), flipEl = $('.card__flip');
   const finish = $('.card__finish'), light = $('.table__light'), stage = $('#stage'), back = $('.back');
-  const paper = $('.card__paper'), shadow = $('.card__shadow'), caption = $('.card__caption');
+  const paper = $('.card__paper'), shadow = $('.card__shadow'), shade = $('.card__shade'), caption = $('.card__caption');
   const captionEls = [...caption.querySelectorAll('span')], captionOwn = captionEls.map((e) => e.textContent);
   let L = null, last = '', posed = null;
   const tilt = { x: 0, y: 0, tx: 0, ty: 0, nx: 0, tnx: 0, live: 0 };
@@ -192,26 +197,37 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
     finish.style.visibility = f > 0.003 ? 'visible' : 'hidden';
     light.style.opacity = f.toFixed(3);
     light.style.visibility = f > 0.003 ? 'visible' : 'hidden';
-    card.style.setProperty('--sheen', `${(34 + tilt.nx * 30).toFixed(1)}%`);
+    // (The band of gloss moves with the lean, and sweeps right across as the card turns over.)
+    card.style.setProperty('--sheen', `${(34 + tilt.nx * 30 + 70 * Math.sin(Math.PI * Math.min(state.flip, 0.5))).toFixed(1)}%`);
     // (No fading of the picture's colour: the first iteration desaturated it to look printed,
     // and Sam read the whole page as washed out. The paper, the sheen and the stillness say
     // "print"; the colour stays the scene's.)
 
-    // The card itself: leaning a little to the pointer at rest, and turning over at the end
-    // (it lifts off the sand as it goes).
-    const lift = 1 + 0.06 * Math.sin(Math.PI * flip);
-    const turned = flip > 0.5;
+    // The card itself: leaning a little to the pointer at rest, and turning over at the end.
+    // It is picked up to turn (towards the eye, so it grows), tipped and twisted a little on
+    // the way, and each face goes darker as it turns edge-on to the light. The front and the
+    // back are two elements given the same motion, half a turn apart: one hands over to the
+    // other when the card is edge-on and neither can be seen.
+    const up = Math.sin(Math.PI * flip), turned = flip > 0.5;
+    const high = LIFT * (cw + 2 * b) * s * up;                       // screen pixels off the sand
+    const hand = `rotateZ(${(TWIST * up).toFixed(3)}deg) rotateX(${(tilt.x + TIP * up).toFixed(3)}deg)`;
     flipEl.style.visibility = turned ? 'hidden' : 'visible';
     flipEl.style.transform = (flip > 0 || tilt.x || tilt.y)
-      ? `perspective(${(EYE / s).toFixed(0)}px) rotateX(${tilt.x.toFixed(3)}deg) rotateY(${(tilt.y + 180 * flip).toFixed(3)}deg) scale(${lift.toFixed(4)})`
+      ? `perspective(${(EYE / s).toFixed(0)}px) translateZ(${(high / s).toFixed(1)}px) ${hand} rotateY(${(tilt.y + 180 * flip).toFixed(3)}deg)`
       : 'none';
     back.style.visibility = turned ? 'visible' : 'hidden';
-    if (turned) back.style.transform = `translate(-50%, -50%) rotate(${L.P.end.rz}deg) perspective(${EYE}px) rotateY(${(180 * flip - 180).toFixed(3)}deg) scale(${lift.toFixed(4)})`;
-    // The shadow on the sand narrows with the card as it turns and slides out a little as it
-    // lifts. Once turned, the back brings its own.
-    const far = (lift - 1) * cw;
-    shadow.style.transform = `translate(${(far * 0.5).toFixed(1)}px, ${far.toFixed(1)}px) scale(${(sx * Math.abs(Math.cos(Math.PI * flip))).toFixed(5)}, ${sy.toFixed(5)})`;
-    shadow.style.opacity = turned ? '0' : (1 - 3 * (lift - 1)).toFixed(3);
+    if (turned) back.style.transform = `translate(-50%, -50%) rotate(${L.P.end.rz}deg) perspective(${EYE}px) translateZ(${high.toFixed(1)}px) ${hand} rotateY(${(180 * flip - 180).toFixed(3)}deg)`;
+    const dark = (SHADE * Math.pow(up, 1.3)).toFixed(3);
+    shade.style.opacity = turned ? '0' : dark;
+    back.style.setProperty('--shade', turned ? dark : '0');
+    // The shadow stays on the sand through the whole turn, under both faces: it narrows with
+    // the card, slides away from the low sun as the card comes up, and thins out.
+    const away = (high / s) * 0.62;
+    shadow.style.transform = `translate(${away.toFixed(1)}px, ${(away * 0.42).toFixed(1)}px) scale(${(sx * Math.max(Math.abs(Math.cos(Math.PI * flip)), 0.07)).toFixed(5)}, ${sy.toFixed(5)})`;
+    shadow.style.opacity = (1 - 0.45 * up).toFixed(3);
+    // (And goes soft: a thing held off the ground has no sharp shadow. Only while it turns,
+    // when nothing else on the page is being drawn.)
+    shadow.style.filter = up > 0.01 ? `blur(${((high / s) * 0.06).toFixed(1)}px)` : 'none';
   }
 
   // The lean toward the pointer: a card on sand is never quite flat. Only near rest, and not
