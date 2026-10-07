@@ -3792,3 +3792,13 @@ License's text with the copyright notice read out of the font file itself.
 `kelingking.html` rebuilt: four faces inlined, no link to Google Fonts left. Opened from
 `file://` with the network cut, all four are loaded and the headline's computed font is
 Vujahday Script.
+
+### The sand, third version (6 October)
+
+Sam replaced the sand with `beach-sand-variation-03-4k.png`: the same composition with the
+texture pulled back, fine pale cream sand where the first had chunky macro grains. It is the
+better ground for type: the ink lines and the typed rows read more easily, and the cards
+stand off it more. Only the file changed (`assets/hero/sand.jpg`). Checked on every sand
+screen at desktop and phone size (`captures/r8-sand03.jpg`, `captures/r8-sand03-p.jpg`).
+His notes with the image name its tool as "built-in image_gen" and give the prompt, both now
+in `assets/hero/CREDITS.md`. Which product that is, and its terms, are still his to confirm.
