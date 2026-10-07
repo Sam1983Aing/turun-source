@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit ac54451. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
+  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit e314fac. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Turun · The walk down to Kelingking Beach</title>
@@ -94,10 +94,14 @@ html.scroll.loading { overflow: hidden; }
 .hero .display em::after, .sp__head em::after { content: ""; position: absolute; left: -3%; right: -6%; bottom: -0.04em; height: 0.16em;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 40 4 110 3 197 7' fill='none' stroke='%23b4532d' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M30 13.5 C 80 9 140 8.5 186 11' fill='none' stroke='%23b4532d' stroke-width='1.6' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
 
-.button { pointer-events: auto; appearance: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 14px; background: var(--ink); color: var(--cream); padding: 17px 22px 16px 24px; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; transition: background 0.5s var(--ease); }
-.button::after { content: ""; width: 22px; height: 1px; background: currentColor; box-shadow: 0 0 0 0 currentColor; transform-origin: 0 50%; transition: transform 0.5s var(--ease); }
-.button:hover, .button:focus-visible { background: var(--accent-deep); }
-.button:hover::after, .button:focus-visible::after { transform: scaleX(1.5); }
+.button { pointer-events: auto; appearance: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 18px; background: var(--pen); color: var(--cream); padding: 8px 8px 8px 28px; border-radius: 99px; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 14px 24px -14px rgba(23, 37, 61, 0.7); transition: background 0.5s var(--ease), box-shadow 0.5s var(--ease); }
+/* (The pen's own blue, a pill, and an arrow in a paper-white disc where a rule used to be.) */
+.button::after { content: ""; flex: none; width: 36px; height: 36px; border-radius: 50%;
+  background: var(--cream) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 8h11.5M9 3.5 13.5 8 9 12.5' fill='none' stroke='%2317253d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 15px 15px no-repeat;
+  transition: transform 0.5s var(--ease), background-color 0.5s var(--ease); }
+.button:hover, .button:focus-visible { background: #20355a; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 18px 28px -14px rgba(23, 37, 61, 0.8); }
+.button:hover::after, .button:focus-visible::after { transform: translateX(3px); background-color: #fff; }
 .button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 /* ------------------------------------------------------------ the table: sand, card, picture */
@@ -142,10 +146,11 @@ html.scroll.at-card #stage { cursor: pointer; }
    beyond it, and the sand a shade darker all round. The far corner sits a little proud. */
 /* (The shadow's own box is clear and sits square under the paper: with a fill and a slight
    turn, as it first had, it showed as a dark lip along the card's top and right edges. The
-   first of its shadows is all round, so the top and the left edge are grounded too.) */
+   first of its shadows is all round, wide and faint, so the top and the left edge are grounded
+   too. A tight one there as well drew a dark rim of sand along the white border: Sam saw it
+   as "texture of the sand in the border".) */
 .card__shadow {
-  box-shadow: 0 0 calc(var(--cw) * 0.004) 0 rgba(58, 36, 14, 0.32),
-    0 0 calc(var(--cw) * 0.022) calc(var(--cw) * 0.003) rgba(58, 36, 14, 0.36),
+  box-shadow: 0 0 calc(var(--cw) * 0.04) calc(var(--cw) * 0.004) rgba(58, 36, 14, 0.2),
     calc(var(--cw) * 0.004) calc(var(--cw) * 0.007) calc(var(--cw) * 0.008) calc(var(--cw) * -0.003) rgba(58, 36, 14, 0.5),
     calc(var(--cw) * 0.018) calc(var(--cw) * 0.036) calc(var(--cw) * 0.045) calc(var(--cw) * -0.012) rgba(58, 36, 14, 0.4),
     calc(var(--cw) * 0.035) calc(var(--cw) * 0.07) calc(var(--cw) * 0.16) calc(var(--cw) * -0.02) rgba(58, 36, 14, 0.28); }
@@ -167,8 +172,7 @@ html.scroll.at-card #stage { cursor: pointer; }
    and falls to the right, and there is no pool of light for words on the left. */
 .table.is-end .card__shadow {
   box-shadow: calc(var(--cw) * 0.005) calc(var(--cw) * 0.006) calc(var(--cw) * 0.008) calc(var(--cw) * -0.002) rgba(70, 40, 12, 0.55),
-    0 0 calc(var(--cw) * 0.004) 0 rgba(70, 40, 12, 0.3),
-    0 0 calc(var(--cw) * 0.022) calc(var(--cw) * 0.003) rgba(70, 40, 12, 0.32),
+    0 0 calc(var(--cw) * 0.04) calc(var(--cw) * 0.004) rgba(70, 40, 12, 0.2),
     calc(var(--cw) * 0.058) calc(var(--cw) * 0.024) calc(var(--cw) * 0.022) calc(var(--cw) * -0.008) rgba(70, 40, 12, 0.5),
     calc(var(--cw) * 0.08) calc(var(--cw) * 0.05) calc(var(--cw) * 0.14) calc(var(--cw) * -0.02) rgba(70, 40, 12, 0.24); }
 .table.is-end .table__light { background: radial-gradient(130% 120% at 28% 18%, rgba(0, 0, 0, 0) 60%, rgba(64, 40, 14, 0.2) 100%); }
@@ -266,15 +270,18 @@ html.scroll.at-card #stage { cursor: pointer; }
   .sp__rows div { grid-template-columns: 6.4rem 1fr; padding: 8px 0; }
   .sp__rows dd { font-size: 1.02rem; }
   .sp__price b { font-size: 1.5rem; }
-  .sp__price .button { padding: 13px 16px 12px 18px; }
+  .sp__price .button { padding: 6px 6px 6px 20px; gap: 12px; }
 }
 
 /* ------------------------------------------------------------ the frame around the scene */
 
 .hud { position: fixed; z-index: 10; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 44px; padding: max(18px, env(safe-area-inset-top)) var(--gutter) 0; pointer-events: none; color: var(--cream); text-shadow: var(--shadow); opacity: 0; transition: color 0.9s var(--ease), text-shadow 0.9s var(--ease); }
 .hud a { pointer-events: auto; color: inherit; text-decoration: none; }
-.hud__mark { display: flex; align-items: baseline; gap: 14px; font: 400 27px/1 var(--serif); letter-spacing: -0.01em; }
-.hud__mark span { font: 500 10.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.66; }
+/* The name: the serif, a hairline, and what the firm does in two small lines beside it. */
+.hud__mark { display: flex; align-items: center; gap: 14px; }
+.hud__mark b { font: 400 31px/1 var(--serif); letter-spacing: -0.012em; }
+.hud__mark span { display: grid; gap: 4px; padding: 1px 0 1px 14px; border-left: 1px solid color-mix(in srgb, currentColor 42%, transparent); font: 500 9.5px/1 var(--type); letter-spacing: 0.27em; text-transform: uppercase; }
+.hud__mark span i { font-style: normal; opacity: 0.62; }
 .hud__nav { display: flex; align-items: center; gap: clamp(18px, 2.4vw, 36px); font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; }
 .hud__nav a { position: relative; padding: 12px 0; }
 .hud__nav a:not(.hud__cta)::after { content: ""; position: absolute; left: 0; right: 0; bottom: 6px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: 100% 50%; transition: transform 0.6s var(--ease); }
@@ -312,17 +319,16 @@ html.scroll.at-card #stage { cursor: pointer; }
 
 /* The hero: ink on the sand, beside the card. */
 .hero { left: var(--gutter); top: 0; bottom: 0; width: calc(var(--card-left, 50vw) - var(--gutter) - 3.5vw); display: grid; align-content: center; gap: clamp(18px, 2.6vh, 30px); color: var(--ink); padding-bottom: 4vh; box-sizing: border-box; }
-.hero__label { display: flex; flex-wrap: wrap; gap: 6px 18px; color: rgba(20, 18, 14, 0.74); }
-.hero__label span:first-child { color: var(--ink); }
 /* (Pen-blue ink, written a little uphill. The measure breaks it after "people" and "the".) */
 .hero .display { font-size: clamp(3.5rem, 0.64rem + 7.4vw, 9.6rem); color: var(--pen); max-width: 4.91em; text-wrap: wrap; margin: 0.06em 0 0.02em; transform: rotate(-3.5deg); transform-origin: 0 60%; }
 .hero .display em { color: var(--accent-deep); }
 .hero .body { color: rgba(20, 18, 14, 0.82); max-width: 29rem; }
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 30px; margin-top: 6px; }
-/* "Scroll into the picture": in the hand, like a note in the margin. */
-.cue { display: flex; align-items: center; gap: 10px; margin: 0; font: 400 2.34rem/1 var(--hand); color: var(--pen); transform: rotate(-5deg); }
-.cue i { display: block; width: 34px; height: 1.5px; background: currentColor; transform-origin: 0 50%; animation: cue 2.6s var(--ease) infinite; }
-@keyframes cue { 0% { transform: scaleX(0); } 55% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1); opacity: 0; } }
+/* "Scroll into the postcard": in the hand, like a note in the margin, and an arrow drawn with
+   the same pen towards the card. */
+.cue { display: flex; align-items: center; gap: 14px; margin: 0; font: 400 2.34rem/1 var(--hand); color: var(--pen); transform: rotate(-5deg); }
+.cue__arrow { flex: none; width: 66px; height: 29px; overflow: visible; fill: none; stroke: currentColor; stroke-width: 3.3; stroke-linecap: round; stroke-linejoin: round; animation: cue 2.8s ease-in-out infinite; }
+@keyframes cue { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(8px, -3px); } }
 
 /* The notes on the way down: one thing each, each in its own place and at its own size. They
    are inside the picture, so their type is the clean pair: the serif for the line (its word
@@ -392,7 +398,7 @@ html.scroll.at-card #stage { cursor: pointer; }
 
 @media (max-width: 720px) {
   .hud__mark span, .hud__nav a:not(.hud__cta), .hud__where .hud__lon, .hud__where .hud__lat { display: none; }
-  .hud__mark { font-size: 24px; }
+  .hud__mark b { font-size: 26px; }
   .hud__cta { padding: 11px 15px !important; }
   .scene-controls { right: auto; left: var(--gutter); bottom: auto; top: calc(max(18px, env(safe-area-inset-top)) + 52px); justify-items: start; }
   .time-of-day::before { display: none; }
@@ -417,10 +423,11 @@ html.scroll.at-card #stage { cursor: pointer; }
   .hero .display { font-size: clamp(2.76rem, 14.2vw, 5.5rem); max-width: none; margin: 0.2em 0 0.16em; }
   .hero .body { font-size: 0.98rem; line-height: 1.5; }
   .hero__actions { position: absolute; left: 0; right: 0; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 16px); margin: 0; justify-content: space-between; flex-wrap: nowrap; }
-  .hero__actions .button { padding: 15px 16px 14px 18px; white-space: nowrap; gap: 10px; }
-  .hero__actions .button::after { width: 14px; }
+  .hero__actions .button { padding: 6px 6px 6px 20px; gap: 12px; }
+  .button::after { width: 32px; height: 32px; }
   .cue { white-space: nowrap; font-size: 1.7rem; }
-  .cue i { width: 20px; }
+  .cue { gap: 8px; }
+  .cue__arrow { width: 40px; height: 18px; rotate: 100deg; }
   /* The back of the card stands upright: the message, then the lines to fill in. */
   .back__in { grid-template-columns: 1fr; grid-template-rows: auto 1fr; padding: 8.5cqh 7cqw 5cqh; row-gap: 3.4cqh; }
   .back__in::before { display: none; }
@@ -435,7 +442,7 @@ html.scroll.at-card #stage { cursor: pointer; }
   .back__price { padding-top: 1.6cqh; font-size: max(11px, 3.1cqw); }
   .back__price b { font-size: 5cqw; }
   .back__addr { padding: 0; gap: 1.5cqh; align-content: end; position: static; }
-  .back__addr .button { margin-top: 0.6cqh; padding: 15px 18px 14px 20px; }
+  .back__addr .button { margin-top: 0.6cqh; padding: 6px 6px 6px 20px; gap: 12px; }
   .back__to { font-size: 6cqw; }
   .field span { font-size: max(9px, 2.5cqw); }
   .field input, .field select { font-size: max(20px, 5.6cqw); min-height: 26px; }
@@ -446,7 +453,7 @@ html.scroll.at-card #stage { cursor: pointer; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cue i { animation: none; transform: scaleX(1); }
+  .cue__arrow { animation: none; }
 }
 </style>
 </head>
@@ -462,7 +469,7 @@ html.scroll.at-card #stage { cursor: pointer; }
         <div class="card__shadow"></div>
         <div class="card__flip">
           <div class="card__paper">
-            <p class="card__caption"><span>Kelingking, Nusa Penida</span><span>8°45′S 115°28′E</span></p>
+            <p class="card__caption"><span>Kelingking Beach, Nusa Penida</span><span>8°45′S 115°28′E</span></p>
           </div>
           <div id="stage"><img id="ref" alt=""></div>
           <div class="card__finish"></div>
@@ -484,7 +491,7 @@ html.scroll.at-card #stage { cursor: pointer; }
           <li><time>07:10</time><span>Breakfast on the sand. Then nothing, all day.</span></li>
           <li><time>17:40</time><span>The jukung, round the head to Toyapakeh.</span></li>
         </ol>
-        <p class="back__price"><b>US$ 240</b> a walker. Six walkers a morning, April to October.</p>
+        <p class="back__price"><b>US$ 240</b> a walker. Six a morning, April to October.</p>
       </div>
       <form class="back__addr" novalidate>
         <div class="stamp" aria-hidden="true">
@@ -522,7 +529,7 @@ html.scroll.at-card #stage { cursor: pointer; }
          (the hero's dive in reverse), with these words beside it: left of the card the first
          time, right of it the second (src/scroll/spreads.js; where, in SPREADS in scroll.js).
          data-caption: what the card says under its picture there. -->
-    <section class="sp sp--walk" data-hold="walk" data-caption="From the steps, 120 m" aria-label="The walk">
+    <section class="sp sp--walk" data-hold="walk" data-caption="On the ridge, 93 m" aria-label="The walk">
       <div class="sp__text">
         <p class="label sp__label"><b>The walk</b><span>06:10</span></p>
         <h2 class="display sp__head"><span class="sp__mask"><span class="sp__ln">Six walkers.</span></span><span class="sp__mask"><span class="sp__ln">One <em>guide</em>.</span></span></h2>
@@ -549,7 +556,7 @@ html.scroll.at-card #stage { cursor: pointer; }
     </section>
 
     <header class="hud">
-      <a class="hud__mark" href="#" data-top>Turun<span>Guided descents</span></a>
+      <a class="hud__mark" href="#" data-top aria-label="Turun, guided descents"><b>Turun</b><span>Guided <i>descents</i></span></a>
       <nav class="hud__nav" aria-label="Sections">
         <a href="#walk" data-go="walk">The walk</a>
         <a href="#boat" data-go="boat">The boat</a>
@@ -584,12 +591,11 @@ html.scroll.at-card #stage { cursor: pointer; }
          data-end: how far into the ending (0 the last frame, 1 the back of the card). -->
     <main class="words">
       <section class="hero" data-hero="-1,0.05">
-        <p class="label hero__label"><span>Guided descents</span><span>Kelingking Beach, Nusa Penida</span></p>
         <h1 class="display" data-lines>Most people stop at the <em>railing</em>.</h1>
         <p class="body">They take the photo and go back to the car park. The beach is another 150 metres down. We walk you there at first light, and a boat brings you out.</p>
         <div class="hero__actions">
           <a class="button" href="#reserve" data-go="reserve">Reserve a morning</a>
-          <p class="cue"><i></i><span>Scroll<span class="wide-only"> into the picture</span></span></p>
+          <p class="cue"><span>Scroll<span class="wide-only"> into the postcard</span></span><svg class="cue__arrow" viewBox="0 0 92 40" aria-hidden="true"><path d="M4 31 C 26 37, 56 31, 85 10"/><path d="M67 8 L86 9 L78 27"/></svg></p>
         </div>
       </section>
 
@@ -599,10 +605,11 @@ html.scroll.at-card #stage { cursor: pointer; }
         <p class="body">The photo gets taken from this platform. Then it's the car park and the fast boat home. You're going the other way.</p>
       </section>
 
-      <!-- The day's time lapse runs from here to the cove (LAPSE in scroll.js): the clock on this
-           line, and the one in the frame, run with it. -->
-      <section class="note note--m at-r" data-tau="1.42,2.06">
-        <p class="label"><b class="clock">06:20</b><span>The ridge · 95 m</span></p>
+      <!-- Down the steps to the ridge. (This line was on the ridge, through the day's time lapse,
+           until the first spread moved there: the lapse now starts as that card comes up, LAPSE in
+           scroll.js, and the clock in the frame runs with it.) -->
+      <section class="note note--m at-r" data-tau="1.08,1.5">
+        <p class="label"><b class="clock">06:10</b><span>The steps · 130 m</span></p>
         <h2 class="display" data-lines>We leave at first <em>light</em>.</h2>
         <p class="body">Before the day boats land and the heat sets in. Six walkers, and a guide who has done this a thousand times.</p>
       </section>
@@ -96168,12 +96175,16 @@ const FOLLOW = 9;
 // it then turns back (a critically damped spring, per second: most of the way in a second).
 const LOOK_HOLD = 0.6, LOOK_BACK = 3.2;
 
-// The card's picture: this far down the flight. High over the bay, with the whole headland in
-// it, head and all (at 0.5, where it first was, the head was cut off at the top).
-const TAU0 = 0.3;
-// From the card to the first spread the camera goes this much slower than the scroll (Sam: "it's
-// too quick before we reach the second postcard").
-const FIRST_LEG = 0.85;
+// The card's picture: this far down the flight. A drone's three-quarter view: the headland and
+// its beach fill the card, with nothing but sea round them. (Sam's pick of four. It was first
+// at 0.5, straight down with the head cut off, then at 0.3, the whole place like a map, with
+// the mainland's cliffs and their flat morning shadows in it.)
+const TAU0 = 0.75;
+// From the card to the first spread the camera goes this much slower than the scroll. The
+// card's shot is well down the flight, so there is not much of the path left before the
+// railing, and Sam's note on the stretch was "it's too quick before we reach the second
+// postcard".
+const FIRST_LEG = 0.62;
 // The dive, in screens of scroll. The camera sets off at the first touch and is up to the
 // scroll's speed within START_EASE screens. (The first iteration held it for 60% of the dive,
 // and Sam's note was that he scrolled and scrolled and nothing moved until the picture was the
@@ -96203,7 +96214,10 @@ const COVE = { tau: 2.2, len: 0.7, easeIn: 0.3, easeOut: 0.3 };
 // card to come down, `rest` at rest, `out` to go back in. The camera keeps walking while the
 // card comes down and slows to a stop over the last `easeIn` of it, and it is walking again
 // `easeOut` into the way back in: the scene moves inside the card both ways.
-const SPREADS = [{ id: 'walk', tau: 1.32 }, { id: 'beach', tau: 3.02 }];
+// (The first is on the ridge, where the two railings run together towards the head: Sam's
+// place for it, after the steps. It was at 1.32, at the top of them. The day's time lapse
+// starts just past it, so the light begins to turn while the card is still coming up.)
+const SPREADS = [{ id: 'walk', tau: 1.65 }, { id: 'beach', tau: 3.02 }];
 const SPREAD = { in: 0.9, rest: 0.9, out: 1.05, easeIn: 0.6, easeOut: 0.2 };
 // The ending, in screens, and the shares of it for the frame going back to a card, and the
 // card turning over.

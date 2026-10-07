@@ -37,7 +37,7 @@
         <div class="card__shadow"></div>
         <div class="card__flip">
           <div class="card__paper">
-            <p class="card__caption"><span>Kelingking, Nusa Penida</span><span>8°45′S 115°28′E</span></p>
+            <p class="card__caption"><span>Kelingking Beach, Nusa Penida</span><span>8°45′S 115°28′E</span></p>
           </div>
           <div id="stage"><img id="ref" alt=""></div>
           <div class="card__finish"></div>
@@ -59,7 +59,7 @@
           <li><time>07:10</time><span>Breakfast on the sand. Then nothing, all day.</span></li>
           <li><time>17:40</time><span>The jukung, round the head to Toyapakeh.</span></li>
         </ol>
-        <p class="back__price"><b>US$ 240</b> a walker. Six walkers a morning, April to October.</p>
+        <p class="back__price"><b>US$ 240</b> a walker. Six a morning, April to October.</p>
       </div>
       <form class="back__addr" novalidate>
         <div class="stamp" aria-hidden="true">
@@ -97,7 +97,7 @@
          (the hero's dive in reverse), with these words beside it: left of the card the first
          time, right of it the second (src/scroll/spreads.js; where, in SPREADS in scroll.js).
          data-caption: what the card says under its picture there. -->
-    <section class="sp sp--walk" data-hold="walk" data-caption="From the steps, 120 m" aria-label="The walk">
+    <section class="sp sp--walk" data-hold="walk" data-caption="On the ridge, 93 m" aria-label="The walk">
       <div class="sp__text">
         <p class="label sp__label"><b>The walk</b><span>06:10</span></p>
         <h2 class="display sp__head"><span class="sp__mask"><span class="sp__ln">Six walkers.</span></span><span class="sp__mask"><span class="sp__ln">One <em>guide</em>.</span></span></h2>
@@ -124,7 +124,7 @@
     </section>
 
     <header class="hud">
-      <a class="hud__mark" href="#" data-top>Turun<span>Guided descents</span></a>
+      <a class="hud__mark" href="#" data-top aria-label="Turun, guided descents"><b>Turun</b><span>Guided <i>descents</i></span></a>
       <nav class="hud__nav" aria-label="Sections">
         <a href="#walk" data-go="walk">The walk</a>
         <a href="#boat" data-go="boat">The boat</a>
@@ -159,12 +159,11 @@
          data-end: how far into the ending (0 the last frame, 1 the back of the card). -->
     <main class="words">
       <section class="hero" data-hero="-1,0.05">
-        <p class="label hero__label"><span>Guided descents</span><span>Kelingking Beach, Nusa Penida</span></p>
         <h1 class="display" data-lines>Most people stop at the <em>railing</em>.</h1>
         <p class="body">They take the photo and go back to the car park. The beach is another 150 metres down. We walk you there at first light, and a boat brings you out.</p>
         <div class="hero__actions">
           <a class="button" href="#reserve" data-go="reserve">Reserve a morning</a>
-          <p class="cue"><i></i><span>Scroll<span class="wide-only"> into the picture</span></span></p>
+          <p class="cue"><span>Scroll<span class="wide-only"> into the postcard</span></span><svg class="cue__arrow" viewBox="0 0 92 40" aria-hidden="true"><path d="M4 31 C 26 37, 56 31, 85 10"/><path d="M67 8 L86 9 L78 27"/></svg></p>
         </div>
       </section>
 
@@ -174,10 +173,11 @@
         <p class="body">The photo gets taken from this platform. Then it's the car park and the fast boat home. You're going the other way.</p>
       </section>
 
-      <!-- The day's time lapse runs from here to the cove (LAPSE in scroll.js): the clock on this
-           line, and the one in the frame, run with it. -->
-      <section class="note note--m at-r" data-tau="1.42,2.06">
-        <p class="label"><b class="clock">06:20</b><span>The ridge · 95 m</span></p>
+      <!-- Down the steps to the ridge. (This line was on the ridge, through the day's time lapse,
+           until the first spread moved there: the lapse now starts as that card comes up, LAPSE in
+           scroll.js, and the clock in the frame runs with it.) -->
+      <section class="note note--m at-r" data-tau="1.08,1.5">
+        <p class="label"><b class="clock">06:10</b><span>The steps · 130 m</span></p>
         <h2 class="display" data-lines>We leave at first <em>light</em>.</h2>
         <p class="body">Before the day boats land and the heat sets in. Six walkers, and a guide who has done this a thousand times.</p>
       </section>

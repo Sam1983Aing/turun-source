@@ -163,9 +163,9 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   that transform back to nothing, so at the end of the dive the page is a plain full-screen
   canvas again. Nothing is cross-faded. At rest the camera is stopped and so is the sea's
   clock, and the page draws no frames at all. From the first touch of the scroll the sea
-  starts and the camera sets off from `tau` 0.3 (`TAU0`: high enough for the whole headland,
-  head and all, to be in the picture), while the card is still small: you see the scene turn
-  inside the picture before it grows. From there to the first spread the camera moves a little
+  starts and the camera sets off from `tau` 0.75 (`TAU0`: a drone's three-quarter view, the
+  headland and its beach filling the card), while the card is still small: you see the scene
+  turn inside the picture before it grows. From there to the first spread the camera moves
   slower than the scroll (`FIRST_LEG`).
 - **The sand** is a photograph: `assets/hero/sand.jpg` (palm shadows on pale sand) under the
   hero and the spreads, `assets/hero/sand-end.jpg` (the tide's edge in evening light) under the
@@ -180,7 +180,7 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
 - **The spreads** (v35, `spreads.js`). Twice on the way down the dive runs backwards: the frame
   goes back to being a postcard on the sand, the camera slowing to a stop as it lands, and a
   piece of the offer comes in beside it (words left of the card the first time, right of it
-  the second). Scrolling on dives back in. The card has a named place to rest for each
+  the second). The first is on the ridge, after the steps, the second above the beach. Scrolling on dives back in. The card has a named place to rest for each
   (`POSES` in `postcard.js`: hero, walk, beach, end) and changes pose only while its picture
   is the whole screen.
 - **The day** (v35). The page sets the sun from where the scroll is (`DAY`, `LAPSE` in

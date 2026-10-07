@@ -104,8 +104,16 @@ are already in `vendor/fonts/` for the standalone file).
   mock-ups on his own concepts (limestone, linen). The plates are his to generate.
 
 - Then: "three more shots for the first postcard, I'm not sure yet for this one". Drone,
-  Horizon and Cove are behind `?card=` (`src/scroll/card-options.js`), recorded in
-  `demo/card/`. His pick is open. The losers and the switch go once he has chosen.
+  Horizon and Cove were built and recorded (`demo/card/`). He picked **Drone**.
+
+## Round 9 (6 October 2026, night: the hero again, and the second card)
+
+- Drone is the card's shot.
+- The second postcard later, on the ridge where the two railings run together (his frame),
+  "so we can go down the stairs".
+- The hero: no eyebrow, "Kelingking Beach" on the card, the name "a little bit more premium",
+  "a better button" without the rule in it, the cue "Scroll into the postcard" with an arrow
+  on the right, and no sand-textured rim on the card's left and top edges.
 
 ## Found by other versions
 

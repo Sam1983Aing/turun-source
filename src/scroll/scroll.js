@@ -38,7 +38,6 @@ import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText.js';
 import Lenis from 'lenis';
 import { createApp, ASSETS } from '../app.js';
-import { cardShot } from './card-options.js';
 import { buildPanel } from '../debug.js';
 import { SHOTS } from '../shots.js';
 import { ORIGIN } from '../terrain/geo.js';
@@ -64,12 +63,16 @@ const FOLLOW = 9;
 // it then turns back (a critically damped spring, per second: most of the way in a second).
 const LOOK_HOLD = 0.6, LOOK_BACK = 3.2;
 
-// The card's picture: this far down the flight. High over the bay, with the whole headland in
-// it, head and all (at 0.5, where it first was, the head was cut off at the top).
-const TAU0 = 0.3;
-// From the card to the first spread the camera goes this much slower than the scroll (Sam: "it's
-// too quick before we reach the second postcard").
-const FIRST_LEG = 0.85;
+// The card's picture: this far down the flight. A drone's three-quarter view: the headland and
+// its beach fill the card, with nothing but sea round them. (Sam's pick of four. It was first
+// at 0.5, straight down with the head cut off, then at 0.3, the whole place like a map, with
+// the mainland's cliffs and their flat morning shadows in it.)
+const TAU0 = 0.75;
+// From the card to the first spread the camera goes this much slower than the scroll. The
+// card's shot is well down the flight, so there is not much of the path left before the
+// railing, and Sam's note on the stretch was "it's too quick before we reach the second
+// postcard".
+const FIRST_LEG = 0.62;
 // The dive, in screens of scroll. The camera sets off at the first touch and is up to the
 // scroll's speed within START_EASE screens. (The first iteration held it for 60% of the dive,
 // and Sam's note was that he scrolled and scrolled and nothing moved until the picture was the
@@ -99,7 +102,10 @@ const COVE = { tau: 2.2, len: 0.7, easeIn: 0.3, easeOut: 0.3 };
 // card to come down, `rest` at rest, `out` to go back in. The camera keeps walking while the
 // card comes down and slows to a stop over the last `easeIn` of it, and it is walking again
 // `easeOut` into the way back in: the scene moves inside the card both ways.
-const SPREADS = [{ id: 'walk', tau: 1.32 }, { id: 'beach', tau: 3.02 }];
+// (The first is on the ridge, where the two railings run together towards the head: Sam's
+// place for it, after the steps. It was at 1.32, at the top of them. The day's time lapse
+// starts just past it, so the light begins to turn while the card is still coming up.)
+const SPREADS = [{ id: 'walk', tau: 1.65 }, { id: 'beach', tau: 3.02 }];
 const SPREAD = { in: 0.9, rest: 0.9, out: 1.05, easeIn: 0.6, easeOut: 0.2 };
 // The ending, in screens, and the shares of it for the frame going back to a card, and the
 // card turning over.
@@ -126,9 +132,6 @@ export function startScroll({ params }) {
     const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('./type-options.css', import.meta.url).href; document.head.append(l);
     html.classList.add('scene-sans');
   }
-  // (Demo: another shot for the hero's card, ?card=drone|horizon|cove, card-options.js.)
-  const shot = cardShot(params.get('card'));
-  const tau0 = shot?.tau ?? TAU0;
   const $ = (s) => document.querySelector(s);
   const loaderEl = $('.loader');
 
@@ -154,7 +157,7 @@ export function startScroll({ params }) {
   // ---------------------------------------------------------------- the page in screens
 
   const pace = makePace();
-  const sStart = BARE ? 0 : pace.screensAt(tau0), sEnd = pace.screens;
+  const sStart = BARE ? 0 : pace.screensAt(TAU0), sEnd = pace.screens;
   const heroLen = BARE ? 0 : HERO, outLen = BARE ? 0 : OUTRO;
   // Where the scroll holds the camera still: while a spread's card rests on the sand, and for
   // a moment over the cove. s: where on the path. len: for how many screens. easeIn, easeOut: the
@@ -172,7 +175,7 @@ export function startScroll({ params }) {
     const add = (kind, len, E = 0, k = 1) => { if (len > 0) segs.push({ kind, y0: y, y1: y + len, s0: at, E, k }); y += Math.max(len, 0); };
     const cruise = (to, k) => { add('go', (to - at) / k, 0, k); at = Math.max(at, to); };
     const turn = (kind, E, k) => { add(kind, E, E, k); at += (k * E) / 2; };
-    let k = BARE ? 1 : shot?.leg ?? FIRST_LEG;
+    let k = BARE ? 1 : FIRST_LEG;
     turn('up', BARE ? 0 : START_EASE, k);
     for (const h of holds) { cruise(h.s - (k * h.easeIn) / 2, k); turn('down', h.easeIn, k); h.y = y; add('hold', h.len); k = 1; turn('up', h.easeOut, k); }
     cruise(sEnd, k);
@@ -417,7 +420,7 @@ export function startScroll({ params }) {
   // y: the page's place, in screens. screens: the camera's, in path.js's. hero: how far into the
   // dive. out: how far into the ending. card, up: which card the page is at and how far up it is
   // from rest (cardAt).
-  const cam = { y: 0, screens: sStart, tau: BARE ? 0 : tau0, pose: null, hero: BARE ? 1 : 0, out: 0, card: BARE ? null : 'hero', up: BARE ? 1 : 0 };
+  const cam = { y: 0, screens: sStart, tau: BARE ? 0 : TAU0, pose: null, hero: BARE ? 1 : 0, out: 0, card: BARE ? null : 'hero', up: BARE ? 1 : 0 };
   const inScene = () => cam.up >= 1;
   function placeCamera(dt, snap = false) {
     if (!(unit > 0)) return;
@@ -435,7 +438,6 @@ export function startScroll({ params }) {
     [cam.card, cam.up] = cardAt(cam.y, cam.out);
     if (!descent) return;
     let p = descent.poseAt(cam.tau);
-    if (shot && !BARE) p = shot.pose(p, cam.hero);
     // At the water's edge the head turns to the boat.
     if (app.boat && !BARE) {
       const w = smooth(BOAT_PAN[0], BOAT_PAN[1], cam.tau);
@@ -810,7 +812,7 @@ export function startScroll({ params }) {
     const frame = () => new Promise((r) => requestAnimationFrame(r));
     const gl = renderer.getContext(), px = new Uint8Array(4);
     const timed = [];
-    const first = BARE ? 0 : tau0;
+    const first = BARE ? 0 : TAU0;
     const at = [first, ...[0.4, 0.7, 0.9, 1, 1.4, 1.8, 2, 2.3, 2.6, 3, 3.3, 3.6, 4, 4.5, 5].filter((t) => t > first)];
     for (const t of at) {
       const p = descent.poseAt(t);

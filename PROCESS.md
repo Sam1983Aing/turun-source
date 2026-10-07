@@ -3985,3 +3985,37 @@ Recorded next to the page as it is, same scroll plan, desktop and phone
 (`demo/card/`, plan and reel script kept, the videos are local). Stills of the four:
 `captures/card-options.jpg`.
 
+### Drone, the second card on the ridge, and the hero's furniture (6 October, night)
+
+Sam picked **Drone** for the first card and gave a list for the hero.
+
+- **The card's shot is the drone's** (`TAU0` 0.75, `FIRST_LEG` 0.62). The other two shots and
+  the `?card=` switch are gone (`card-options.js` deleted).
+- **The second postcard is on the ridge.** "If I'm using drone, the second [postcard] comes
+  too fast... delay it just a little bit so we can go down the stairs." He sent a frame of the
+  place: the ridge where the two railings run together towards the head. Matched against
+  stills along the path, that is `tau` 1.65 (it was 1.32, the top of the steps). The card
+  comes to rest there at screen 6.53, where it was 5.46. Its caption is "On the ridge, 93 m".
+- **What that moved.** The line "We leave at first light" stood on the ridge. It is on the
+  steps now (`tau` 1.08 to 1.5), so the walk down them has its words. The day's time lapse
+  still starts at 1.75, which is now just past the card's rest: the light begins to turn
+  while the card is coming up (about 10:30 on the sun's clock when it is half way, 12:30 when
+  the picture is the screen) and the afternoon and the gold happen full screen.
+- **The rim on the card.** "There's some texture of the sand in the border", on the left and
+  the top. That was the tight shadow added in round 8 so those edges were grounded: 2 px of
+  sand a fifth darker hugging the white edge reads as a dirty outline, not as a shadow. Only
+  the wide faint one is left on that side. Measured at twice the density: the sand falls from
+  216 to 200 over 18 px to the left edge and the paper starts clean at 251 (the rim had it
+  down to 185).
+- **The eyebrow is out.** "Guided descents" is by the name and the place is on the card. The
+  card's caption says "Kelingking Beach, Nusa Penida".
+- **The name** is the serif at 31 px, a hairline, and "Guided / descents" in two small spaced
+  lines beside it.
+- **The button** is a pill in the pen's blue with an arrow in a paper-white disc. The rule
+  that was in it is gone. The same button is on the second spread and on the card's back.
+- **The cue** reads "Scroll into the postcard" and ends in an arrow drawn with the same pen,
+  towards the card (on a phone it points down). It nudges, where the rule before it grew.
+
+Checked: nine places at desktop size and seven on a phone (`captures/h3-page.jpg`,
+`captures/h3-phone.jpg`), the hero at twice the density (`captures/h3-hero2x/`).
+
