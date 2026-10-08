@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Vujahday+Script&family=Jost:wght@400;500&display=swap">
+  <link rel="preload" as="image" href="assets/hero/sand-clean.jpg">
   <link rel="stylesheet" href="src/scroll/page.css">
   <script type="importmap">
     {
@@ -83,9 +84,9 @@
   <div id="status"></div>
 
   <div class="page">
-    <div class="loader" role="status" aria-live="polite">
+    <div class="loader" role="status" aria-live="polite" style="background-image: url(assets/hero/sand-clean.jpg)">
       <p class="label">Nusa Penida, Bali</p>
-      <p class="loader__title">Kelingking</p>
+      <p class="loader__title" aria-label="Kelingking"><span class="loader__ghost" aria-hidden="true">Kelingking</span><span class="loader__fill" aria-hidden="true"><span class="loader__sea"><span class="loader__wave"><span class="loader__unwave"><span class="loader__unsea">Kelingking</span></span></span></span></span></p>
       <div class="loader__bar"><span></span></div>
       <p class="loader__step"><span class="loader__count">000</span><span class="loader__what">Raising the headland</span></p>
       <p class="loader__fail">This needs WebGL 2 and a reasonably recent graphics chip, and this browser could not start it. It runs best in Chrome or Safari on a laptop.</p>

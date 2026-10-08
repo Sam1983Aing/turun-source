@@ -4180,3 +4180,42 @@ photograph with no palm at all, back to back (a Blender render from another proj
 using the machine). So the palm costs about what the photograph does, but neither was
 measured on a quiet machine.
 
+### Round 13: Sam's notes on the live hero (8 October)
+
+"I love the effect, it's super nice." Then:
+
+- **The near shadow is lighter** (`SHADE.near`, 0.57 of the sand's light to 0.70, and the frond a
+  little shorter): at the bottom right it "is kind of hiding a bit the postcard". The far ones
+  stay as they were ("very subtle").
+- **The leaf is greener, and there are two.** "It feels a little bit burned": the cut-out's red
+  is held well under its green (`tools/prepare-palm-sand.mjs`). The same picture, mirrored and
+  38% larger, hangs out of the top right corner, its tips over the card's corner, with its own
+  shadow. On a phone the photograph is cut to its middle, so the left corner is the name's:
+  a smaller one hangs in the right corner there.
+- **A gust, with the sand's own grains.** Every 9 to 13 seconds and as the scroll begins. The
+  streamers are clouds of grains whose colours are read off the sand's canvas, most a little
+  lighter than it and a quarter darker, so they show over the sand, over the card's white
+  border and over its picture. The layer is above the card, so the sand blows across it. The
+  fronds and leaves pull with it and the card's windward edge lifts by about a degree.
+- **`palm.js`.** The live palm is the only way now, so the code for the two ways Sam did not
+  choose is gone (`sand-options.js`, the shader). `?sand=photo` is still the old photograph.
+- **The top bar's Reserve is off the sand screens**, where the page has its own ("it does the
+  same thing as the one on the hero section"). It stays inside the picture, where it is the
+  only one. The two links moved in from the corner to stand clear of the right leaf.
+- **The loader.** Sam asked if it is real. It is: its count follows the scene's own events
+  (terrain, textures, plants, path, warm-up). So it stays, as he drew it: on the hero's sand,
+  not on black, with the name filling with sea from the bottom, a wave's edge at the height
+  of the loading (two copies of the word, the upper one clipped by a polygon redrawn each
+  frame). The name's box is padded to hold the tail of the g, so the bar under it no longer
+  cuts it (the bar is 16 px under the box).
+- **The card is glossy.** One overlay across border and picture: a narrow hard glint with a
+  broad soft glare beside it, a little of the sky from the top, the far corner a shade
+  duller, a bright hair along the two sunward edges and a dark one along the others. It
+  slides with the lean and sweeps as the card turns over.
+- **The headline's arrival: three options** behind `?title=write|ink|wind`
+  (`title-options.js`), recorded with the page as it is in `../demos/title/`. His pick is open.
+
+Checked: the loader at four points of a real load, every sand screen on desktop and phone
+(`captures/q4.jpg`, `captures/q5-phone.jpg`), each headline option settled against the page as
+it is (the same line breaks, the letters within a pixel).
+

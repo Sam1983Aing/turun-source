@@ -6,7 +6,7 @@
 //                                multiplied: the new plate was a shade greyer and darker)
 //   assets/hero/palm-leaf.png    the green leaf, cut out of the photograph the page had before
 //                                (../images/sand/beach-sand-variation-03-4k.png, its top left
-//                                corner), so that the page can make it sway
+//                                corner), so that the page can make it sway, and made greener
 //
 // The leaf is cut by colour. Green or yellowed, it has far less blue in it than sand has, lit
 // or in shade: (green - blue) / green is over 0.5 on the leaf and under 0.25 on sand. One
@@ -54,7 +54,10 @@ let kept = 0;
 for (let i = 0; i < BOX.w * BOX.h; i++) {
   const r = raw[i * 3], g = raw[i * 3 + 1], b = raw[i * 3 + 2];
   const a = inside(SMEAR, i % BOX.w, Math.floor(i / BOX.w)) ? 0 : smooth(0.3, 0.44, (g - b) / Math.max(g, 1));
-  out[i * 4] = r; out[i * 4 + 1] = g; out[i * 4 + 2] = b; out[i * 4 + 3] = Math.round(a * 255);
+  // Greener: the photograph's leaf has yellowed, orange tips (Sam: "it feels a little bit
+  // burned"). Red is held well under green, green lifted a little, blue eased, and the leaf's
+  // own light and shade stay as they are.
+  out[i * 4] = Math.round(r * 0.2 + Math.min(r, g * 0.66) * 0.8); out[i * 4 + 1] = Math.min(255, Math.round(g * 1.05)); out[i * 4 + 2] = Math.round(b * 0.9); out[i * 4 + 3] = Math.round(a * 255);
   if (a > 0.5) kept++;
 }
 run(['-f', 'rawvideo', '-pix_fmt', 'rgba', '-s', `${BOX.w}x${BOX.h}`, '-i', '-', join(root, 'assets/hero/palm-leaf.png')], { input: out });

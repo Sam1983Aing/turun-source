@@ -38,7 +38,8 @@ import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText.js';
 import Lenis from 'lenis';
 import { createApp, ASSETS } from '../app.js';
-import { sandOption } from './sand-options.js';
+import { createPalm } from './palm.js';
+import { titleOption } from './title-options.js';
 import { buildPanel } from '../debug.js';
 import { SHOTS } from '../shots.js';
 import { ORIGIN } from '../terrain/geo.js';
@@ -150,12 +151,11 @@ export function startScroll({ params }) {
   stage.prepend(renderer.domElement);
   if (params.has('pr')) app.governor.on = false;
   const post = createPostcard({ reduced, captions: spreadCaptions(), onPose: (pose) => { sandWanted = pose === 'hero' ? 'day' : pose; drawSand(); } });
-  // The sand under the card is alive: a plate with no shadows in it, palms' shadows cast on it
-  // and on the card, a leaf that sways (sand-options.js, 'palm'). ?sand=photo is the photograph
-  // the page had before, with its shadows in it and nothing moving. (?sand=shade and ?sand=gust:
-  // the two other ways that were tried, until Sam says they can go.)
-  const sandFx = BARE ? null : sandOption(params.get('sand') ?? 'palm', { reduced, plate: params.get('plate') ?? ASSETS.heroPalm, leaf: ASSETS.heroLeaf });
-  sandFx?.mount({ ground: post.ground, card: $('.card'), post });
+  // The sand under the card is alive (palm.js): a plate with no shadows in it, palms' shadows
+  // cast on it and on the card, two leaves that sway, a gust now and then. ?sand=photo is the
+  // photograph the page had before, with its shadows in it and nothing moving.
+  const palm = BARE || params.get('sand') === 'photo' ? null : createPalm({ reduced, plate: params.get('plate') ?? ASSETS.heroPalm, leaf: ASSETS.heroLeaf });
+  palm?.mount({ ground: post.ground, card: $('.card'), post });
   // Frames owed (the picture stands still at rest, so frames are only drawn when asked; two,
   // as the haze settles over a frame).
   let dirty = 2;
@@ -371,7 +371,7 @@ export function startScroll({ params }) {
     const g = c.getContext('2d');
     g.imageSmoothingQuality = 'high';
     g.drawImage(img, sx, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
-    sandFx?.sandChanged(c, img === sands.day ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
+    palm?.sandChanged(c, img === sands.day ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
   }
   const loadSand = (which, src) => new Promise((done) => {
     const img = new Image();
@@ -380,7 +380,7 @@ export function startScroll({ params }) {
     img.src = src;
     setTimeout(done, 8000);
   });
-  const sandReady = BARE ? Promise.resolve() : loadSand('day', sandFx?.plate ?? ASSETS.hero);
+  const sandReady = BARE ? Promise.resolve() : loadSand('day', palm?.plate ?? ASSETS.hero);
   // (The ending's is not needed for a long while: fetched once the page has begun.)
   const under = { walk: ASSETS.heroWalk, beach: ASSETS.heroBeach, end: ASSETS.heroEnd };
   for (const kv of (params.get('under') ?? '').split(',')) { const i = kv.indexOf(':'); if (i > 0 && kv.slice(0, i) in under) under[kv.slice(0, i)] = kv.slice(i + 1); }
@@ -637,6 +637,7 @@ export function startScroll({ params }) {
 
   // Every block shows while the page is inside its range: data-hero (how far the card is up),
   // data-tau (the camera's place on the way down), data-end (how far into the ending).
+  const titleFx = titleOption(params.get('title'), { gsap, SplitText, reduced });
   const blocks = [...document.querySelectorAll('.words > *')].map((el) => {
     const kind = 'hero' in el.dataset ? 'hero' : 'tau' in el.dataset ? 'tau' : 'end';
     const [a, b] = (el.dataset[kind] ?? '0,0').split(',').map(Number);
@@ -644,6 +645,8 @@ export function startScroll({ params }) {
     const k = { el, kind, a, b, off: el.classList.contains('note') ? LINE_OFF_CLEAN : LINE_OFF, lines: [], byEl: new Map(), after, drift: kind === 'tau' ? el.querySelector('.display') : null, on: false, tl: null };
     // (Split again whenever the lines break differently: a font arriving, the window resized.)
     for (const d of el.querySelectorAll('[data-lines]')) {
+      // (Demo: another way for the hero's line to arrive, ?title=write|ink|wind, title-options.js.)
+      if (titleFx && kind === 'hero') { titleFx.split(d); k.title = true; continue; }
       SplitText.create(d, { type: 'lines', mask: 'lines', linesClass: 'line', autoSplit: true, onSplit: (self) => {
         k.byEl.set(d, self.lines);
         k.lines = [...k.byEl.values()].flat();
@@ -692,6 +695,7 @@ export function startScroll({ params }) {
     k.el.classList.add('is-on');
     const d = reduced ? 0 : REVEAL;
     if (k.lines.length) t.to(k.lines, { yPercent: 0, duration: d, ease: EASE, stagger: 0.09 }, 0);
+    if (k.title) titleFx.show(t, 0);
     // The small words come in after the line, one after another.
     t.to(k.after, { autoAlpha: 1, y: 0, duration: d, ease: EASE, stagger: 0.07 }, reduced ? 0 : 0.35);
   }
@@ -701,6 +705,7 @@ export function startScroll({ params }) {
     k.el.classList.remove('is-on');
     const d = reduced ? 0 : 0.7;
     if (k.lines.length) t.to(k.lines, { yPercent: -k.off, duration: d, ease: EASE, stagger: 0.04 }, 0);
+    if (k.title) titleFx.hide(t);
     t.to(k.after, { autoAlpha: 0, y: -8, duration: d * 0.8, ease: EASE }, 0);
     t.set(k.el, { visibility: 'hidden' });
     if (k.lines.length) t.set(k.lines, { yPercent: k.off });
@@ -802,8 +807,15 @@ export function startScroll({ params }) {
   let loadShown = 0, sinceStep = 0, loaded = false, started = false;
   for (const s of steps) if (s.key !== 'warm') app.on(s.key, () => { done.add(s.key); sinceStep = 0; });
   app.on('plants', (p) => { steps[2].label = `Growing ${Math.round((app.hf?.plants.count ?? 180000) / 1000) * 1000} plants`.replace(/(\d)(?=(\d{3})+\b)/g, '$1,'); });
-  const countEl = $('.loader__count'), whatEl = $('.loader__what'), barEl = $('.loader__bar span');
+  const countEl = $('.loader__count'), whatEl = $('.loader__what'), barEl = $('.loader__bar span'), seaEl = $('.loader__sea'), unseaEl = $('.loader__unsea');
+  let seaAt = -1, loaderAt = performance.now();
   function updateLoader(dt) {
+    // The loader keeps the wall's time, not the frame's. While the page is busy building the
+    // scene its frames are far apart, and the page's own step is capped at a tenth of a second:
+    // on that clock the count fell seconds behind the loading and then jumped to the end.
+    const now = performance.now();
+    if (!RECORD) dt = Math.min((now - loaderAt) / 1000, 2);
+    loaderAt = now;
     sinceStep += dt;
     const doneW = steps.filter((s) => done.has(s.key)).reduce((a, s) => a + s.w, 0);
     const next = steps.find((s) => !done.has(s.key));
@@ -813,6 +825,19 @@ export function startScroll({ params }) {
     countEl.textContent = String(Math.min(100, Math.floor(loadShown * 100 + 0.5))).padStart(3, '0');
     barEl.style.transform = `scaleX(${loadShown})`;
     if (next && whatEl.textContent !== next.label) whatEl.textContent = next.label;
+    // The sea rising through the name (page.css, .loader__sea). The script only says where the
+    // water is going: nine tenths of the way through the step being waited for, slowly, or
+    // to the top once everything is in. The browser moves it there on its own, so it keeps
+    // rising through the seconds when the page is too busy to draw a frame. The water starts
+    // at the letters' feet (80% down their box, which has room under them for the tail of the g).
+    const to = next ? doneW + next.w * 0.9 : 1;
+    if (seaEl && to !== seaAt) {
+      seaAt = to;
+      const level = 80 - to * 88, ease = `transform ${reduced ? 0 : next ? 5.5 : 0.8}s cubic-bezier(0.16, 0.62, 0.3, 1)`;
+      seaEl.style.transition = unseaEl.style.transition = ease;
+      seaEl.style.transform = `translateY(${level.toFixed(2)}%)`;
+      unseaEl.style.transform = `translateY(${(-level).toFixed(2)}%)`;
+    }
   }
 
   // Once everything is in: draw a frame at points all the way down, so every shader is
@@ -873,7 +898,7 @@ export function startScroll({ params }) {
     const t = gsap.timeline();
     t.to(loaderEl, { autoAlpha: 0, duration: reduced ? 0 : 1.6, ease: 'power2.inOut' });
     if (!reduced && !BARE) t.to(intro, { k: 1, duration: 3.4, ease: 'power3.out', onUpdate: () => post.set({ settle: intro.k }) }, 0.15);
-    // The title once the black has mostly lifted.
+    // The title once the loader has mostly lifted.
     t.add(() => { wordsOn = true; }, reduced ? 0 : 1.05);
     t.add(() => { lenis?.start(); }, 0.4);
     t.add(() => { window.__ready = true; }, reduced ? 0 : 3.2);
@@ -906,7 +931,7 @@ export function startScroll({ params }) {
     updateWords();
     updateFrame();
     post.tick(dt);
-    sandFx?.tick(dt, cam);
+    palm?.tick(dt, cam);
     // (At rest the picture is a picture: no frame is drawn until something in it changes.)
     if (dirty > 0 || !still()) { dirty = Math.max(0, dirty - 1); app.frame(dt); }
     if (DEBUG) {

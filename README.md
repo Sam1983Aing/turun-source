@@ -174,13 +174,15 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   under the hero and the spreads, `assets/hero/sand-end.jpg` (the tide's edge in evening light)
   under the ending. With the leaf below, they are the only pictures on the page the scene did
   not draw.
-- **The palm over it is alive** (`sand-options.js`). The sand has no shadows in it. The page
-  casts them: palm fronds drawn every frame (a rib that curls, leaflets that each flutter to
-  their own beat), small and stretched so they are soft, multiplied over the sand and over
-  the card, in the colour the baked shadows had in the photograph the page used before. The
-  leaf in the corner is a cut-out of that photograph's own leaf (`assets/hero/palm-leaf.png`),
-  turning on its stem, with its shadow. It all settles as you scroll into the card.
-  `?sand=photo` shows the old photograph, still. Each place the card
+- **The palm over it is alive** (`palm.js`). The sand has no shadows in it. The page casts
+  them: palm fronds drawn every frame (a rib that curls, leaflets that each flutter to their
+  own beat), small and stretched so they are soft, multiplied over the sand and over the
+  card, in the colour the baked shadows had in the photograph the page used before. The two
+  leaves in the top corners are one cut-out of that photograph's own leaf
+  (`assets/hero/palm-leaf.png`), the right one mirrored and larger, each turning on its stem
+  with its shadow. Now and then, and as the scroll begins, a gust: sand in the plate's own
+  colours skims across the sand and over the card. It all settles as you scroll into the
+  card. `?sand=photo` shows the old photograph, still. Each place the card
   rests can have its own (`ASSETS.heroWalk`, `heroBeach` in `app.js`, empty for now, and
   `?under=walk:url,beach:url` tries one). It lies in the card's world with the inverse of the world's resting
   transform, so at rest it fills the screen as it was composed, and on the way up it grows

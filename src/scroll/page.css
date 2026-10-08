@@ -125,8 +125,6 @@ html.scroll.at-card #stage { cursor: pointer; }
    of light that crosses the picture crosses the border too (--sheen, set by postcard.js). */
 .card__paper { background: linear-gradient(135deg, #ffffff 0%, #fcfbf8 55%, #f4f2ec 100%);
   box-shadow: calc(var(--cw) * 0.0008) calc(var(--cw) * 0.0016) 0 #ddd8cc; }
-.card__paper::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: linear-gradient(112deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 70%) var(--sheen, 50%) 0 / 300% 100% no-repeat; }
 /* The card's shadow on the sand. Noon sun, almost overhead, from the top left: the sand a
    shade darker all round (wide and faint, so the top and the left edge are grounded too), a
    tight shadow under the edge away from the sun, a soft one beyond it and a long faint one.
@@ -151,12 +149,23 @@ html.scroll.at-card #stage { cursor: pointer; }
 .card__caption { user-select: none; -webkit-user-select: none; position: absolute; left: var(--b); right: var(--b); bottom: 0; height: var(--bb); margin: 0; display: flex; align-items: center; justify-content: space-between;
   font: 500 calc(var(--cw) * 0.0158)/1 var(--type); letter-spacing: 0.22em; text-transform: uppercase; color: #3b342a; text-shadow: 0 calc(var(--cw) * 0.0008) 0 rgba(255, 255, 255, 0.8); }
 .card__caption span:last-child { font-variant-numeric: tabular-nums; color: #6d6252; }
-/* The gloss over the picture: a soft light from the top left and a band of it that moves
-   with the tilt, and a crisp edge where the picture meets the border. Lifts as the card comes up. */
+/* The gloss. This is a coated card, and what says so is a window's light lying across the
+   whole of it, border and picture alike: a hard narrow glint with a broad soft glare beside
+   it, that slides as the card leans (--sheen, postcard.js) and sweeps across as it turns over.
+   With it, a little of the sky from the top, the far corner a shade duller, and a bright hair
+   along the two edges that face the sun and a dark one along the two that do not, which is the
+   card's thickness. On the picture alone: a soft light from the top left, and a crisp edge
+   where it meets the border. All of it lifts as the card comes up.
+   (It was one faint band, on the picture only, and Sam found the card "a little bit paper".) */
 .card__finish { position: absolute; left: calc(50% - var(--cw) / 2); top: calc(50% - var(--ch) / 2); width: var(--cw); height: var(--ch); pointer-events: none;
-  background: linear-gradient(112deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.13) 45%, rgba(255,255,255,0.17) 50%, rgba(255,255,255,0.13) 55%, rgba(255,255,255,0) 70%) var(--sheen, 50%) 0 / 300% 100% no-repeat,
-    linear-gradient(128deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 24%, rgba(255,255,255,0) 44%);
+  background: linear-gradient(128deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 24%, rgba(255,255,255,0) 44%);
   box-shadow: inset 0 0 0 calc(var(--cw) * 0.0006) rgba(40, 30, 16, 0.16); }
+.card__finish::before { content: ""; position: absolute; inset: calc(var(--b) * -1) calc(var(--b) * -1) calc(var(--bb) * -1) calc(var(--b) * -1); border-radius: calc(var(--cw) * 0.005); pointer-events: none;
+  background:
+    linear-gradient(112deg, rgba(255,255,255,0) 24.5%, rgba(255,255,255,0.4) 27%, rgba(255,255,255,0.12) 28.6%, rgba(255,255,255,0.24) 32.5%, rgba(255,255,255,0.1) 37%, rgba(255,255,255,0) 42%) var(--sheen, 50%) 0 / 300% 100% no-repeat,
+    linear-gradient(188deg, rgba(198, 228, 255, 0.17) 0%, rgba(198, 228, 255, 0.05) 30%, rgba(198, 228, 255, 0) 55%),
+    radial-gradient(120% 100% at 100% 100%, rgba(40, 28, 12, 0.1), rgba(40, 28, 12, 0) 55%);
+  box-shadow: inset calc(var(--cw) * 0.0011) calc(var(--cw) * 0.0011) 0 rgba(255, 255, 255, 0.9), inset calc(var(--cw) * -0.0009) calc(var(--cw) * -0.0009) 0 rgba(96, 74, 42, 0.26); }
 /* The light on the whole still life: warm from the top left, falling away to the far corner. */
 .table__light { position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(58% 78% at 20% 46%, rgba(255, 238, 206, 0.5), rgba(255, 238, 206, 0.22) 45%, rgba(255, 238, 206, 0) 78%), radial-gradient(130% 120% at 28% 18%, rgba(0, 0, 0, 0) 58%, rgba(64, 40, 14, 0.24) 100%); }
@@ -169,6 +178,16 @@ html.scroll.at-card #stage { cursor: pointer; }
 .table.is-end .card__shadow i:nth-child(3) { --c: rgba(70, 40, 12, 0.5); --blur: 0.022; --g: -0.008; --e: 0.041; --x: 0.058; --y: 0.024; }
 .table.is-end .card__shadow i:nth-child(4) { --c: rgba(70, 40, 12, 0.24); --blur: 0.14; --g: -0.02; --e: 0.23; --x: 0.08; --y: 0.05; }
 .table.is-end .table__light { background: radial-gradient(130% 120% at 28% 18%, rgba(0, 0, 0, 0) 60%, rgba(64, 40, 14, 0.2) 100%); }
+/* The palm over the sand (palm.js): layers in the card's world, laid with the sand's own
+   transform. Shadows multiply over the sand and the card, the two leaves are pictures that
+   turn on their stems, the gust's sand is drawn over everything. */
+.fx { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: 50% 50%; pointer-events: none; }
+.fx-shade { mix-blend-mode: multiply; }
+.fx-leaf .leaf { position: absolute; display: none; will-change: transform; }
+.fx-leaf .leaf img { display: block; width: 100%; height: 100%; user-select: none; -webkit-user-drag: none; }
+.fx-leaf .leaf--right img { transform: scaleX(-1); }
+.table.is-full .fx { visibility: hidden; }
+html.tool .fx { display: none; }
 .table.is-full .ground, .table.is-full .card__paper, .table.is-full .card__shadow, .table.is-full .card__shade, .table.is-full .card__finish, .table.is-full .table__light { visibility: hidden; }
 
 /* ------------------------------------------------------------ the back of the card */
@@ -215,14 +234,41 @@ html.scroll.at-card #stage { cursor: pointer; }
 
 /* ------------------------------------------------------------ loader */
 
-.loader { position: fixed; inset: 0; z-index: 50; background: var(--ink); display: grid; place-content: center; justify-items: center; gap: 22px; text-align: center; padding: 0 var(--gutter); }
-.loader .label { color: var(--cream-dim); }
-.loader__title { margin: 0; font: 400 clamp(3.8rem, 2.2rem + 7.6vw, 9.4rem)/0.9 var(--hand); }
-.loader__bar { width: min(340px, 60vw); height: 1px; background: rgba(243, 239, 230, 0.16); overflow: hidden; }
-.loader__bar span { display: block; height: 100%; background: var(--accent-deep); transform-origin: 0 50%; transform: scaleX(0); }
-.loader__step { margin: 0; display: flex; gap: 14px; align-items: baseline; justify-content: center; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; color: var(--cream-dim); min-height: 1em; }
-.loader__count { font-variant-numeric: tabular-nums; color: var(--cream); }
-.loader__fail { display: none; max-width: 30rem; font: 400 15px/1.5 var(--type); color: var(--cream-dim); letter-spacing: 0; text-transform: none; }
+/* The loader is real: its bar and its count follow the page as it raises the terrain, loads
+   the textures, grows the plants and compiles the sea (scroll.js). It lies on the same sand as
+   the hero (the picture is set in index.html), so the page opens out of it, and the place's
+   name fills with sea from the bottom as the loading goes: a wave's edge rising through the
+   letters. (It was near-black, with the name in cream.) */
+.loader { position: fixed; inset: 0; z-index: 50; background: #ecd6b0 center / cover no-repeat; display: grid; place-content: center; justify-items: center; gap: 16px; text-align: center; padding: 0 var(--gutter); color: var(--ink); }
+.loader::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(64% 56% at 50% 46%, rgba(255, 244, 220, 0.55), rgba(255, 244, 220, 0) 72%), radial-gradient(130% 120% at 50% 40%, rgba(0, 0, 0, 0) 58%, rgba(64, 40, 14, 0.22) 100%); }
+.loader > * { position: relative; }
+.loader .label { color: rgba(20, 18, 14, 0.72); }
+/* (The name's box is padded to hold the hand's swashes and the tail of its g, so the water's
+   edge, which is cut out of that box, reaches all of every letter, and the bar under it stands
+   clear of the g.) */
+.loader__title { --pad: 0.3em 0.36em 0.56em; margin: 0; position: relative; display: inline-block; padding: var(--pad); font: 400 clamp(3.8rem, 2.2rem + 7.6vw, 9.4rem)/0.9 var(--hand); white-space: nowrap; }
+.loader__ghost { color: rgba(23, 37, 61, 0.13); }
+/* The water in the name. A second copy of the word, in the sea's colours, seen only through a
+   shape with a wave for its top edge. The shape slides down to where the loading is (__sea)
+   and from side to side (__wave), and inside it the word is moved back by as much each way
+   (__unwave, __unsea), so the word stands still and only the water's edge moves. All four are
+   transforms, run by a transition or an animation: the browser keeps them going on its own
+   while the page is busy building the scene and cannot draw a frame for seconds at a time.
+   (Drawn frame by frame from the script, as it first was, the water stood still at the
+   letters' feet for five seconds and then jumped to the top.) */
+.loader__fill, .loader__sea, .loader__wave, .loader__unwave, .loader__unsea { position: absolute; inset: 0; display: block; }
+.loader__sea { transform: translateY(80%); will-change: transform; }
+.loader__unsea { transform: translateY(-80%); will-change: transform; padding: var(--pad); color: transparent; background: linear-gradient(180deg, #3cc4c9 0%, #1c95ad 46%, #0e5d7f 100%); -webkit-background-clip: text; background-clip: text; }
+.loader__wave { clip-path: polygon(-20.0% 0.76%, -16.5% 1.79%, -13.0% 1.60%, -9.5% 2.28%, -6.0% -0.31%, -2.5% -2.75%, 1.0% -1.58%, 4.5% -1.23%, 8.0% -0.12%, 11.5% 2.92%, 15.0% 2.25%, 18.5% 0.17%, 22.0% -0.18%, 25.5% -2.29%, 29.0% -2.89%, 32.5% 0.16%, 36.0% 1.22%, 39.5% 1.60%, 43.0% 2.75%, 46.5% 0.25%, 50.0% -2.28%, 53.5% -1.59%, 57.0% -1.81%, 60.5% -0.72%, 64.0% 2.59%, 67.5% 2.31%, 71.0% 0.76%, 74.5% 0.47%, 78.0% -2.08%, 81.5% -3.07%, 85.0% -0.39%, 88.5% 0.57%, 92.0% 1.43%, 95.5% 3.08%, 99.0% 0.79%, 102.5% -1.70%, 106.0% -1.43%, 109.5% -2.26%, 113.0% -1.30%, 116.5% 2.13%, 120.0% 2.20%, 120% 400%, -20% 400%); animation: sea-x 2.6s ease-in-out infinite alternate; }
+.loader__unwave { animation: sea-unx 2.6s ease-in-out infinite alternate; }
+@keyframes sea-x { from { transform: translateX(-4.5%); } to { transform: translateX(4.5%); } }
+@keyframes sea-unx { from { transform: translateX(4.5%); } to { transform: translateX(-4.5%); } }
+.loader__bar { width: min(340px, 60vw); height: 1px; background: rgba(20, 18, 14, 0.2); overflow: hidden; }
+.loader__bar span { display: block; height: 100%; background: #12809b; transform-origin: 0 50%; transform: scaleX(0); }
+.loader__step { margin: 0; display: flex; gap: 14px; align-items: baseline; justify-content: center; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(20, 18, 14, 0.72); min-height: 1em; }
+.loader__count { font-variant-numeric: tabular-nums; color: var(--ink); }
+.loader__fail { display: none; max-width: 30rem; font: 400 15px/1.5 var(--type); color: rgba(20, 18, 14, 0.82); letter-spacing: 0; text-transform: none; }
 .loader.failed .loader__fail { display: block; }
 .loader.failed .loader__step, .loader.failed .loader__bar { display: none; }
 
@@ -290,7 +336,12 @@ html.scroll.at-card #stage { cursor: pointer; }
 /* On sand (the hero, the ending): ink, the whole menu. In the scene: cream, where you are,
    and only the way to book. */
 .at-sand .hud { color: var(--ink); text-shadow: none; }
-.at-sand .hud__cta:hover, .at-sand .hud__cta:focus-visible { background: var(--ink); color: var(--cream) !important; border-color: var(--ink); }
+/* (On the sand screens the way to reserve is on the page itself, so the bar's button is only
+   there inside the picture, where nothing else is. Sam: "it does the same thing as the one on
+   the hero section".) */
+.at-sand .hud__cta { display: none; }
+/* (And the two links stand clear of the leaf that hangs out of the top right corner.) */
+.at-sand .hud__nav { margin-right: clamp(70px, 8.8vw, 150px); }
 .in-scene .hud__where { display: flex; font: 500 11px/1 var(--sans); letter-spacing: 0.16em; font-variant-numeric: tabular-nums; }
 .in-scene .hud__nav { font: 500 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; }
 .in-scene .hud__nav a:not(.hud__cta), .in-scene .hud__mark span { display: none; }
@@ -330,6 +381,8 @@ html.scroll.at-card #stage { cursor: pointer; }
 /* (Pen-blue ink, written a little uphill. The measure breaks it after "people" and "the".) */
 .hero .display { font-size: clamp(3.5rem, 0.64rem + 7.4vw, 9.6rem); color: var(--pen); max-width: 4.91em; text-wrap: wrap; margin: 0.06em 0 0.02em; transform: rotate(-3.5deg); transform-origin: 0 60%; }
 .hero .display em { color: var(--accent-deep); }
+/* (The stroke under the word can be drawn: a clip opened from the left, --u from 0 to 1.) */
+.hero .display em::after { clip-path: inset(-30% calc((1 - var(--u, 1)) * 100%) -30% -6%); }
 .hero .body { color: rgba(20, 18, 14, 0.82); max-width: 29rem; }
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 30px; margin-top: 6px; }
 /* "Scroll into the postcard": in the hand, a note on the sand under the card's lower left
@@ -465,4 +518,5 @@ html.scroll.at-card #stage { cursor: pointer; }
 
 @media (prefers-reduced-motion: reduce) {
   .cue__arrow { animation: none; }
+  .loader__wave, .loader__unwave { animation: none; }
 }

@@ -144,6 +144,14 @@ are already in `vendor/fonts/` for the standalone file).
 - Open: whether the other two options go, and whether Gust's wind at the start of the scroll
   is wanted on top.
 
+## Round 13 (8 October 2026: his notes on the live hero)
+
+- The bottom right shadow lighter. The leaf greener, and a second, longer one top right. A
+  little gust with real sand that can cross the postcard. The top bar's Reserve off the hero.
+- The loader is real, so it stays: on sand, the name filling like a wave, the bar clear of the g.
+- The card glossy, "the whole thing".
+- "A nice text headline animation": three options behind `?title=`. His pick is open.
+
 ## Found by other versions
 
 Nothing yet.
