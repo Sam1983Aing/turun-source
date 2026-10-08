@@ -2,22 +2,13 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "kelingking",
+      "name": "kelingking-beach",
       "runtimeExecutable": "python3",
       "runtimeArgs": [
         "tools/serve.py",
-        "5178"
+        "5190"
       ],
-      "port": 5178
-    },
-    {
-      "name": "kelingking-5181",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": [
-        "tools/serve.py",
-        "5181"
-      ],
-      "port": 5181
+      "port": 5190
     }
   ]
 }

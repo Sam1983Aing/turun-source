@@ -69,7 +69,7 @@ try {
     const shot = SHOTS[name];
     const extra = flag('set') ? '&' + String(flag('set')).split(';').join('&') : '';
     // (The extra switches first: a page reads the first of a repeated switch.)
-    const page = await b.open(`http://localhost:5178/?shot=${name}${extra}&q=1024&pr=1&t=17`, { width: WIDTH, height: Math.round(WIDTH / refAspect(shot.ref)) });
+    const page = await b.open(`http://localhost:5190/?shot=${name}${extra}&q=1024&pr=1&t=17`, { width: WIDTH, height: Math.round(WIDTH / refAspect(shot.ref)) });
     await page.waitFor('window.__ready === true');
     await page.eval(SETUP);
     const ratios = Object.fromEntries(groups.map((g) => [g, []]));

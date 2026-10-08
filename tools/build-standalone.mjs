@@ -14,7 +14,7 @@
 // and the terrain is generated on the page (it freezes for several seconds while it does).
 //
 //   node tools/build-standalone.mjs            kelingking.html, assets from the CDN
-//   node tools/build-standalone.mjs --local    kelingking-local.html, assets from localhost:5178
+//   node tools/build-standalone.mjs --local    kelingking-local.html, assets from localhost:5190
 //   node tools/build-standalone.mjs --local --asset-base=http://localhost:5183/assets/
 //                                              (for testing before the assets are pushed)
 //
@@ -35,7 +35,7 @@ const LOCAL = process.argv.includes('--local');
 export const TAG = '1.11.0';
 const CDN = `https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@${TAG}/kelingking/`;
 const assetBase = process.argv.find((arg) => arg.startsWith('--asset-base='))?.slice(13);
-const BASE = LOCAL ? (assetBase ?? 'http://localhost:5178/assets/').replace(/\/?$/, '/') : CDN;
+const BASE = LOCAL ? (assetBase ?? 'http://localhost:5190/assets/').replace(/\/?$/, '/') : CDN;
 const ASSETS = { textures: `${BASE}textures/`, bake: `${BASE}terrain/terrain-1024.bin` };
 const OUT = join(root, LOCAL ? 'kelingking-local.html' : 'kelingking.html');
 

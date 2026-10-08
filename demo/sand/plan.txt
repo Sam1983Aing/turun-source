@@ -1,1 +1,0 @@
-0:0; 7.5:0; 14:js:__scroll.pace.screensAt(1)*innerHeight; 16:js:__scroll.pace.screensAt(1)*innerHeight+1

@@ -10,6 +10,9 @@ The page is written as a travel page for a walk down to the beach ("Turun, guide
 That part is a concept: the outfitter, the prices and the boat pick-up are invented. The real
 surf at Kelingking is dangerous and swimming is banned.
 
+This repository is the landing page. It grew out of the scene's own repository
+(`Sam1983Aing/kelingking`, the descent alone, v1 to v34) and carries that history.
+
 **[Open the live page](https://sam1983aing.github.io/kelingking/)** (a laptop with Chrome or
 Safari works best, it takes about 10 seconds to load)
 
@@ -30,7 +33,7 @@ Safari works best, it takes about 10 seconds to load)
    python3 tools/serve.py
    ```
 
-   Then open http://localhost:5178. Nothing to install apart from Python, which Macs have.
+   Then open http://localhost:5190. Nothing to install apart from Python, which Macs have.
    More under [Run it](#run-it).
 4. **Build your own.** Paste the [starter prompt](teach/03-starter-prompt.md) into Claude Code
    or Codex, in an empty folder. It builds the foundation of the island in five steps and
@@ -89,7 +92,7 @@ See [how v1 was built](docs/gallery/history/README.md).
 python3 tools/serve.py
 ```
 
-Then open http://localhost:5178: the landing page, from the postcard on the sand (v35) down
+Then open http://localhost:5190: the landing page, from the postcard on the sand (v35) down
 to the water's edge (v8) and the back of the card. The source needs a local server (a browser will not load ES modules
 or start a module worker from `file://`). `kelingking.html` is the same page built to run
 without one. Nothing to install: the source page loads three.js, GSAP and Lenis from jsDelivr
@@ -106,7 +109,7 @@ the beach. “Reset view” returns to the composed camera. Left/right arrow key
 the scene is focused; Escape resets. A vertical touch swipe still scrolls.
 
 The tools that match the scene to photos are the same page with a shot in the URL:
-http://localhost:5178/?shot=viewpoint. There, keys `1` to `9` switch shots, `O` photo overlay,
+http://localhost:5190/?shot=viewpoint. There, keys `1` to `9` switch shots, `O` photo overlay,
 `D` difference blend, `L` outline mode, `F` free camera, `C` contour lines, and the panel on the
 right tunes the camera and the terrain live. On the landing page the panel, a readout and keys
 `1` to `6` (the stops) only appear with `?debug`.
@@ -266,7 +269,7 @@ the loader lifts.
 
 ```bash
 node tools/build-standalone.mjs                 # kelingking.html, assets from the CDN
-node tools/build-standalone.mjs --local         # kelingking-local.html, assets from localhost:5178
+node tools/build-standalone.mjs --local         # kelingking-local.html, assets from localhost:5190
 node tools/test-standalone.mjs                  # open kelingking.html from file:// and photograph 4 stops
 node tools/test-standalone.mjs --offline        # the same with the network cut
 ```

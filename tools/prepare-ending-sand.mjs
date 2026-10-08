@@ -34,7 +34,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const opt = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3);
-const SRC = process.argv.slice(2).find((a) => !a.startsWith('--')) ?? join(root, 'ending-concept-05-tide-line.png');
+const SRC = process.argv.slice(2).find((a) => !a.startsWith('--')) ?? join(root, '../images/ending-concepts/ending-concept-05-tide-line.png');
 const OUT = opt('out') ? join(root, opt('out')) : join(root, 'assets/hero/sand-end.jpg');
 const W = 3840, H = 2400, CELL = 16;
 

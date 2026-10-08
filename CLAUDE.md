@@ -1,20 +1,38 @@
-# Kelingking: working notes
+# Kelingking Beach, the landing page: working notes
 
-A real place (Kelingking Beach, Nusa Penida) rebuilt in three.js as a scroll descent from the
-air down to the sand. The bar is photoreal water, sand and rock, and plants that feel alive.
+A real place (Kelingking Beach, Nusa Penida) rebuilt in three.js, with a travel landing page
+around it: "Turun, guided descents". The page opens on a postcard lying on sand, you scroll
+into its picture and down the cliff to the water, and the card turns over into a booking.
+The bar is photoreal water, sand and rock, plants that feel alive, and a page worth $10k.
+
+## Where this came from, and what is where
+
+The scene was built in versions v1 to v34 in `Projects/Claude Code/012 Nusa Penida` (public
+as `Sam1983Aing/kelingking`, live on GitHub Pages). The landing page was v35 there. On
+8 October 2026 it became its own project: this folder is a copy of that repo with its whole
+history, on `main`, with no GitHub repo of its own yet.
+
+- `012 Nusa Penida` is the remote `scene`, to bring a scene fix over (`git fetch scene`, then
+  cherry-pick). Nothing is ever pushed there from here.
+- This repo is the page: code, assets, the single file. One folder up are the things that
+  are not code: `../demos/` (recorded design options, with their scroll plans and reel
+  scripts), `../images/` (Sam's generated plates and concepts, and the prompts),
+  `../teach/` (the journal and its stills). `captures/` here is scratch, not in git.
+- The state of the work and what is open: `../HANDOFF.md`.
 
 ## How this project is run
 
-It is built in versions, one element per chat session. Before doing anything, read
-`docs/versions/README.md` and the brief for the version you have been asked to do. Work on
-that element only, on its own branch, and finish with `node tools/hero.mjs <version>` and a
-section in `PROCESS.md`. Problems that belong to another version go into that version's brief.
+In rounds of Sam's notes on the page, on `main`. The brief with every round is
+`docs/versions/v35-landing-page.md`, and each round gets a section in `PROCESS.md`. The 3D
+scene is not changed unless Sam asks (so far: the boat and its mooring). Design choices are
+shown as recorded demos behind a URL switch, not as lists. Nothing goes to GitHub and nothing
+goes live without Sam saying so.
 
 ## Things that already cost time
 
 - **The browser pane lies.** It stops rendering when hidden and its screenshots go stale. Use
   `tools/capture.mjs` (headless Chrome, nothing to install) and read numbers back from the
-  page. The server is `python3 tools/serve.py` (`.claude/launch.json`, "kelingking"): port 5178, and
+  page. The server is `python3 tools/serve.py` (`.claude/launch.json`, "kelingking-beach"): port 5190, and
   it tells browsers not to reuse stale files (with plain `http.server`, Safari mixed an old
   script with new ones and the loader hung at 99).
 - **`node --check` on a `.js` file treats it as a script**, so module-only mistakes pass.

@@ -98,7 +98,7 @@ async function sideBySide() {
   const b = await launch();
   const pages = {};
   try {
-    for (const [k, base] of [['a', `http://localhost:5178/${dir}/`], ['b', 'http://localhost:5178/']]) {
+    for (const [k, base] of [['a', `http://localhost:5190/${dir}/`], ['b', 'http://localhost:5190/']]) {
       pages[k] = await b.open(`${base}?shot=viewpoint&q=1024&pr=1&t=17`, { width: W, height: H });
       await pages[k].waitFor('window.__ready === true');
       await pages[k].eval(SETUP);
@@ -141,7 +141,7 @@ async function pace() {
   try {
     const p = await b.open('about:blank', { width: W, height: H });
     await b.send('Emulation.setDeviceMetricsOverride', { width: W, height: H, deviceScaleFactor: DPR, mobile: false }, p.sessionId);
-    await b.send('Page.navigate', { url: 'http://localhost:5178/' }, p.sessionId);
+    await b.send('Page.navigate', { url: 'http://localhost:5190/' }, p.sessionId);
     await p.waitFor('window.__ready === true', 180000);
     const r = await p.eval(`new Promise((done) => {
       const S = __scroll, L = S.lenis, total = S.pace.screens * innerHeight;

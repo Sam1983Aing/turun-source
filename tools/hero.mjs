@@ -30,7 +30,7 @@ const roundsFlag = args.find((a) => a.startsWith('--rounds='));
 const roundCount = roundsFlag ? Math.max(0, Number(roundsFlag.slice(9))) : 3;
 const comparePhotos = !args.includes('--no-compare');
 const baseFlag = args.find((a) => a.startsWith('--url='));
-const BASE = (baseFlag ? baseFlag.slice(6) : 'http://localhost:5178/').replace(/\/?$/, '/');
+const BASE = (baseFlag ? baseFlag.slice(6) : 'http://localhost:5190/').replace(/\/?$/, '/');
 
 const run = (...a) => {
   const urlOpt = a.some((arg) => arg.startsWith('--url=')) ? [] : [`--url=${BASE}`];
