@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 1895867. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
+  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 07ab9ac. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Turun · The walk down to Kelingking Beach</title>
@@ -95,16 +95,18 @@ html.scroll.loading { overflow: hidden; }
 .hero .display em::after, .sp__head em::after { content: ""; position: absolute; left: -3%; right: -6%; bottom: -0.04em; height: 0.16em;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 40 4 110 3 197 7' fill='none' stroke='%23b4532d' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M30 13.5 C 80 9 140 8.5 186 11' fill='none' stroke='%23b4532d' stroke-width='1.6' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
 
-.button { position: relative; isolation: isolate; overflow: hidden; pointer-events: auto; appearance: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 18px; background: #192a45; color: var(--cream); padding: 8px 8px 8px 28px; border-radius: 99px; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; white-space: nowrap;
-  box-shadow: inset 0 1px 0 rgba(190, 232, 240, 0.22), inset 0 0 0 1px rgba(120, 190, 210, 0.12), 0 14px 24px -14px rgba(23, 37, 61, 0.7); transition: box-shadow 0.5s var(--ease), transform 0.3s var(--ease); }
-/* The button's face is a small pool of water (water-button.js): it ripples under the pointer
-   and under a press, and now and then a drop falls on it. Lit by its slope only, no glow. */
+.button { position: relative; isolation: isolate; overflow: hidden; pointer-events: auto; appearance: none; cursor: pointer; display: inline-flex; align-items: center; gap: 18px; border: 2.5px solid #122640; background: linear-gradient(180deg, #116f8b, #09435f); color: #f8f4ea; text-shadow: 0 1px 2px rgba(3, 28, 44, 0.6); padding: 6px 6px 6px 26px; border-radius: 99px; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; white-space: nowrap;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35), 0 14px 24px -14px rgba(12, 32, 56, 0.75); transition: box-shadow 0.5s var(--ease), transform 0.3s var(--ease); }
+/* The button's face is the sea, set a little into a dark rim (water-button.js): a net of light
+   moves over its floor, it ripples under the pointer and under a press, and now and then a
+   drop falls on it. After ThreeUI's "Water Ripple", without its glow. Without WebGL it is the
+   plain gradient above. */
 .button__water { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; border-radius: inherit; pointer-events: none; }
 /* (An arrow in a paper-white disc where a rule used to be.) */
 .button::after { content: ""; flex: none; width: 36px; height: 36px; border-radius: 50%;
   background: var(--cream) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 8h11.5M9 3.5 13.5 8 9 12.5' fill='none' stroke='%2317253d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 15px 15px no-repeat;
   transition: transform 0.5s var(--ease), background-color 0.5s var(--ease); }
-.button:hover, .button:focus-visible { box-shadow: inset 0 1px 0 rgba(190, 232, 240, 0.3), inset 0 0 0 1px rgba(120, 190, 210, 0.2), 0 18px 28px -14px rgba(23, 37, 61, 0.8); }
+.button:hover, .button:focus-visible { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4), 0 18px 28px -14px rgba(12, 32, 56, 0.85); }
 .button:hover::after, .button:focus-visible::after { transform: translateX(3px); background-color: #fff; }
 .button:active { transform: scale(0.985); }
 .button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
@@ -351,7 +353,7 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
   .sp__rows div { grid-template-columns: 6.4rem 1fr; padding: 8px 0; }
   .sp__rows dd { font-size: 1.02rem; }
   .sp__price b { font-size: 1.5rem; }
-  .sp__price .button { padding: 6px 6px 6px 20px; gap: 12px; }
+  .sp__price .button { padding: 4px 4px 4px 18px; gap: 12px; }
 }
 
 /* ------------------------------------------------------------ the frame around the scene */
@@ -541,7 +543,7 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
   .hero .display { font-size: clamp(2.76rem, 14.2vw, 5.5rem); max-width: none; margin: 0.2em 0 0.16em; }
   .hero .body { font-size: 0.98rem; line-height: 1.5; }
   .hero__actions { position: absolute; left: 0; right: 0; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 16px); margin: 0; justify-content: space-between; flex-wrap: nowrap; }
-  .hero__actions .button { padding: 6px 6px 6px 20px; gap: 12px; }
+  .hero__actions .button { padding: 4px 4px 4px 18px; gap: 12px; }
   .button::after { width: 32px; height: 32px; }
   .cue { left: auto; right: 4px; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 22px); font-size: 1.7rem; gap: 8px; rotate: -5deg; transform-origin: 100% 50%; }
   .cue__arrow { width: 40px; height: 18px; rotate: 100deg; }
@@ -559,7 +561,7 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
   .back__price { padding-top: 1.6cqh; font-size: max(11px, 3.1cqw); }
   .back__price b { font-size: 5cqw; }
   .back__addr { padding: 0; gap: 1.5cqh; align-content: end; position: static; }
-  .back__addr .button { margin-top: 0.6cqh; padding: 6px 6px 6px 20px; gap: 12px; }
+  .back__addr .button { margin-top: 0.6cqh; padding: 4px 4px 4px 18px; gap: 12px; }
   .back__to { font-size: 6cqw; }
   .field span { font-size: max(9px, 2.5cqw); }
   .field input, .field select { font-size: max(20px, 5.6cqw); min-height: 26px; }
@@ -96300,96 +96302,174 @@ return { "titleOption": titleOption };
 // src/scroll/water-button.js
 __m["src/scroll/water-button.js"] = (function () {
 "use strict";
-// Water in the buttons (v35 round 15). Sam pointed at a "water ripple" button (ThreeUI's, a
-// members' component whose source could not be read here) and asked for that feeling, quieter:
-// "the water effect feels a bit too strong, the glow". This is the page's own, made for it.
+// Water in the buttons (v35 rounds 15 and 16).
 //
-// The button's face is a small pool: a grid of heights, one cell for every two pixels, that
-// obeys the wave equation (each cell goes to the mean of its four neighbours, less where it
-// was, times a little damping). The pointer moving over it drags a wake, a press drops a
-// stone in, and now and then a drop falls on its own. It is lit from the top left by its
-// slope and nothing else: no glow, no colour of its own beyond the pen's blue it sits in.
-// When the pool is still nothing is drawn.
+// After ThreeUI's "Water Ripple" button, which Sam pointed at and asked for quieter ("the water
+// effect feels a bit too strong, the glow"). Theirs was looked at running, in his own browser:
+// a pool set into a dark rim, a bright net of light moving over a tiled floor, the surface
+// rippling under the pointer, and a glow at its ends and all round it. This is the page's own
+// writing of that (their source was not read), for a beach: the sea in place of the pool, no
+// tiles, no glow.
+//
+// Two things make it:
+//
+//   the net of light   what sunlight does on the floor of shallow water. The surface is a sum
+//                      of six travelling waves. Each bends the light by its slope, so light
+//                      that left evenly spaced arrives bunched up: its brightness on the floor
+//                      is one over how much a small patch of it has been squeezed, which is
+//                      the determinant of (1 + the surface's curvature). Where that passes
+//                      through nothing the light is focused into a line. Worked out for
+//                      every pixel by a small shader.
+//   the ripples        a grid of heights, one cell for two pixels, that obeys the wave
+//                      equation (each cell goes to the mean of its four neighbours, less
+//                      where it was, times a little damping). The pointer drags a wake, a
+//                      press drops a stone in, and now and then a drop falls on its own. The
+//                      grid's slope goes to the shader, which looks through it: the net
+//                      under a ripple is pushed aside, and the ripple's own faces catch the
+//                      light or lose it.
+//
+// It runs only while its button can be seen.
 
-const CELL = 2;            // pixels to a cell
-const DAMP = 0.986;        // what a wave keeps each step
-const DEEP = [[30, 58, 92], [19, 32, 54]];     // the face, top and bottom (the pen's blue)
-const LIGHT = [150, 226, 232], SHADE = [4, 10, 22];
+const CELL = 2;            // pixels to a cell of the ripples' grid
+const DAMP = 0.986;        // what a ripple keeps each step
+
+const VERT = 'attribute vec2 p; varying vec2 v; void main() { v = vec2(p.x * 0.5 + 0.5, 0.5 - p.y * 0.5); gl_Position = vec4(p, 0.0, 1.0); }';
+// S the button's size in pixels. T time. K how bright the net is. R the ripples: their slope
+// in red and green. v: 0 to 1 across the button, from its top left.
+const FRAG = `
+precision highp float;
+uniform sampler2D R; uniform vec2 S; uniform float T, K;
+varying vec2 v;
+// One wave of the surface, going along d: what it adds to the surface's curvature at x
+// (xx, yy, xy). Its height is taken as 1 / k^2, so that every wave bends the light as much.
+vec3 wave(vec2 x, vec2 d, float k, float w, float ph) {
+  return -sin(dot(d, x) * k + w * T + ph) * vec3(d.x * d.x, d.y * d.y, d.x * d.y);
+}
+void main() {
+  vec2 px = v * S;
+  vec2 slope = (texture2D(R, v).xy - 0.5) * 2.0;
+  // (The floor seen through a ripple is seen a little to one side.)
+  vec2 x = px / 9.5 + slope * 2.6;
+  vec3 c = wave(x, vec2(0.955, 0.296), 1.0, 0.9, 0.0) + wave(x, vec2(0.315, 0.949), 1.6, -1.2, 1.3)
+         + wave(x, vec2(-0.737, 0.675), 2.3, 1.0, 2.1) + wave(x, vec2(-0.897, -0.443), 1.3, -0.7, 4.0)
+         + wave(x, vec2(-0.211, -0.978), 2.9, 1.4, 0.7) + wave(x, vec2(0.776, -0.631), 1.9, 0.8, 5.2);
+  c *= 0.44;
+  float squeezed = abs((1.0 + c.x) * (1.0 + c.y) - c.z * c.z);
+  // (Kept from burning out: the brightest of it is well short of white, so the words on the
+  // button can always be read.)
+  float net = pow(min(0.17 / (squeezed + 0.1), 1.05), 1.35);
+  // The sea, deeper down the button, and the light on its floor.
+  vec3 col = mix(vec3(0.066, 0.435, 0.545), vec3(0.035, 0.262, 0.392), v.y);
+  col += vec3(0.42, 0.82, 0.83) * net * K;
+  // A ripple's faces: lit towards the top left, dark away from it.
+  float lit = slope.x * 0.62 + slope.y * 0.78;
+  col += vec3(0.5, 0.86, 0.88) * max(lit, 0.0) * 0.6;
+  col *= 1.0 - max(-lit, 0.0) * 0.5;
+  // The water stands a little below its rim: darker close under it, most under its top.
+  float r = S.y * 0.5;
+  vec2 q = vec2(max(abs(px.x - S.x * 0.5) - (S.x * 0.5 - r), 0.0), px.y - r);
+  float inFromRim = r - length(q);
+  col *= mix(0.5, 1.0, smoothstep(0.0, 7.0 + 5.0 * (1.0 - v.y), inFromRim));
+  gl_FragColor = vec4(col, 1.0);
+}`;
 
 function pool(btn, { reduced }) {
   const c = document.createElement('canvas');
   c.className = 'button__water';
   c.setAttribute('aria-hidden', 'true');
   btn.prepend(c);
-  const ctx = c.getContext('2d');
-  let W = 0, H = 0, cur = null, old = null, img = null, running = false, lastDrop = performance.now(), wait = 2600, px = -1, py = -1;
+  const gl = c.getContext('webgl', { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: 'low-power' });
+  if (!gl) { c.remove(); return null; }
+  const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+  const prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG)); gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+  gl.useProgram(prog);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, 'p');
+  gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  const u = Object.fromEntries(['R', 'S', 'T', 'K'].map((n) => [n, gl.getUniformLocation(prog, n)]));
+  gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+  for (const [k, val] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, val);
+
+  let W = 0, H = 0, cur = null, old = null, slopes = null, rippling = false, running = false, seen = false, hover = 0, over = false;
+  let lastDrop = performance.now(), wait = 2600, px = -1, py = -1, t0 = performance.now(), cssW = 0, cssH = 0;
 
   function size() {
-    const w = Math.max(8, Math.round(btn.offsetWidth / CELL)), h = Math.max(6, Math.round(btn.offsetHeight / CELL));
-    if (w === W && h === H) return;
-    W = w; H = h; c.width = W; c.height = H;
-    cur = new Float32Array(W * H); old = new Float32Array(W * H);
-    img = ctx.createImageData(W, H);
+    cssW = btn.clientWidth; cssH = btn.clientHeight;
+    if (!cssW || !cssH) return;
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    c.width = Math.round(cssW * dpr); c.height = Math.round(cssH * dpr);
+    gl.viewport(0, 0, c.width, c.height);
+    const w = Math.max(8, Math.round(cssW / CELL)), h = Math.max(6, Math.round(cssH / CELL));
+    if (w !== W || h !== H) { W = w; H = h; cur = new Float32Array(W * H); old = new Float32Array(W * H); slopes = new Uint8Array(W * H * 4).fill(128); }
+    upload();
     draw();
   }
   // A stone of radius r cells at x, y (cells): the water under it goes down by `amp`.
   function drop(x, y, r, amp) {
+    if (!W) return;
     for (let j = Math.max(1, Math.floor(y - r)); j <= Math.min(H - 2, Math.ceil(y + r)); j++) for (let i = Math.max(1, Math.floor(x - r)); i <= Math.min(W - 2, Math.ceil(x + r)); i++) {
       const d = Math.hypot(i - x, j - y) / r;
       if (d < 1) cur[j * W + i] -= amp * (0.5 + 0.5 * Math.cos(Math.PI * d));
     }
-    if (!running && !reduced) { running = true; requestAnimationFrame(frame); }
+    rippling = true;
+    start();
   }
   function step() {
     let moving = 0;
     for (let j = 1; j < H - 1; j++) for (let i = 1, k = j * W + 1; i < W - 1; i++, k++) {
-      const v = ((cur[k - 1] + cur[k + 1] + cur[k - W] + cur[k + W]) * 0.5 - old[k]) * DAMP;
-      old[k] = v;
-      moving += v < 0 ? -v : v;
+      const val = ((cur[k - 1] + cur[k + 1] + cur[k - W] + cur[k + W]) * 0.5 - old[k]) * DAMP;
+      old[k] = val;
+      moving += val < 0 ? -val : val;
     }
     [cur, old] = [old, cur];
-    return moving / (W * H);
+    if (moving / (W * H) < 0.0015) { rippling = false; cur.fill(0); old.fill(0); }
+  }
+  // The ripples' slope, for the shader: red across, green down, 128 for level.
+  function upload() {
+    if (!W) return;
+    for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+      const o = (j * W + i) * 4;
+      slopes[o] = Math.max(0, Math.min(255, 128 + (cur[Math.min(W - 1, i + 1) + j * W] - cur[Math.max(0, i - 1) + j * W]) * 150));
+      slopes[o + 1] = Math.max(0, Math.min(255, 128 + (cur[i + Math.min(H - 1, j + 1) * W] - cur[i + Math.max(0, j - 1) * W]) * 150));
+    }
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, W, H, 0, gl.RGBA, gl.UNSIGNED_BYTE, slopes);
   }
   function draw() {
-    const d = img.data;
-    for (let j = 0; j < H; j++) {
-      const v = j / (H - 1), base = [0, 1, 2].map((n) => DEEP[0][n] + (DEEP[1][n] - DEEP[0][n]) * v);
-      for (let i = 0; i < W; i++) {
-        const k = j * W + i, o = k * 4;
-        // The slope, towards the light (the top left): a face turned to it is lit, one turned away is dark.
-        const sx = cur[Math.min(W - 1, i + 1) + j * W] - cur[Math.max(0, i - 1) + j * W], sy = cur[i + Math.min(H - 1, j + 1) * W] - cur[i + Math.max(0, j - 1) * W];
-        const l = sx * 0.62 + sy * 0.78, up = l > 0 ? Math.min(l * 0.42, 0.5) : 0, down = l < 0 ? Math.min(-l * 0.5, 0.55) : 0;
-        d[o] = base[0] + (LIGHT[0] - base[0]) * up + (SHADE[0] - base[0]) * down;
-        d[o + 1] = base[1] + (LIGHT[1] - base[1]) * up + (SHADE[1] - base[1]) * down;
-        d[o + 2] = base[2] + (LIGHT[2] - base[2]) * up + (SHADE[2] - base[2]) * down;
-        d[o + 3] = 255;
-      }
-    }
-    ctx.putImageData(img, 0, 0);
+    if (!cssW) return;
+    gl.uniform1i(u.R, 0); gl.uniform2f(u.S, cssW, cssH); gl.uniform1f(u.T, reduced ? 4 : (performance.now() - t0) / 1000); gl.uniform1f(u.K, 0.5 + 0.18 * hover);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
   function frame() {
-    const moving = step();
+    if (!seen || reduced) { running = false; return; }
+    hover += ((over ? 1 : 0) - hover) * 0.08;
+    if (rippling) { step(); upload(); }
     draw();
-    if (moving > 0.0015) requestAnimationFrame(frame);
-    else { running = false; cur.fill(0); old.fill(0); draw(); }
+    requestAnimationFrame(frame);
   }
+  function start() { if (!running && seen && !reduced) { running = true; requestAnimationFrame(frame); } }
 
   const at = (ev) => { const r = btn.getBoundingClientRect(); return [((ev.clientX - r.left) / r.width) * W, ((ev.clientY - r.top) / r.height) * H]; };
+  btn.addEventListener('pointerenter', () => { over = true; }, { passive: true });
   btn.addEventListener('pointermove', (ev) => {
     const [x, y] = at(ev), far = px < 0 ? 0 : Math.hypot(x - px, y - py);
     px = x; py = y;
     if (far > 0.4) drop(x, y, 2.6, Math.min(far, 6) * 0.16);
   }, { passive: true });
-  btn.addEventListener('pointerleave', () => { px = py = -1; }, { passive: true });
+  btn.addEventListener('pointerleave', () => { over = false; px = py = -1; }, { passive: true });
   btn.addEventListener('pointerdown', (ev) => { const [x, y] = at(ev); drop(x, y, 4.5, 2.4); lastDrop = performance.now(); }, { passive: true });
   new ResizeObserver(size).observe(btn);
   size();
   return {
-    // A drop of its own, now and then, if the button is there to be seen.
-    idle(now) {
-      if (reduced || now - lastDrop < wait || document.hidden || !W) return;
+    // Twice a second: is the button there to be seen? And a drop of its own, now and then.
+    check(now) {
       const r = btn.getBoundingClientRect();
-      if (!r.width || r.bottom < 0 || r.top > innerHeight || getComputedStyle(btn).visibility !== 'visible') return;
+      seen = !document.hidden && r.width > 0 && r.bottom > 0 && r.top < innerHeight && getComputedStyle(btn).visibility === 'visible';
+      if (!seen) return;
+      start();
+      if (reduced || now - lastDrop < wait) return;
       lastDrop = now; wait = 3800 + Math.random() * 3400;
       drop(W * (0.16 + 0.5 * Math.random()), H * (0.3 + 0.4 * Math.random()), 3.2, 1.5);
     },
@@ -96397,8 +96477,13 @@ function pool(btn, { reduced }) {
 }
 
 function waterButtons({ reduced = false } = {}) {
-  const pools = [...document.querySelectorAll('.button')].map((b) => pool(b, { reduced }));
-  if (!reduced) setInterval(() => { const now = performance.now(); for (const p of pools) p.idle(now); }, 500);
+  const pools = [];
+  for (const b of document.querySelectorAll('.button')) {
+    try { const p = pool(b, { reduced }); if (p) pools.push(p); } catch (e) { console.warn('the water in a button did not start', e); b.querySelector('.button__water')?.remove(); }
+  }
+  const check = () => { const now = performance.now(); for (const p of pools) p.check(now); };
+  check();
+  setInterval(check, 500);
 }
 
 return { "waterButtons": waterButtons };

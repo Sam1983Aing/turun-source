@@ -170,6 +170,12 @@ are already in `vendor/fonts/` for the standalone file).
 - Open: whether the other two handwritten headings take the gradient too. Which headline
   arrival (Written is in). The real ThreeUI component, if he signs the connector in.
 
+## Round 16 (9 October 2026: the water button, properly)
+
+- ThreeUI's "Water Ripple" was looked at running in Sam's own Chrome (their source still was
+  not read), and the page's button rebuilt after it: the sea with a net of light in a dark
+  rim, no tiles, no glow.
+
 ## Found by other versions
 
 Nothing yet.

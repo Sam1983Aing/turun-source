@@ -150,6 +150,11 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   growing the plants, the path), then draws a frame at fifteen points down the path behind
   it, so no shader compiles and no texture uploads the first time the camera gets somewhere,
   and times a few of them to pick the pixel ratio (aiming for 13 ms a frame).
+- **The buttons are water** (`water-button.js`). Each button's face is the sea set into a
+  dark rim: a net of light moves over its floor (worked out in a small shader as how much
+  six travelling waves squeeze the light), and the surface ripples under the pointer and a
+  press (a grid of heights obeying the wave equation, which the shader looks through).
+  After ThreeUI's "Water Ripple", in the page's own code and without its glow.
 - **The opening** (v35). The loader has no ground of its own: its three lines (where, the
   name, how far along) stand on the hero's sand with the palm moving over it, and the name
   fills with sea as the loading goes. When everything is in, the card is let go above the

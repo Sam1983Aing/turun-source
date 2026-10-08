@@ -78,16 +78,18 @@ html.scroll.loading { overflow: hidden; }
 .hero .display em::after, .sp__head em::after { content: ""; position: absolute; left: -3%; right: -6%; bottom: -0.04em; height: 0.16em;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 40 4 110 3 197 7' fill='none' stroke='%23b4532d' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M30 13.5 C 80 9 140 8.5 186 11' fill='none' stroke='%23b4532d' stroke-width='1.6' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
 
-.button { position: relative; isolation: isolate; overflow: hidden; pointer-events: auto; appearance: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 18px; background: #192a45; color: var(--cream); padding: 8px 8px 8px 28px; border-radius: 99px; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; white-space: nowrap;
-  box-shadow: inset 0 1px 0 rgba(190, 232, 240, 0.22), inset 0 0 0 1px rgba(120, 190, 210, 0.12), 0 14px 24px -14px rgba(23, 37, 61, 0.7); transition: box-shadow 0.5s var(--ease), transform 0.3s var(--ease); }
-/* The button's face is a small pool of water (water-button.js): it ripples under the pointer
-   and under a press, and now and then a drop falls on it. Lit by its slope only, no glow. */
+.button { position: relative; isolation: isolate; overflow: hidden; pointer-events: auto; appearance: none; cursor: pointer; display: inline-flex; align-items: center; gap: 18px; border: 2.5px solid #122640; background: linear-gradient(180deg, #116f8b, #09435f); color: #f8f4ea; text-shadow: 0 1px 2px rgba(3, 28, 44, 0.6); padding: 6px 6px 6px 26px; border-radius: 99px; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; white-space: nowrap;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35), 0 14px 24px -14px rgba(12, 32, 56, 0.75); transition: box-shadow 0.5s var(--ease), transform 0.3s var(--ease); }
+/* The button's face is the sea, set a little into a dark rim (water-button.js): a net of light
+   moves over its floor, it ripples under the pointer and under a press, and now and then a
+   drop falls on it. After ThreeUI's "Water Ripple", without its glow. Without WebGL it is the
+   plain gradient above. */
 .button__water { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; border-radius: inherit; pointer-events: none; }
 /* (An arrow in a paper-white disc where a rule used to be.) */
 .button::after { content: ""; flex: none; width: 36px; height: 36px; border-radius: 50%;
   background: var(--cream) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 8h11.5M9 3.5 13.5 8 9 12.5' fill='none' stroke='%2317253d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 15px 15px no-repeat;
   transition: transform 0.5s var(--ease), background-color 0.5s var(--ease); }
-.button:hover, .button:focus-visible { box-shadow: inset 0 1px 0 rgba(190, 232, 240, 0.3), inset 0 0 0 1px rgba(120, 190, 210, 0.2), 0 18px 28px -14px rgba(23, 37, 61, 0.8); }
+.button:hover, .button:focus-visible { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4), 0 18px 28px -14px rgba(12, 32, 56, 0.85); }
 .button:hover::after, .button:focus-visible::after { transform: translateX(3px); background-color: #fff; }
 .button:active { transform: scale(0.985); }
 .button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
@@ -334,7 +336,7 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
   .sp__rows div { grid-template-columns: 6.4rem 1fr; padding: 8px 0; }
   .sp__rows dd { font-size: 1.02rem; }
   .sp__price b { font-size: 1.5rem; }
-  .sp__price .button { padding: 6px 6px 6px 20px; gap: 12px; }
+  .sp__price .button { padding: 4px 4px 4px 18px; gap: 12px; }
 }
 
 /* ------------------------------------------------------------ the frame around the scene */
@@ -524,7 +526,7 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
   .hero .display { font-size: clamp(2.76rem, 14.2vw, 5.5rem); max-width: none; margin: 0.2em 0 0.16em; }
   .hero .body { font-size: 0.98rem; line-height: 1.5; }
   .hero__actions { position: absolute; left: 0; right: 0; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 16px); margin: 0; justify-content: space-between; flex-wrap: nowrap; }
-  .hero__actions .button { padding: 6px 6px 6px 20px; gap: 12px; }
+  .hero__actions .button { padding: 4px 4px 4px 18px; gap: 12px; }
   .button::after { width: 32px; height: 32px; }
   .cue { left: auto; right: 4px; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 22px); font-size: 1.7rem; gap: 8px; rotate: -5deg; transform-origin: 100% 50%; }
   .cue__arrow { width: 40px; height: 18px; rotate: 100deg; }
@@ -542,7 +544,7 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
   .back__price { padding-top: 1.6cqh; font-size: max(11px, 3.1cqw); }
   .back__price b { font-size: 5cqw; }
   .back__addr { padding: 0; gap: 1.5cqh; align-content: end; position: static; }
-  .back__addr .button { margin-top: 0.6cqh; padding: 6px 6px 6px 20px; gap: 12px; }
+  .back__addr .button { margin-top: 0.6cqh; padding: 4px 4px 4px 18px; gap: 12px; }
   .back__to { font-size: 6cqw; }
   .field span { font-size: max(9px, 2.5cqw); }
   .field input, .field select { font-size: max(20px, 5.6cqw); min-height: 26px; }

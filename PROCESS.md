@@ -4310,3 +4310,31 @@ Not proven: the final clips' smoothness. Blender was rendering for another proje
 (637% of a core) and the long recordings came out at 27 to 35 frames a second. The short ones
 taken between its jobs were at 60.
 
+### Round 16: the water button, after the real one (9 October)
+
+A correction first. In round 15 I wrote that ThreeUI's "Water Ripple" could not be read
+because its connector was not signed in. There are two ThreeUI connectors in this setup and
+one is signed in: I had only looked at the other, and at the public page. Sam asked ("you
+don't have access to this?") and I looked properly.
+
+- Through the signed-in connector: the Shader Buttons family and its file list can be seen.
+  The file the Pro variants live in is not in that list, and asking for a file's source
+  returns a reference to it, not its text. So their code was still not read.
+- Sam: "look at it in my Chrome". Signed in there, the button runs: a pool set into a dark
+  graphite rim, a tiled floor, a bright cyan net of light moving over it, sharper under the
+  pointer, a glow at both ends and a halo all round.
+- `water-button.js` was rewritten after that look, in the page's own code. The net of light
+  is worked out, not painted: the surface is six travelling waves, and the light on the floor
+  is one over how much a patch of it has been squeezed, the determinant of (1 + the
+  surface's curvature). Where that passes through nothing the light gathers into a line. A
+  small WebGL shader does it for every pixel. The ripples from round 15 stay (the grid of
+  heights under the pointer and the press) and now bend that net and catch the light.
+- For this page: the sea's own teal in place of the pool's neon cyan, no tiles (a beach, not
+  a pool), a dark rim, and none of the glow, which is what Sam found too strong. The net is
+  kept short of white so the label can always be read.
+- It runs only while its button can be seen (checked twice a second).
+
+Checked at twice the density, at rest and after a press, in its three places (the hero, the
+third postcard, the card's back) and on a phone. The single file rebuilt and opened from
+`file://` with no errors.
+
