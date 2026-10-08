@@ -71,6 +71,12 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
   const captionEls = [...caption.querySelectorAll('span')], captionOwn = captionEls.map((e) => e.textContent);
   let L = null, last = '', posed = null;
   const tilt = { x: 0, y: 0, tx: 0, ty: 0, nx: 0, tnx: 0, live: 0, gx: 0, gy: 0 };
+  // The card off the sand, falling onto it as the page opens (drop.js works it out): its height
+  // `z` and its place `x`, `y` against where it will lie (screen pixels), its tilt and turn
+  // (degrees), how much of it is there (`a`), `over` while it is still above the palm's leaves
+  // and shadows, and `hidden` before it is let go.
+  const REST = { z: 0, x: 0, y: 0, rx: 0, ry: 0, rz: 0, a: 1, over: false, hidden: false };
+  const fall = { ...REST };
   const state = { pose: 'hero', up: 0, flip: 0, settle: 1 };
 
   function layout() {
@@ -151,7 +157,7 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
     // draws every frame under it).
     const f = 1 - smooth(0.02, 0.24, raw);
     const flip = state.flip;
-    const key = state.pose + [e, f, flip, state.settle, tilt.x, tilt.y, tilt.nx].map((n) => n.toFixed(4)).join();
+    const key = state.pose + [e, f, flip, state.settle, tilt.x, tilt.y, tilt.nx, fall.z, fall.x, fall.y, fall.rx, fall.ry, fall.rz, fall.a, +fall.over, +fall.hidden].map((n) => n.toFixed(4)).join();
     if (key === last) return;
     last = key;
     table.classList.toggle('is-full', full);
@@ -198,7 +204,7 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
     light.style.opacity = f.toFixed(3);
     light.style.visibility = f > 0.003 ? 'visible' : 'hidden';
     // (The band of gloss moves with the lean, and sweeps right across as the card turns over.)
-    card.style.setProperty('--sheen', `${(34 + tilt.nx * 30 + 70 * Math.sin(Math.PI * Math.min(state.flip, 0.5))).toFixed(1)}%`);
+    card.style.setProperty('--sheen', `${(34 + tilt.nx * 30 + 70 * Math.sin(Math.PI * Math.min(state.flip, 0.5)) + fall.ry * 3.2).toFixed(1)}%`);
     // (No fading of the picture's colour: the first iteration desaturated it to look printed,
     // and Sam read the whole page as washed out. The paper, the sheen and the stillness say
     // "print"; the colour stays the scene's.)
@@ -209,25 +215,39 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
     // back are two elements given the same motion, half a turn apart: one hands over to the
     // other when the card is edge-on and neither can be seen.
     const up = Math.sin(Math.PI * flip), turned = flip > 0.5;
-    const high = LIFT * (cw + 2 * b) * s * up;                       // screen pixels off the sand
-    const hand = `rotateZ(${(TWIST * up).toFixed(3)}deg) rotateX(${(tilt.x + TIP * up).toFixed(3)}deg)`;
+    // Screen pixels off the sand: picked up to turn over, or falling onto it.
+    const high = LIFT * (cw + 2 * b) * s * up + fall.z;
+    // (Falling: where it is over the sand, and, as the eye is over the middle of the screen
+    // and not over the card, how much further out from the middle it is seen for its height.
+    // Both in the world's own turned and scaled space.)
+    const inWorld = (px, py) => { const r = (P.rz * m * Math.PI) / 180; return [(px * Math.cos(r) + py * Math.sin(r)) / s, (-px * Math.sin(r) + py * Math.cos(r)) / s]; };
+    const near = EYE / Math.max(EYE - fall.z, EYE * 0.2) - 1;
+    const [ox, oy] = inWorld(fall.x + (P.x - 0.5) * vw * near, fall.y + (P.y - 0.5) * vh * near), [gx, gy] = inWorld(fall.x, fall.y);
+    const moved = fall.z || fall.x || fall.y || fall.rx || fall.ry || fall.rz;
+    const hand = `rotateZ(${(TWIST * up + fall.rz).toFixed(3)}deg) rotateX(${(tilt.x + TIP * up + fall.rx).toFixed(3)}deg)`;
     flipEl.style.visibility = turned ? 'hidden' : 'visible';
-    flipEl.style.transform = (flip > 0 || tilt.x || tilt.y)
-      ? `perspective(${(EYE / s).toFixed(0)}px) translateZ(${(high / s).toFixed(1)}px) ${hand} rotateY(${(tilt.y + 180 * flip).toFixed(3)}deg)`
+    flipEl.style.transform = (flip > 0 || tilt.x || tilt.y || moved)
+      ? `${moved ? `translate(${ox.toFixed(1)}px, ${oy.toFixed(1)}px) ` : ''}perspective(${(EYE / s).toFixed(0)}px) translateZ(${(high / s).toFixed(1)}px) ${hand} rotateY(${(tilt.y + 180 * flip + fall.ry).toFixed(3)}deg)`
       : 'none';
+    // (Hidden by its opacity: its parts set their own visibility, which a hidden parent would not override.)
+    card.style.opacity = fall.hidden ? '0' : '';
+    card.style.zIndex = fall.over ? '2' : '';
+    flipEl.style.opacity = fall.a < 1 ? fall.a.toFixed(3) : '';
     back.style.visibility = turned ? 'visible' : 'hidden';
     if (turned) back.style.transform = `translate(-50%, -50%) rotate(${L.P.end.rz}deg) perspective(${EYE}px) translateZ(${high.toFixed(1)}px) ${hand} rotateY(${(180 * flip - 180).toFixed(3)}deg)`;
     const dark = (SHADE * Math.pow(up, 1.3)).toFixed(3);
     shade.style.opacity = turned ? '0' : dark;
     back.style.setProperty('--shade', turned ? dark : '0');
     // The shadow stays on the sand through the whole turn, under both faces: it narrows with
-    // the card, slides away from the low sun as the card comes up, and thins out.
-    const away = (high / s) * 0.62;
-    shadow.style.transform = `translate(${away.toFixed(1)}px, ${(away * 0.42).toFixed(1)}px) scale(${(sx * Math.max(Math.abs(Math.cos(Math.PI * flip)), 0.07)).toFixed(5)}, ${sy.toFixed(5)})`;
-    shadow.style.opacity = (1 - 0.45 * up).toFixed(3);
-    // (And goes soft: a thing held off the ground has no sharp shadow. Only while it turns,
-    // when nothing else on the page is being drawn.)
-    shadow.style.filter = up > 0.01 ? `blur(${((high / s) * 0.06).toFixed(1)}px)` : 'none';
+    // the card, slides away from the low sun as the card comes up, and thins out. Under a
+    // falling card it is where the card is over the sand, turned and foreshortened with it,
+    // further off and fainter and softer the higher the card is, and closes in as it lands.
+    const away = (high / s) * 0.62, lean = Math.cos((fall.ry * Math.PI) / 180), nod = Math.cos((fall.rx * Math.PI) / 180);
+    shadow.style.transform = `translate(${(gx + away).toFixed(1)}px, ${(gy + away * 0.42).toFixed(1)}px) rotate(${fall.rz.toFixed(3)}deg) scale(${(sx * lean * Math.max(Math.abs(Math.cos(Math.PI * flip)), 0.07)).toFixed(5)}, ${(sy * nod).toFixed(5)})`;
+    shadow.style.opacity = ((1 - 0.45 * up) * fall.a / (1 + fall.z / 520)).toFixed(3);
+    // (And goes soft: a thing held off the ground has no sharp shadow. Only while it turns or
+    // falls, when nothing else on the page is being drawn.)
+    shadow.style.filter = high > 1 ? `blur(${(Math.min(high * 0.06, 26) / s).toFixed(1)}px)` : 'none';
   }
 
   // The lean toward the pointer: a card on sand is never quite flat. Only near rest, and not
@@ -252,8 +272,13 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
 
   return {
     layout, set, tick, ground, back, state,
-    // (A lean laid on top of the pointer's, in degrees: for the sand demo's gust.)
+    // (A lean laid on top of the pointer's, in degrees: the gust lifting the card's edge.)
     lean(x, y) { tilt.gx = x; tilt.gy = y; },
+    // The card off the sand (see `fall` above): drop({ hidden: true }) before it is let go,
+    // drop({ z, x, y, rx, ry, rz, a, over }) as it falls, drop(null) at rest.
+    drop(v) { Object.assign(fall, REST, v); last = ''; apply(); },
+    // The card's paper on the screen, as it lies.
+    get rect() { return paper.getBoundingClientRect(); },
     get L() { return L; },
     // The resting card's edges on the screen in a pose: { left, right, top, bottom } in pixels.
     box: (pose) => L?.box[pose] ?? null,

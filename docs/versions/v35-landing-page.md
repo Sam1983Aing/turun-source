@@ -158,6 +158,18 @@ are already in `vendor/fonts/` for the standalone file).
   placed freely. It hangs by its stem in both top corners now.
 - Still open from round 13: which headline animation.
 
+## Round 15 (9 October 2026: the opening)
+
+- The headline in the loader's sea gradient, and "railing" in a lighter orange to go with it.
+- The loader tighter, "clean and more premium, but keep it simple".
+- The loader on the hero's own scene (palm, shadows, gust), then "the card is like falling
+  down on the sand, with like real physics movement", the headline's animation as it hits,
+  and the name and menu appearing "nicely, slowly".
+- A water button after ThreeUI's "Water Ripple", less intense. Their component could not be
+  read (members only): the page has its own.
+- Open: whether the other two handwritten headings take the gradient too. Which headline
+  arrival (Written is in). The real ThreeUI component, if he signs the connector in.
+
 ## Found by other versions
 
 Nothing yet.

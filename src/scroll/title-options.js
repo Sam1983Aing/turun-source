@@ -1,8 +1,10 @@
-// Three ways for the hero's headline to arrive, for Sam to compare in the page (demo,
-// 8 October 2026: "I would like a nice text headline animation on 'Most people stop at the
-// railing'"). Without the switch its lines rise out of their masks, as before.
+// How the hero's headline arrives (8 October 2026: "I would like a nice text headline animation
+// on 'Most people stop at the railing'"). Three ways were built for Sam to compare. The page
+// uses the first, which starts as the card lands on the sand. The other two are still behind
+// the switch until he says they can go, and ?title=lines is the old way (its lines rising out
+// of their masks).
 //
-//   ?title=write   01 Written    the line is written: letter after letter in the order a hand
+//   (the page)     01 Written    the line is written: letter after letter in the order a hand
 //                                would make them, a breath between words, and the stroke under
 //                                "railing" drawn last
 //   ?title=ink     02 Ink        each word comes up out of a soft blot, wide and blurred at
@@ -27,7 +29,7 @@ export function titleOption(name, { gsap, SplitText, reduced = false } = {}) {
     name,
     split(el) {
       h = el; em = el.querySelector('em');
-      const s = SplitText.create(el, { type: 'words,chars' });
+      const s = SplitText.create(el, { type: 'words,chars', charsClass: 'ch' });
       chars = s.chars; words = s.words;
       wordOf = chars.map((c) => words.findIndex((w) => w.contains(c)));
       rest();

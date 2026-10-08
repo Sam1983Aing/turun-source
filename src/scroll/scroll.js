@@ -38,8 +38,10 @@ import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText.js';
 import Lenis from 'lenis';
 import { createApp, ASSETS } from '../app.js';
+import { createDrop } from './drop.js';
 import { createPalm } from './palm.js';
 import { titleOption } from './title-options.js';
+import { waterButtons } from './water-button.js';
 import { buildPanel } from '../debug.js';
 import { SHOTS } from '../shots.js';
 import { ORIGIN } from '../terrain/geo.js';
@@ -156,10 +158,11 @@ export function startScroll({ params }) {
   // photograph the page had before, with its shadows in it and nothing moving.
   const palm = BARE || params.get('sand') === 'photo' ? null : createPalm({ reduced, plate: params.get('plate') ?? ASSETS.heroPalm, leaf: ASSETS.heroLeaf });
   palm?.mount({ ground: post.ground, card: $('.card'), post });
+  if (!BARE) waterButtons({ reduced });
   // Frames owed (the picture stands still at rest, so frames are only drawn when asked; two,
   // as the haze settles over a frame).
   let dirty = 2;
-  if (BARE) post.set({ up: 1 });
+  if (BARE) { post.set({ up: 1 }); html.classList.add('bare'); $('.table').classList.add('sand-in'); }
 
   // ---------------------------------------------------------------- the page in screens
 
@@ -372,6 +375,8 @@ export function startScroll({ params }) {
     g.imageSmoothingQuality = 'high';
     g.drawImage(img, sx, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
     palm?.sandChanged(c, img === sands.day ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
+    // (The scene under the loader comes up out of the plain sand colour once its sand is there.)
+    $('.table').classList.add('sand-in');
   }
   const loadSand = (which, src) => new Promise((done) => {
     const img = new Image();
@@ -637,7 +642,7 @@ export function startScroll({ params }) {
 
   // Every block shows while the page is inside its range: data-hero (how far the card is up),
   // data-tau (the camera's place on the way down), data-end (how far into the ending).
-  const titleFx = titleOption(params.get('title'), { gsap, SplitText, reduced });
+  const titleFx = titleOption(params.get('title') ?? 'write', { gsap, SplitText, reduced });
   const blocks = [...document.querySelectorAll('.words > *')].map((el) => {
     const kind = 'hero' in el.dataset ? 'hero' : 'tau' in el.dataset ? 'tau' : 'end';
     const [a, b] = (el.dataset[kind] ?? '0,0').split(',').map(Number);
@@ -770,7 +775,7 @@ export function startScroll({ params }) {
       for (const c of ['at-sand', 'in-scene', 'at-card']) html.classList.toggle(c, phase.split(' ').includes(c));
     }
     const quiet = !wordsOn || traveling;
-    setShown('.hud', !quiet && (cam.up >= 0.96 || (cam.up < 0.1 && (cam.card !== 'end' || cam.out > 0.55))));
+    setShown('.hud', hudOn && !quiet && (cam.up >= 0.96 || (cam.up < 0.1 && (cam.card !== 'end' || cam.out > 0.55))));
     setShown('.rail', !quiet && inScene() && cam.tau > 0.93);
     setShown('.scene-controls', !quiet && inScene() && cam.tau >= 4.02);
 
@@ -885,25 +890,56 @@ export function startScroll({ params }) {
   }
   app.on('loaded', () => { loaded = true; warmUp().catch((e) => console.error('warm-up failed', e)); });
 
-  // The loader lifts from black onto the sand and the card, the camera settles back to rest,
-  // and the title comes up line by line.
+  // The opening. The loader's words stand on the hero's own sand, with the palm moving over
+  // it, and there is no card yet. When everything is in, the words go, the card is let go
+  // above the sand and falls onto it (drop.js), and as it lands the headline is written and
+  // the page can be scrolled. The name and the menu come in after, slowly. All the while the
+  // camera settles back a little, as it did.
   const intro = { k: 0 };
+  let falling = null, hudOn = false;
+  function landed() {
+    wordsOn = true;
+    lenis?.start();
+    gsap.delayedCall(0.55, () => {
+      hudOn = true;
+      gsap.from('.hud__mark, .hud__nav a', { autoAlpha: 0, y: -10, duration: 2, ease: 'power2.out', stagger: 0.22, clearProps: 'opacity,visibility,transform' });
+    });
+    gsap.delayedCall(2, () => { window.__ready = true; });
+  }
   function begin(skip = false) {
     started = true;
     dirty = 2;
     performance.mark('kl:begin');
     html.classList.remove('loading');
-    if (skip || reduced) post.set({ settle: 1 });
-    if (skip) { gsap.set(loaderEl, { autoAlpha: 0 }); lenis?.start(); wordsOn = true; window.__ready = true; return; }
+    palm?.wake();
+    const plain = skip || reduced || BARE;
+    if (plain) { post.set({ settle: 1 }); post.drop(null); }
+    if (skip) { gsap.set(loaderEl, { autoAlpha: 0 }); lenis?.start(); wordsOn = hudOn = true; window.__ready = true; return; }
     const t = gsap.timeline();
-    t.to(loaderEl, { autoAlpha: 0, duration: reduced ? 0 : 1.6, ease: 'power2.inOut' });
-    if (!reduced && !BARE) t.to(intro, { k: 1, duration: 3.4, ease: 'power3.out', onUpdate: () => post.set({ settle: intro.k }) }, 0.15);
-    // The title once the loader has mostly lifted.
-    t.add(() => { wordsOn = true; }, reduced ? 0 : 1.05);
-    t.add(() => { lenis?.start(); }, 0.4);
-    t.add(() => { window.__ready = true; }, reduced ? 0 : 3.2);
+    if (plain) {
+      t.to(loaderEl, { autoAlpha: 0, duration: reduced ? 0 : 1.2, ease: 'power2.inOut' });
+      t.add(() => { wordsOn = hudOn = true; lenis?.start(); window.__ready = true; }, reduced ? 0 : 0.8);
+      return;
+    }
+    t.to(loaderEl, { autoAlpha: 0, y: -14, duration: 0.55, ease: 'power2.in' });
+    t.to(intro, { k: 1, duration: 3.6, ease: 'power3.out', onUpdate: () => post.set({ settle: intro.k }) }, 0.1);
+    t.add(() => {
+      const r = post.rect;
+      falling = createDrop({ from: Math.min(innerHeight, innerWidth) * 0.84, width: r.width, height: r.height });
+      post.drop({ ...falling.step(0), over: true });
+    }, 0.7);
   }
-  if (!BARE) post.set({ settle: 0 });
+  // (Each frame of the fall. Its low corner meeting the sand throws sand out from under it, and
+  // from then it is under the palm's leaves and shadows like everything else on the sand.)
+  let cardDown = false;
+  function fallStep(dt) {
+    const f = falling.step(dt);
+    if (f.touched) { cardDown = true; palm?.puff(post.rect); }
+    if (f.done) { falling = null; post.drop(null); return; }
+    post.drop({ z: f.z, x: f.x, y: f.y, rx: f.rx, ry: f.ry, rz: f.rz, a: f.a, over: !cardDown });
+    if (f.landed) landed();
+  }
+  if (!BARE) { post.set({ settle: 0 }); post.drop({ hidden: true }); }
 
   // Back to the top: the camera climbs the whole way back up. The words stay out of the way.
   document.querySelectorAll('[data-top]').forEach((b) => b.addEventListener('click', (e) => {
@@ -923,9 +959,11 @@ export function startScroll({ params }) {
   function tick(dt) {
     if (!started) {
       updateLoader(dt);
+      palm?.tick(dt, cam);
       if (done.has('warm') && loadShown > 0.995) begin();
       return;
     }
+    if (falling) fallStep(dt);
     placeCamera(dt);
     updateStory();
     updateWords();
@@ -944,7 +982,7 @@ export function startScroll({ params }) {
     }
   }
 
-  const api = { pace: page, path: pace, get descent() { return descent; }, cam, look, resetLook, pinLook, chooseLighting, post, travel };
+  const api = { palm, pace: page, path: pace, get descent() { return descent; }, cam, look, resetLook, pinLook, chooseLighting, post, travel };
   if (RECORD) {
     // Frame by frame, on the recorder's clock: GSAP's own clock stops and is stepped with it.
     gsap.ticker.remove(gsap.updateRoot);
@@ -965,7 +1003,7 @@ export function startScroll({ params }) {
       },
     };
     // Until the recorder starts, the loader runs on the real clock.
-    const idle = () => { if (!started) { updateLoader(1 / 60); if (!done.has('warm')) requestAnimationFrame(idle); } };
+    const idle = () => { if (!started) { updateLoader(1 / 60); palm?.tick(0, cam); if (!done.has('warm')) requestAnimationFrame(idle); } };
     requestAnimationFrame(idle);
   } else {
     gsap.ticker.lagSmoothing(0);

@@ -4249,3 +4249,64 @@ from `file://` with no errors. The palm's script costs 0.2 to 0.4 ms a frame at 
 Not proven: the frame rate in a recording. Another project was rendering in Blender on this
 machine and every clip stuttered, the page without the palm as well.
 
+### Round 15: the opening (9 October)
+
+Sam's notes, in his order.
+
+- **The headline is in the loader's colours.** "I love the gradient color on the Kelingking
+  word. I think I want to use the same thing on our headline." The sea's gradient, per
+  letter (`background-clip: text`). A hand's letters reach well outside their boxes and a
+  background stops at the box, so each letter's box is padded out and pulled back in by as
+  much, and the gradient's stops are set for that padded box so the letters take the same
+  part of it as the name does in the loader. "Railing", in the page's deep orange, sat dark
+  beside it ("adapt that orange, make it a little bit lighter"): a lighter orange, graded the
+  same way, and its brushed stroke with it. The two other handwritten headings, at the
+  second and third postcards, are still in the pen's blue: he asked for the hero.
+- **The loader, tighter.** The space was the padding that holds the name's swashes. Negative
+  margins take it back out of the spacing, the bar is shorter, the small type smaller and
+  more spaced. The bar clears the g's tails by 15 px.
+- **The loader stands on the hero's own scene.** No ground of its own any more: the sand,
+  the palm's shadows, the leaves, a gust, and no card yet.
+  The catch: while the page loads, the script cannot draw a frame for seconds at a time
+  (that is what froze the water in the name in round 13). So `palm.js` was turned round.
+  What has to move then is moved by the browser: the leaves sway on a looping animation of
+  their own (three sines that fit the loop a whole number of times, sampled into 120
+  keyframes), their shadows are the same boxes again filled with shade and given the same
+  animation, the fronds' shadows drift as a whole, and a gust is a long sheet of streamers,
+  drawn once, sliding along the wind and fading in and out. Only the leaflets' flutter is
+  still drawn by the script, and it starts when the page does, from where it stood.
+  Recorded through a real load: 60 frames a second with no gap over 28 ms.
+- **The card falls onto the sand.** "With like real physics movement." `drop.js` works it
+  out 240 times a second: gravity against drag (so it is soon at a steady speed), the air
+  righting the tilted card like a keel, harder the faster it falls, so it swings through
+  level and past; a glide towards whichever edge is low; a slow turn. Its low corner meets
+  the sand first (at 57 px up, tilted 6 and 5 degrees), it lies down about that corner in a
+  twentieth of a second, comes up 6 px once, and the edges flick a degree the other way.
+  0.67 s from let go to flat. It is run through once beforehand to see where it ends, and
+  started that far the other way, so it lands exactly on its place with no correction at the
+  end. `postcard.js` draws it: the height as real perspective, further out from the middle of
+  the screen the higher it is (the eye is over the screen's middle, not over the card), its
+  shadow on the sand under it, far off and soft and faint from high up and closing in. Until
+  its corner touches it is above the palm's leaves and shadows, and under them after. Sand
+  flies out from under it as it touches.
+- **Then the words.** The headline starts to be written as the card lies flat ("Written", of
+  the three arrivals shown in round 13: Sam did not name one, and this is the one I had
+  recommended. The other two are still behind `?title=`). The name and the menu come in
+  half a second later, over two seconds, one after the other.
+- **Water in the buttons.** He pointed at ThreeUI's "Water Ripple" button and asked for that,
+  quieter. It is a members' component: its page shows no live preview and no source without
+  his login, and the connector for it is not signed in here, so it could not be read. The
+  page has its own (`water-button.js`): the button's face is a small grid of heights obeying
+  the wave equation, the pointer drags a wake, a press drops a stone in, a drop falls on its
+  own every few seconds, and it is lit by its slope only. No glow. Nothing is drawn while the
+  pool is still.
+
+Checked: the opening through a real load on desktop and phone, frame by frame
+(`captures`-style sheets in the session's scratch folder, the clips in `../demos/hero/`),
+the hero at rest, a gust, a press on the button. The single file rebuilt (66 modules) and
+opened from `file://` with no errors.
+
+Not proven: the final clips' smoothness. Blender was rendering for another project again
+(637% of a core) and the long recordings came out at 27 to 35 frames a second. The short ones
+taken between its jobs were at 60.
+

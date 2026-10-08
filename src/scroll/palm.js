@@ -1,23 +1,29 @@
-// The sand under the card, alive (v35, rounds 11 to 13).
+// The sand under the card, alive (v35, rounds 11 to 15).
 //
 // The sand is a photograph with nothing on it (assets/hero/sand-clean.jpg, Sam's plate). What
 // lies on it is laid by the page, in layers that can each move on their own:
 //
-//   shadows   palm fronds drawn every frame (a rib that curls, leaflets that each flutter to
+//   shadows   palm fronds drawn by the script (a rib that curls, leaflets that each flutter to
 //             their own beat), small and stretched so they are soft, multiplied over the sand
 //             and over the card: far ones faint, the near one a little stronger
 //   leaves    two real ones, hanging into the top corners: one picture of a frond's tip with a
 //             clear background (assets/hero/palm-leaf.png, Sam's), hung twice, the right one
-//             mirrored and longer. Each turns on its stem and casts its shadow.
-//   a gust    now and then, and as the scroll begins: the fronds pull, sand skims across the
-//             sand and over the card in streamers, the card's windward edge lifts
+//             mirrored and longer. Each turns on its stem, and its shadow turns with it.
+//   a gust    now and then, and as the scroll begins: sand skims across the sand and over the
+//             card in streamers, the leaves pull, the card's windward edge lifts
+//
+// Who moves what. The page opens on this scene, under the loader, while the script is busy
+// raising the terrain and cannot draw a frame for seconds at a time. So everything that has to
+// move then is moved by the browser on its own (Web Animations on transforms and opacity): the
+// leaves' sway, a slow drift of the whole shadows, the gust's sand sliding across. Only the
+// leaflets' flutter in the shadows is drawn frame by frame by the script, and that starts when
+// the page does (`wake`), from where it stood, so nothing jumps.
 //
 // The layers live in the card's world and take the sand's own transform, so they are laid with
 // it for every pose and grow with it into the dive. Everything settles as the card comes up.
 //
 // (Two other ways were built and recorded before this one, in demos/sand/: the old photograph
-// with its baked shadows slid about by a shader, and that with gusts. Sam chose this, and a
-// little of the gust with it.)
+// with its baked shadows slid about by a shader, and that with gusts. Sam chose this.)
 
 const DEG = Math.PI / 180;
 // The wind blows this way across the screen (right and down), as the shadows lie.
@@ -52,9 +58,13 @@ const SHADE = { far: 'rgb(192, 193, 184)', near: 'rgb(178, 179, 169)' };
 // full-size layers, tried first, cost a fifth of a second a frame once the dive began to
 // scale them up.)
 const SOFT = { far: [0.25, 1.5], near: [0.4, 1.2] };
+// The browser's own motions repeat after this many seconds (each is a few sines that fit a
+// whole number of times into it, so the loop has no seam), and a gust lasts this long.
+const LOOP = 20, GUST = 3.3;
 
 const clamp01 = (x) => Math.min(Math.max(x, 0), 1);
 const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+const el = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
 
 // A frond's shadow: a midrib that curls, and a leaflet each side at every step along it,
 // longest a third of the way out, each fluttering to its own beat. f: where it starts (shares
@@ -112,38 +122,85 @@ const PALMS = {
   },
 };
 
+// ---------------------------------------------------------------- what the browser moves
+
+// Keyframes for a motion that loops without a seam: `at(u)` gives the transform at u (0 to 1
+// round the loop), sampled closely enough to go straight from one to the next.
+const frames = (n, at) => Array.from({ length: n + 1 }, (_, i) => ({ transform: at(i / n) }));
+const TAU = Math.PI * 2;
+// A leaf on its stem: a slow sway with a quicker tremble on it, and a lean. `k`: how much.
+const swayFrames = (ph, k = 1) => frames(120, (u) => {
+  const r = (Math.sin(TAU * 3 * u + ph) * 0.62 + Math.sin(TAU * 7 * u + ph * 1.7) * 0.26 + Math.sin(TAU * 16 * u + ph) * 0.12) * 2.0 * k;
+  return `rotate(${r.toFixed(3)}deg) skewX(${(Math.sin(TAU * 5 * u + ph + 1.4) * 0.7 * k).toFixed(3)}deg)`;
+});
+// A whole shadow, drifting a little: the palm that casts it is swaying.
+const driftFrames = (ph, k = 1) => frames(48, (u) =>
+  `translate(${((Math.sin(TAU * 2 * u + ph) * 0.24 + Math.sin(TAU * 5 * u + ph * 2) * 0.1) * k).toFixed(3)}%, ${(Math.sin(TAU * 3 * u + ph + 1) * 0.2 * k).toFixed(3)}%) rotate(${(Math.sin(TAU * 3 * u + ph) * 0.28 * k).toFixed(3)}deg)`);
+
 // ---------------------------------------------------------------- sand, blown
 
 // Sand lifted by a gust skims the ground in streamers that snake downwind. Each is a small
-// cloud of grains, drawn many times along a lane that bends. The grains are the sand's own:
-// their colours are read off the photograph, most a little lighter than it (sand in the air
-// catches the sun) and some darker, so the cloud shows over pale sand, over the card's white
-// border and over its picture alike. The gust comes in from the upwind corner and its front
-// crosses the screen in about a second.
-// (Grains drawn one by one as streaks read as rain. Smooth pale wisps could not be seen on
-// sand without a shadow under them, and then looked like ribbons.)
+// cloud of grains, and the grains are the sand's own: their colours are read off the
+// photograph, most a little lighter than it (sand in the air catches the sun) and some darker,
+// so a cloud shows over pale sand, over the card's white border and over its picture alike.
+// The streamers are drawn once, onto a long sheet that lies along the wind, and a gust is
+// that sheet sliding downwind across the screen and fading in and out: two things the
+// browser can do without the script. The sheet is two copies of one piece laid end to end,
+// and the piece is drawn so that its ends meet.
+// (Before: grains drawn one by one as streaks read as rain. Smooth pale wisps could not be
+// seen on sand without a shadow under them, and then looked like ribbons. And streamers moved
+// frame by frame by the script froze whenever the script was busy.)
 function makeGust() {
-  const c = document.createElement('canvas');
-  c.className = 'fx fx-gust';
-  const g = c.getContext('2d');
+  const wrap = el('div', 'fx fx-gust'), turn = el('div', 'gust__turn'), run = el('div', 'gust__run'), tiles = [el('canvas'), el('canvas')];
+  run.append(...tiles); turn.append(run); wrap.append(turn);
+  turn.style.transform = `rotate(${(Math.atan2(WIND[1], WIND[0]) / DEG).toFixed(2)}deg)`;
   let seed = 81007;
   const rnd = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
-  const lanes = Array.from({ length: 7 }, (_, i) => ({
-    off: (i + 0.5) / 7 + 0.05 * Math.sin(i * 12.9898), amp: 0.02 + 0.03 * rnd(), k: 1.1 + rnd() * 1.7, ph: rnd() * 6.283,
-    puffs: Array.from({ length: 26 }, () => ({ at: rnd() * 1.3, v: 0.2 + rnd() * 0.2, len: 0.07 + rnd() * 0.1, w: 0.014 + rnd() * 0.02, a: 0.3 + rnd() * 0.7, j: (rnd() - 0.5) * 0.024, kind: Math.floor(rnd() * 3) })),
-  }));
-  const wa = Math.atan2(WIND[1], WIND[0]);
-  let sprites = null;
+  let sprites = null, D = 0, TL = 0, anim = null;
+  const RES = 0.6;   // the sheet is drawn at this share of the screen's own grain
+
+  function paint() {
+    if (!sprites || !TL) return;
+    const c = tiles[0], g = c.getContext('2d'), W = c.width, H = c.height;
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.clearRect(0, 0, W, H);
+    seed = 7411;
+    for (let i = 0; i < 8; i++) {
+      // A lane: where across the wind, how it snakes (a whole number of bends, so the ends meet).
+      const off = (i + 0.5) / 8 + 0.04 * Math.sin(i * 12.9898), amp = 0.016 + 0.026 * rnd(), k = 1 + Math.floor(rnd() * 3), ph = rnd() * TAU;
+      for (let j = 0, n = 12 + Math.floor(rnd() * 8); j < n; j++) {
+        const s = rnd(), wave = k * s * TAU + ph, l = (0.07 + 0.1 * rnd()) * H, w = (0.014 + 0.02 * rnd()) * H;
+        const x = s * W, y = (off + amp * Math.sin(wave) + (rnd() - 0.5) * 0.024) * H;
+        const ang = Math.atan(((amp * H * k * TAU) / W) * Math.cos(wave)), cs = Math.cos(ang), sn = Math.sin(ang);
+        const sprite = sprites[Math.floor(rnd() * sprites.length)];
+        g.globalAlpha = (0.3 + 0.7 * rnd()) * 0.8;
+        for (const dx of [-W, 0, W]) { g.setTransform(cs, sn, -sn, cs, x + dx, y); g.drawImage(sprite, -l / 2, -w / 2, l, w); }
+      }
+    }
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.globalAlpha = 1;
+    const copy = tiles[1].getContext('2d');
+    copy.clearRect(0, 0, W, H);
+    copy.drawImage(c, 0, 0);
+  }
+
   return {
-    el: c,
-    size(w, h) { c.width = w; c.height = h; },
+    el: wrap,
+    get ready() { return !!sprites; },
+    size(w, h) {
+      D = Math.hypot(w, h); TL = 1.1 * D;
+      for (const c of tiles) { c.width = Math.round(TL * RES); c.height = Math.round(D * RES); c.style.width = `${TL}px`; c.style.height = `${D}px`; }
+      run.style.top = `${-D / 2}px`;
+      paint();
+    },
     // The sand has been drawn (again): make the clouds of grains from its colours.
     grains(ground) {
       const w = Math.min(512, ground.width);
       let px;
       try { px = ground.getContext('2d').getImageData((ground.width - w) >> 1, ground.height >> 1, w, 1).data; } catch { px = null; }
+      seed = 81007;
       sprites = [0, 1, 2].map(() => {
-        const s = document.createElement('canvas'), x = s.getContext('2d');
+        const s = el('canvas'), x = s.getContext('2d');
         s.width = 256; s.height = 80;
         for (let n = 0; n < 1500; n++) {
           // (a long cloud, thick along its middle and thinning to its ends and edges)
@@ -157,90 +214,141 @@ function makeGust() {
         }
         return s;
       });
+      paint();
     },
-    // gust: how hard it blows, 0 to 1. since: seconds since it began.
-    draw(t, gust, since) {
-      const W = c.width, H = c.height, D = Math.hypot(W, H);
-      g.setTransform(1, 0, 0, 1, 0, 0);
-      g.clearRect(0, 0, W, H);
-      if (gust < 0.004 || !sprites) return false;
-      const front = since * 0.95 - 0.12;
-      for (const lane of lanes) for (const p of lane.puffs) {
-        const s = ((p.at + t * p.v) % 1.3) - 0.15, reach = smooth(0, 0.3, front - s);
-        const alpha = p.a * gust * reach * 0.8;
-        if (alpha < 0.02) continue;
-        const wave = lane.k * s * 6.283 + lane.ph + t * 0.5, across = lane.off + lane.amp * Math.sin(wave) + p.j;
-        const x = W * 0.5 + (s - 0.5) * D * WIND[0] + (across - 0.5) * D * -WIND[1], y = H * 0.5 + (s - 0.5) * D * WIND[1] + (across - 0.5) * D * WIND[0];
-        const ang = wa + Math.atan(lane.amp * lane.k * 6.283 * Math.cos(wave)), cs = Math.cos(ang), sn = Math.sin(ang), l = p.len * D, w = p.w * D;
-        g.setTransform(cs, sn, -sn, cs, x, y);
-        g.globalAlpha = alpha;
-        g.drawImage(sprites[p.kind], -l / 2, -w / 2, l, w);
+    // A gust: the sheet slides downwind by a little more than the screen, and is there for
+    // the middle of it. (It covers the screen from the first moment to the last.)
+    blow() {
+      if (!TL || !sprites) return;
+      anim?.cancel();
+      anim = run.animate([
+        { transform: `translateX(${(-2 * TL + D / 2).toFixed(0)}px)`, opacity: 0 },
+        { opacity: 0.95, offset: 0.2 },
+        { opacity: 0.7, offset: 0.55 },
+        { transform: `translateX(${(-D / 2).toFixed(0)}px)`, opacity: 0 },
+      ], { duration: GUST * 1000, easing: 'linear' });
+    },
+    // Sand thrown out from under something that has just landed: clouds of grains leaving its
+    // edge, more of them downwind. cx, cy, hw, hh: its middle and half its size, in the
+    // layer's own pixels.
+    puff(cx, cy, hw, hh) {
+      if (!sprites) return;
+      for (let i = 0; i < 22; i++) {
+        const a = rnd() * TAU, ex = Math.cos(a), ey = Math.sin(a);
+        const q = Math.min(hw / Math.max(Math.abs(ex), 1e-3), hh / Math.max(Math.abs(ey), 1e-3)) * 0.97;
+        const c = el('canvas', 'gust__puff'), l = 70 + 90 * rnd(), w = 26 + 26 * rnd(), far = (36 + 90 * rnd()) * (1 + 0.5 * Math.max(0, ex * WIND[0] + ey * WIND[1]));
+        c.width = 128; c.height = 40;
+        c.getContext('2d').drawImage(sprites[i % 3], 0, 0, 128, 40);
+        c.style.cssText = `left:${(cx + ex * q).toFixed(0)}px;top:${(cy + ey * q).toFixed(0)}px;width:${l.toFixed(0)}px;height:${w.toFixed(0)}px`;
+        wrap.append(c);
+        const at = (d, k) => `translate(-50%, -50%) rotate(${(a / DEG).toFixed(1)}deg) translateX(${d.toFixed(0)}px) scale(${k})`;
+        c.animate([{ transform: at(-l * 0.2, 0.5), opacity: 0 }, { opacity: 0.9, offset: 0.12 }, { transform: at(far, 1.5), opacity: 0 }],
+          { duration: 520 + 520 * rnd(), easing: 'cubic-bezier(0.1, 0.7, 0.25, 1)' }).finished.then(() => c.remove(), () => c.remove());
       }
-      g.globalAlpha = 1;
-      return true;
     },
   };
 }
 
 // ---------------------------------------------------------------- the palm
 
-// plate: the sand's photograph (scroll.js loads it as the day's sand). leaf: the leaf's cut-out.
+// plate: the sand's photograph (scroll.js loads it as the day's sand). leaf: the leaf's picture.
 export function createPalm({ reduced = false, plate = null, leaf = null } = {}) {
-  let host = null, t = 0, placed = '', moving = true, gustAt = 3.2, gustEvery = 9.5, wasY = 0, onPlate = true;
-  const layers = [];
-  const layer = (tag, cls) => { const e = document.createElement(tag); e.className = `fx ${cls}`; layers.push(e); return e; };
-  const shade = { far: layer('canvas', 'fx-shade'), near: layer('canvas', 'fx-shade'), buf: { far: document.createElement('canvas'), near: document.createElement('canvas') } };
-  // The leaves: for each, a box that turns about the stem, with the picture in it (mirrored
-  // in one that hangs from the right). Made for the screen's shape in size().
-  const leafWrap = layer('div', 'fx-leaf');
-  let leaves = [], leafSet = null;
+  let host = null, t = 0, awake = false, placed = '', moving = true, wasY = 0, onPlate = true, seenWas = -1, gustAt = -1e9, gustTimer = 0;
+  const layers = [], loops = [];
+  const layer = (cls) => { const e = el('div', `fx ${cls}`); layers.push(e); return e; };
+  const loop = (node, kf) => { if (!reduced) loops.push(node.animate(kf, { duration: LOOP * 1000, iterations: Infinity })); };
+
+  // The palms' shadows: for each, a layer that multiplies, and in it the canvas the script
+  // draws the fronds on, which the browser drifts.
+  const shade = {};
+  for (const k of ['far', 'near']) {
+    const wrap = layer('fx-shade'), cv = el('canvas', 'fx__fill');
+    wrap.append(cv);
+    loop(cv, driftFrames(k === 'far' ? 0.4 : 2.2, k === 'far' ? 1 : 1.3));
+    shade[k] = { wrap, cv, buf: el('canvas') };
+  }
+  // The leaves, and under them their shadows: twice the same boxes, one holding the picture
+  // and one its shape filled with the shade's colour, moved by the same motions.
+  const leafShadeWrap = layer('fx-shade'), leafWrap = layer('fx-leaf');
   const leafImg = new Image();
+  let leaves = [], leafSet = null;
   function hang(set) {
     leafSet = set;
-    leafWrap.replaceChildren();
+    leafWrap.replaceChildren(); leafShadeWrap.replaceChildren();
     leaves = set.map((l) => {
-      const el = document.createElement('div'), img = new Image();
+      // A box that is turned to the leaf's lie, in it one that sways, in it one that a gust
+      // pulls, in it the picture (mirrored in one that hangs from the right).
+      const part = (pic, k) => {
+        const box = el('div', l.flip ? 'leaf leaf--right' : 'leaf'), sway = el('div', 'leaf__in'), pull = el('div', 'leaf__in');
+        pic.classList.add('leaf__pic');
+        for (const e of [box, sway, pull]) e.style.transformOrigin = `${(l.flip ? 1 - STEM[0] : STEM[0]) * 100}% ${STEM[1] * 100}%`;
+        box.style.transform = `rotate(${(l.flip ? -1 : 1) * l.turn}deg)`;
+        box.append(sway); sway.append(pull); pull.append(pic);
+        loop(sway, swayFrames(l.ph, k));
+        return { box, pull };
+      };
+      const img = new Image();
       img.alt = '';
       if (leaf) img.src = leaf;
-      el.className = l.flip ? 'leaf leaf--right' : 'leaf';
-      el.style.transformOrigin = `${(l.flip ? 1 - STEM[0] : STEM[0]) * 100}% ${STEM[1] * 100}%`;
-      el.append(img);
-      leafWrap.append(el);
-      return { ...l, el, sway: 0 };
+      const top = part(img, 1), shadow = el('canvas'), under = part(shadow, 1.15);
+      leafWrap.append(top.box); leafShadeWrap.append(under.box);
+      return { ...l, top, under, shadow };
     });
+    cast();
   }
-  // (A leaf's shadow: its own shape, filled with the shade's colour.)
-  let leafShade = null;
-  leafImg.onload = () => {
-    const img = leafImg, c = document.createElement('canvas'), x = c.getContext('2d');
-    c.width = Math.round(img.naturalWidth / 2); c.height = Math.round(img.naturalHeight / 2);
-    x.drawImage(img, 0, 0, c.width, c.height);
-    x.globalCompositeOperation = 'source-in';
-    x.fillStyle = SHADE.near; x.fillRect(0, 0, c.width, c.height);
-    leafShade = c; moving = true;
-  };
+  // (A leaf's shadow: its own shape, filled with the shade's colour, a little soft.)
+  function cast() {
+    if (!leafImg.complete || !leafImg.naturalWidth) return;
+    for (const l of leaves) {
+      const c = l.shadow, x = c.getContext('2d');
+      c.width = c.height = Math.round(leafImg.naturalWidth / 2);
+      x.filter = 'blur(3px)';
+      x.drawImage(leafImg, 0, 0, c.width, c.height);
+      x.filter = 'none';
+      x.globalCompositeOperation = 'source-in';
+      x.fillStyle = SHADE.near; x.fillRect(0, 0, c.width, c.height);
+    }
+  }
+  leafImg.onload = cast;
   if (leaf) leafImg.src = leaf;
   const gust = reduced ? null : makeGust();
   if (gust) layers.push(gust.el);
 
-  // A gust: up in under a second, away over three.
-  const blow = (since) => (since < 0 ? 0 : since < 0.8 ? smooth(0, 0.8, since) : Math.exp(-(since - 0.8) / 1.5));
+  // A gust: up in under a second, away over three. How hard it is blowing now.
+  const blow = () => { const since = (performance.now() - gustAt) / 1000; return since < 0 || since > GUST ? 0 : since < 0.8 ? smooth(0, 0.8, since) : Math.exp(-(since - 0.8) / 1.1); };
   const breeze = () => 0.55 + 0.25 * Math.sin(t * 0.37) + 0.2 * Math.sin(t * 0.83 + 1.7);
+  function gustNow() {
+    if (!gust || !host || seenWas <= 0.5 || document.hidden) return;
+    gustAt = performance.now();
+    gust.blow();
+    // The leaves, and their shadows, give to it.
+    for (const l of leaves) for (const p of [l.top, l.under]) {
+      p.pull.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(-3.6deg)', offset: 0.2 }, { transform: 'rotate(-1.4deg)', offset: 0.55 }, { transform: 'rotate(0deg)' }],
+        { duration: GUST * 1000, easing: 'ease-out' });
+    }
+  }
+  // (Now and then, and not at an even beat.)
+  function nextGust(after) {
+    clearTimeout(gustTimer);
+    gustTimer = setTimeout(() => { gustNow(); nextGust(awake ? 8500 + 4000 * Math.random() : 5200 + 1500 * Math.random()); }, after);
+  }
 
   function size() {
     if (!host) return;
     const w = host.ground.clientWidth, h = host.ground.clientHeight;
     if (!w || !h) return;
     gust?.size(w, h);
-    for (const k of ['far', 'near']) for (const c of [shade[k], shade.buf[k]]) { c.width = Math.round(w * SOFT[k][0]); c.height = Math.round(h * SOFT[k][0]); }
+    for (const k of ['far', 'near']) for (const c of [shade[k].cv, shade[k].buf]) { c.width = Math.round(w * SOFT[k][0]); c.height = Math.round(h * SOFT[k][0]); }
     const set = w / h < 0.85 ? LEAVES.tall : LEAVES.wide;
     if (set !== leafSet) hang(set);
     for (const l of leaves) {
-      // (The box is a square of the canvas's width, placed so that the stem is at x, y.)
-      const st = l.el.style;
-      st.width = `${l.size * 100}%`;
-      st.left = `${(l.x - (l.flip ? 1 - STEM[0] : STEM[0]) * l.size) * 100}%`;
-      st.top = `${(l.y - STEM[1] * l.size * (w / h)) * 100}%`;
+      // (The box is a square of the canvas's width, placed so that the stem is at x, y. The
+      // shadow's is the same, a little down the sun's way.)
+      const left = l.x - (l.flip ? 1 - STEM[0] : STEM[0]) * l.size, top = l.y - STEM[1] * l.size * (w / h);
+      for (const [p, dx, dy] of [[l.top, 0, 0], [l.under, 0.016, 0.04]]) {
+        const st = p.box.style;
+        st.width = `${l.size * 100}%`; st.left = `${(left + dx) * 100}%`; st.top = `${(top + dy) * 100}%`;
+      }
     }
     moving = true;
   }
@@ -252,66 +360,62 @@ export function createPalm({ reduced = false, plate = null, leaf = null } = {}) 
       // Over the card, from the ground up: sand blows across it, shadows fall on it and on
       // that sand, and the leaves hang over everything (blown sand stays near the ground: with
       // it drawn over the leaves they looked dusty).
-      card.after(...(gust ? [gust.el] : []), shade.far, shade.near, leafWrap);
+      card.after(...(gust ? [gust.el] : []), shade.far.wrap, shade.near.wrap, leafShadeWrap, leafWrap);
       addEventListener('resize', size);
       size();
     },
+    // The page has begun: the script is free, and the leaflets start to flutter.
+    wake() { awake = true; moving = true; },
+    // (A gust, now: for the checks.)
+    gust: () => gustNow(),
     // scroll.js has drawn the sand's canvas again (another photograph, another size). crop: the
-    // part of the photograph that is on it { sx, sy, sw, sh, iw, ih }, or null for a photograph
-    // that is not the plate (the ending's).
+    // part of the photograph that is on it, or null for one that is not the plate (the ending's).
     sandChanged(ground, crop) {
       size();
+      // (The first gust comes soon after the sand is there, so that one is seen under the loader.)
+      if (gust && !gust.ready) nextGust(1100);
       gust?.grains(ground);
       // (The leaves hang over the plate only: not over the ending's sand.)
-      leafWrap.style.display = crop ? '' : 'none';
       onPlate = !!crop;
+      leafWrap.style.display = leafShadeWrap.style.display = onPlate ? '' : 'none';
+    },
+    // Something has landed on the sand: `rect`, on the screen. Sand flies out from under it.
+    puff(rect) {
+      if (!gust || !host) return;
+      const g = host.ground.getBoundingClientRect(), w = host.ground.clientWidth, h = host.ground.clientHeight;
+      if (!g.width) return;
+      gust.puff((((rect.left + rect.right) / 2 - g.left) / g.width) * w, (((rect.top + rect.bottom) / 2 - g.top) / g.height) * h, ((rect.width / 2) / g.width) * w, ((rect.height / 2) / g.height) * h);
     },
     tick(dt, cam) {
       if (!host) return;
-      if (!reduced) t += dt;
-      const pose = host.post.state.pose, up = clamp01(cam.up), calm = 1 - smooth(0.12, 0.55, up), day = pose !== 'end';
+      if (awake && !reduced) t += dt;
+      const pose = host.post.state.pose, up = clamp01(cam.up), calm = 1 - smooth(0.12, 0.55, up), day = pose !== 'end' ? 1 : 0;
       const tf = host.ground.style.transform;
       if (tf !== placed) { placed = tf; for (const e of layers) e.style.transform = tf; }
-      // The wind: a breeze that comes and goes, and a gust now and then (not at an even beat)
-      // and as the scroll begins.
-      if (t - gustAt > gustEvery) { gustAt = t; gustEvery = 8.5 + 4 * (0.5 + 0.5 * Math.sin(t * 1.7)); }
-      if (wasY < 0.004 && cam.y >= 0.004 && t - gustAt > 2.5) gustAt = t - 0.15;
-      wasY = cam.y;
-      const g = reduced ? 0 : blow(t - gustAt) * calm * (day ? 1 : 0);
-      const wind = (0.7 * breeze() + 0.55 * g) * calm * (day ? 1 : 0);
-      const live = wind > 0.004 && up < 0.999;
+      // Seen: there to be seen (it fades as the card comes up, and is not at the ending).
       const seen = day ? 1 - smooth(0.05, 0.42, up) : 0;
-      for (const e of [shade.far, shade.near, leafWrap]) e.style.opacity = seen.toFixed(3);
-
-      if (gust) {
-        gust.el.style.opacity = gust.draw(t, g, t - gustAt) ? '1' : '0';
-        // The card's windward edge lifts a little as the gust passes.
-        host.post.lean?.(-0.9 * g * (0.7 + 0.3 * Math.sin(t * 9)), 1.3 * g * (0.75 + 0.25 * Math.sin(t * 7.3 + 1)));
+      if (seen !== seenWas) {
+        // (The browser's motions rest while nothing of this can be seen.)
+        if ((seen > 0) !== (seenWas > 0)) for (const a of loops) seen > 0 ? a.play() : a.pause();
+        seenWas = seen;
+        for (const e of [shade.far.wrap, shade.near.wrap, leafShadeWrap, leafWrap]) e.style.opacity = seen.toFixed(3);
+        if (gust) gust.el.style.opacity = (calm * day).toFixed(3);
       }
+      // A gust as the scroll begins, if one has not just passed.
+      if (wasY < 0.004 && cam.y >= 0.004 && performance.now() - gustAt > 2500) { gustNow(); nextGust(8500 + 4000 * Math.random()); }
+      wasY = cam.y;
+      const g = blow() * calm * day;
+      const wind = (0.7 * breeze() + 0.55 * g) * calm * day;
+      const live = awake && wind > 0.004 && up < 0.999;
+      // The card's windward edge lifts a little as the gust passes.
+      if (gust && awake) host.post.lean?.(-0.9 * g * (0.7 + 0.3 * Math.sin(t * 9)), 1.3 * g * (0.75 + 0.25 * Math.sin(t * 7.3 + 1)));
       if (seen > 0 && (live || moving)) {
         const set = host.ground.clientWidth / host.ground.clientHeight < 0.85 ? PALMS.tall : PALMS.wide;
-        // Each leaf turns on its stem: a slow sway with a quicker tremble on it, and a lean.
-        for (const l of leaves) {
-          l.sway = (Math.sin(t * 0.9 + l.ph) * 0.62 + Math.sin(t * 2.3 + l.ph * 1.7) * 0.26 + Math.sin(t * 5.1 + l.ph) * 0.12) * 2.2 * wind;
-          l.angle = (l.flip ? -1 : 1) * (l.turn + l.sway);
-          l.el.style.transform = `rotate(${l.angle.toFixed(3)}deg) skewX(${(Math.sin(t * 1.6 + l.ph + 1.4) * 0.8 * wind).toFixed(3)}deg)`;
-        }
         for (const k of ['far', 'near']) {
-          const b = shade.buf[k], x = b.getContext('2d'), out = shade[k].getContext('2d');
+          const b = shade[k].buf, x = b.getContext('2d'), out = shade[k].cv.getContext('2d');
           x.clearRect(0, 0, b.width, b.height);
           x.fillStyle = x.strokeStyle = SHADE[k];
           for (const f of set[k]) frond(x, b.width, b.height, f, t, wind);
-          if (k === 'near' && leafShade && onPlate) for (const l of leaves) {
-            // The leaf's own shadow: its shape again, a little down the sun's way, turning with
-            // it (and a touch further: the shadow of a thing held up moves more than the thing).
-            const side = l.size * b.width;
-            x.save();
-            x.translate(l.x * b.width + 0.016 * b.width, l.y * b.height + 0.04 * b.height);
-            x.rotate((l.flip ? -1 : 1) * (l.turn + l.sway * 1.15) * DEG);
-            if (l.flip) x.scale(-1, 1);
-            x.drawImage(leafShade, -STEM[0] * side, -STEM[1] * side, side, side);
-            x.restore();
-          }
           out.clearRect(0, 0, b.width, b.height);
           out.filter = `blur(${SOFT[k][1]}px)`;
           out.drawImage(b, 0, 0);

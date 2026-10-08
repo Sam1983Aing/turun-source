@@ -78,14 +78,18 @@ html.scroll.loading { overflow: hidden; }
 .hero .display em::after, .sp__head em::after { content: ""; position: absolute; left: -3%; right: -6%; bottom: -0.04em; height: 0.16em;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 40 4 110 3 197 7' fill='none' stroke='%23b4532d' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M30 13.5 C 80 9 140 8.5 186 11' fill='none' stroke='%23b4532d' stroke-width='1.6' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
 
-.button { pointer-events: auto; appearance: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 18px; background: var(--pen); color: var(--cream); padding: 8px 8px 8px 28px; border-radius: 99px; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; white-space: nowrap;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 14px 24px -14px rgba(23, 37, 61, 0.7); transition: background 0.5s var(--ease), box-shadow 0.5s var(--ease); }
-/* (The pen's own blue, a pill, and an arrow in a paper-white disc where a rule used to be.) */
+.button { position: relative; isolation: isolate; overflow: hidden; pointer-events: auto; appearance: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 18px; background: #192a45; color: var(--cream); padding: 8px 8px 8px 28px; border-radius: 99px; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgba(190, 232, 240, 0.22), inset 0 0 0 1px rgba(120, 190, 210, 0.12), 0 14px 24px -14px rgba(23, 37, 61, 0.7); transition: box-shadow 0.5s var(--ease), transform 0.3s var(--ease); }
+/* The button's face is a small pool of water (water-button.js): it ripples under the pointer
+   and under a press, and now and then a drop falls on it. Lit by its slope only, no glow. */
+.button__water { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; border-radius: inherit; pointer-events: none; }
+/* (An arrow in a paper-white disc where a rule used to be.) */
 .button::after { content: ""; flex: none; width: 36px; height: 36px; border-radius: 50%;
   background: var(--cream) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 8h11.5M9 3.5 13.5 8 9 12.5' fill='none' stroke='%2317253d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 15px 15px no-repeat;
   transition: transform 0.5s var(--ease), background-color 0.5s var(--ease); }
-.button:hover, .button:focus-visible { background: #20355a; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 18px 28px -14px rgba(23, 37, 61, 0.8); }
+.button:hover, .button:focus-visible { box-shadow: inset 0 1px 0 rgba(190, 232, 240, 0.3), inset 0 0 0 1px rgba(120, 190, 210, 0.2), 0 18px 28px -14px rgba(23, 37, 61, 0.8); }
 .button:hover::after, .button:focus-visible::after { transform: translateX(3px); background-color: #fff; }
+.button:active { transform: scale(0.985); }
 .button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 /* ------------------------------------------------------------ the table: sand, card, picture */
@@ -180,14 +184,24 @@ html.scroll.at-card #stage { cursor: pointer; }
 .table.is-end .table__light { background: radial-gradient(130% 120% at 28% 18%, rgba(0, 0, 0, 0) 60%, rgba(64, 40, 14, 0.2) 100%); }
 /* The palm over the sand (palm.js): layers in the card's world, laid with the sand's own
    transform. Shadows multiply over the sand and the card, the two leaves are pictures that
-   turn on their stems, the gust's sand is drawn over everything. */
+   turn on their stems (and their shadows the same boxes again, filled), the gust's sand is a
+   long sheet that slides along the wind. What moves in them is moved by the browser. */
 .fx { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: 50% 50%; pointer-events: none; }
 .fx-shade { mix-blend-mode: multiply; }
-.fx-leaf .leaf { position: absolute; aspect-ratio: 1; will-change: transform; }
-.fx-leaf .leaf img { display: block; width: 100%; height: 100%; user-select: none; -webkit-user-drag: none; }
-.fx-leaf .leaf--right img { transform: scaleX(-1); }
+.fx__fill { position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform; }
+.fx .leaf { position: absolute; aspect-ratio: 1; }
+.fx .leaf__in { position: absolute; inset: 0; will-change: transform; }
+.fx .leaf__pic { display: block; width: 100%; height: 100%; user-select: none; -webkit-user-drag: none; }
+.fx .leaf--right .leaf__pic { transform: scaleX(-1); }
+.gust__turn { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
+.gust__run { position: absolute; left: 0; display: flex; opacity: 0; will-change: transform, opacity; }
+.gust__run canvas { flex: none; display: block; }
+.gust__puff { position: absolute; opacity: 0; will-change: transform, opacity; }
 .table.is-full .fx { visibility: hidden; }
 html.tool .fx { display: none; }
+/* (The scene comes up out of the plain sand colour once its sand has been drawn.) */
+html.scroll .world { opacity: 0; transition: opacity 0.9s ease; }
+html.scroll .table.sand-in .world { opacity: 1; }
 .table.is-full .ground, .table.is-full .card__paper, .table.is-full .card__shadow, .table.is-full .card__shade, .table.is-full .card__finish, .table.is-full .table__light { visibility: hidden; }
 
 /* ------------------------------------------------------------ the back of the card */
@@ -235,19 +249,21 @@ html.tool .fx { display: none; }
 /* ------------------------------------------------------------ loader */
 
 /* The loader is real: its bar and its count follow the page as it raises the terrain, loads
-   the textures, grows the plants and compiles the sea (scroll.js). It lies on the same sand as
-   the hero (the picture is set in index.html), so the page opens out of it, and the place's
-   name fills with sea from the bottom as the loading goes: a wave's edge rising through the
-   letters. (It was near-black, with the name in cream.) */
-.loader { position: fixed; inset: 0; z-index: 50; background: #ecd6b0 center / cover no-repeat; display: grid; place-content: center; justify-items: center; gap: 16px; text-align: center; padding: 0 var(--gutter); color: var(--ink); }
+   the textures, grows the plants and compiles the sea (scroll.js). It has no ground of its
+   own: its words stand on the hero's sand, with the palm moving over it, and the page opens
+   by letting the card fall onto that same sand. The place's name fills with sea from the
+   bottom as the loading goes. (It was near-black first, then a still picture of the sand.)
+   Three things, close together: where, the name, how far along. */
+.loader { position: fixed; inset: 0; z-index: 50; display: grid; place-content: center; justify-items: center; text-align: center; padding: 0 var(--gutter); color: var(--ink); }
 .loader::before { content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(64% 56% at 50% 46%, rgba(255, 244, 220, 0.55), rgba(255, 244, 220, 0) 72%), radial-gradient(130% 120% at 50% 40%, rgba(0, 0, 0, 0) 58%, rgba(64, 40, 14, 0.22) 100%); }
+  background: radial-gradient(52% 44% at 50% 48%, rgba(255, 244, 220, 0.6), rgba(255, 244, 220, 0) 72%); }
 .loader > * { position: relative; }
-.loader .label { color: rgba(20, 18, 14, 0.72); }
-/* (The name's box is padded to hold the hand's swashes and the tail of its g, so the water's
-   edge, which is cut out of that box, reaches all of every letter, and the bar under it stands
-   clear of the g.) */
-.loader__title { --pad: 0.3em 0.36em 0.56em; margin: 0; position: relative; display: inline-block; padding: var(--pad); font: 400 clamp(3.8rem, 2.2rem + 7.6vw, 9.4rem)/0.9 var(--hand); white-space: nowrap; }
+.loader .label { color: rgba(20, 18, 14, 0.72); letter-spacing: 0.32em; font-size: 10.5px; }
+/* (The name's box is padded to hold the hand's swashes and the tail of its g, so the water,
+   which is cut out of that box, reaches all of every letter. The margins take the padding
+   back out of the spacing: the line above sits close over the K, and the bar close under
+   the g's tail without touching it.) */
+.loader__title { --pad: 0.3em 0.36em 0.56em; margin: -0.1em 0 -0.27em; position: relative; display: inline-block; padding: var(--pad); font: 400 clamp(3.8rem, 2.2rem + 7.6vw, 9.4rem)/0.9 var(--hand); white-space: nowrap; }
 .loader__ghost { color: rgba(23, 37, 61, 0.13); }
 /* The water in the name. A second copy of the word, in the sea's colours, seen only through a
    shape with a wave for its top edge. The shape slides down to where the loading is (__sea)
@@ -264,13 +280,20 @@ html.tool .fx { display: none; }
 .loader__unwave { animation: sea-unx 2.6s ease-in-out infinite alternate; }
 @keyframes sea-x { from { transform: translateX(-4.5%); } to { transform: translateX(4.5%); } }
 @keyframes sea-unx { from { transform: translateX(4.5%); } to { transform: translateX(-4.5%); } }
-.loader__bar { width: min(340px, 60vw); height: 1px; background: rgba(20, 18, 14, 0.2); overflow: hidden; }
+.loader__bar { width: min(220px, 44vw); height: 1px; background: rgba(20, 18, 14, 0.2); overflow: hidden; }
 .loader__bar span { display: block; height: 100%; background: #12809b; transform-origin: 0 50%; transform: scaleX(0); }
-.loader__step { margin: 0; display: flex; gap: 14px; align-items: baseline; justify-content: center; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(20, 18, 14, 0.72); min-height: 1em; }
+.loader__step { margin: 14px 0 0; display: flex; gap: 12px; align-items: baseline; justify-content: center; font: 500 10.5px/1 var(--type); letter-spacing: 0.24em; text-transform: uppercase; color: rgba(20, 18, 14, 0.72); min-height: 1em; }
 .loader__count { font-variant-numeric: tabular-nums; color: var(--ink); }
 .loader__fail { display: none; max-width: 30rem; font: 400 15px/1.5 var(--type); color: rgba(20, 18, 14, 0.82); letter-spacing: 0; text-transform: none; }
 .loader.failed .loader__fail { display: block; }
 .loader.failed .loader__step, .loader.failed .loader__bar { display: none; }
+/* (The scene alone, for the tools: no sand under the loader, so it is dark as it was.) */
+html.bare .loader { background: var(--ink); color: var(--cream); }
+html.bare .loader::before { display: none; }
+html.bare .loader .label, html.bare .loader__step { color: var(--cream-dim); }
+html.bare .loader__count { color: var(--cream); }
+html.bare .loader__ghost { color: rgba(243, 239, 230, 0.16); }
+html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 
 /* ------------------------------------------------------------ the curtain, and the spreads */
 
@@ -380,7 +403,20 @@ html.tool .fx { display: none; }
 .hero { left: var(--gutter); top: 0; bottom: 0; width: calc(var(--card-left, 50vw) - var(--gutter) - 3.5vw); display: grid; align-content: center; gap: clamp(18px, 2.6vh, 30px); color: var(--ink); padding-bottom: 4vh; box-sizing: border-box; }
 /* (Pen-blue ink, written a little uphill. The measure breaks it after "people" and "the".) */
 .hero .display { font-size: clamp(3.5rem, 0.64rem + 7.4vw, 9.6rem); color: var(--pen); max-width: 4.91em; text-wrap: wrap; margin: 0.06em 0 0.02em; transform: rotate(-3.5deg); transform-origin: 0 60%; }
-.hero .display em { color: var(--accent-deep); }
+.hero .display em { color: #df7646; }
+/* The hero's line is in the sea's colours, as the place's name is in the loader (Sam: "I love
+   the gradient color on the Kelingking word... use the same thing on our headline"), and its
+   word that matters in a lighter orange than the page's, graded the same way, so that it does
+   not sit dark beside it ("adapt that orange, make it a little bit lighter").
+   The colour is each letter's own background, cut to its shape. A hand's letters reach well
+   outside their boxes, and a background stops at the box, so each box is padded out and
+   pulled back in by as much: nothing moves, and the swashes get their colour. The gradient's
+   stops are set for that padded box so the letters take the same part of it as the name does. */
+.hero .display .ch, .hero .display .line { padding: 0.5em 0.55em 0.6em; margin: -0.5em -0.55em -0.6em; color: transparent; -webkit-text-fill-color: transparent;
+  background: linear-gradient(180deg, #3cc4c9 8%, #1c95ad 58%, #0e5d7f 116%); -webkit-background-clip: text; background-clip: text; }
+.hero .display em .ch { background-image: linear-gradient(180deg, #f6a968 8%, #e5804c 58%, #cb5d30 116%); }
+.hero .display .line em { color: #df7646; -webkit-text-fill-color: #df7646; }
+.hero .display em::after { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 40 4 110 3 197 7' fill='none' stroke='%23df7646' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M30 13.5 C 80 9 140 8.5 186 11' fill='none' stroke='%23df7646' stroke-width='1.6' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
 /* (The stroke under the word can be drawn: a clip opened from the left, --u from 0 to 1.) */
 .hero .display em::after { clip-path: inset(-30% calc((1 - var(--u, 1)) * 100%) -30% -6%); }
 .hero .body { color: rgba(20, 18, 14, 0.82); max-width: 29rem; }

@@ -150,6 +150,15 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   growing the plants, the path), then draws a frame at fifteen points down the path behind
   it, so no shader compiles and no texture uploads the first time the camera gets somewhere,
   and times a few of them to pick the pixel ratio (aiming for 13 ms a frame).
+- **The opening** (v35). The loader has no ground of its own: its three lines (where, the
+  name, how far along) stand on the hero's sand with the palm moving over it, and the name
+  fills with sea as the loading goes. When everything is in, the card is let go above the
+  sand and falls onto it. The fall is worked out, not drawn (`drop.js`: gravity against the
+  air's drag, the air righting the tilted card so it swings, a glide towards its low edge,
+  its low corner meeting the sand first and the card lying down about it, a small rebound).
+  It is run through once beforehand to see where it ends, and started that far the other way,
+  so the card lands where the page has it. As it lands the headline is written, and the name
+  and the menu come in after.
 - **The terrain is baked** (v11). Generating it (heightfield, mesh, plants' places, the water's
   maps) takes 3 to 8 s in a worker, so the page downloads it instead: about 13.5 MB packed and
   gzipped (`assets/terrain/terrain-1024.bin`, `src/terrain/bake-format.js`), decoded in about 0.3 s.
@@ -175,14 +184,18 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   under the ending. With the leaf below, they are the only pictures on the page the scene did
   not draw.
 - **The palm over it is alive** (`palm.js`). The sand has no shadows in it. The page casts
-  them: palm fronds drawn every frame (a rib that curls, leaflets that each flutter to their
+  them: palm fronds drawn by the script (a rib that curls, leaflets that each flutter to their
   own beat), small and stretched so they are soft, multiplied over the sand and over the
-  card, in the colour the baked shadows had in the photograph the page used before. The two
+  card, in the colour the baked shadows had in the photograph the page used before. What has
+  to move while the page is still loading, and the script cannot draw a frame for seconds, is
+  moved by the browser itself (Web Animations on transforms and opacity): the leaves' sway,
+  a drift of the whole shadows, the gust's sand. The two
   leaves in the top corners are one picture of a frond's tip with a clear background
   (`assets/hero/palm-leaf.png`), hung by its stem from outside the frame, the right one
   mirrored and larger, each turning on its stem with its shadow (`LEAVES` in `palm.js`: where
   the stem is, how long, how far turned, for a wide screen and a tall one). Now and then, and as the scroll begins, a gust: sand in the plate's own
-  colours skims across the sand and over the card. It all settles as you scroll into the
+  colours skims across the sand and over the card (streamers drawn once on a long sheet that
+  slides along the wind). It all settles as you scroll into the
   card. `?sand=photo` shows the old photograph, still. Each place the card
   rests can have its own (`ASSETS.heroWalk`, `heroBeach` in `app.js`, empty for now, and
   `?under=walk:url,beach:url` tries one). It lies in the card's world with the inverse of the world's resting
