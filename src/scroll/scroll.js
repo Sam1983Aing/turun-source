@@ -38,6 +38,7 @@ import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText.js';
 import Lenis from 'lenis';
 import { createApp, ASSETS } from '../app.js';
+import { sandOption } from './sand-options.js';
 import { buildPanel } from '../debug.js';
 import { SHOTS } from '../shots.js';
 import { ORIGIN } from '../terrain/geo.js';
@@ -149,6 +150,9 @@ export function startScroll({ params }) {
   stage.prepend(renderer.domElement);
   if (params.has('pr')) app.governor.on = false;
   const post = createPostcard({ reduced, captions: spreadCaptions(), onPose: (pose) => { sandWanted = pose === 'hero' ? 'day' : pose; drawSand(); } });
+  // (Demo: the sand under the card alive, ?sand=shade|palm|gust, sand-options.js.)
+  const sandFx = BARE ? null : sandOption(params.get('sand'), { reduced });
+  sandFx?.mount({ ground: post.ground, card: $('.card'), post });
   // Frames owed (the picture stands still at rest, so frames are only drawn when asked; two,
   // as the haze settles over a frame).
   let dirty = 2;
@@ -364,6 +368,7 @@ export function startScroll({ params }) {
     const g = c.getContext('2d');
     g.imageSmoothingQuality = 'high';
     g.drawImage(img, sx, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
+    sandFx?.sandChanged(c, img === sands.day && !sandFx.plate ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
   }
   const loadSand = (which, src) => new Promise((done) => {
     const img = new Image();
@@ -372,7 +377,7 @@ export function startScroll({ params }) {
     img.src = src;
     setTimeout(done, 8000);
   });
-  const sandReady = BARE ? Promise.resolve() : loadSand('day', ASSETS.hero);
+  const sandReady = BARE ? Promise.resolve() : loadSand('day', sandFx?.plate ?? ASSETS.hero);
   // (The ending's is not needed for a long while: fetched once the page has begun.)
   const under = { walk: ASSETS.heroWalk, beach: ASSETS.heroBeach, end: ASSETS.heroEnd };
   for (const kv of (params.get('under') ?? '').split(',')) { const i = kv.indexOf(':'); if (i > 0 && kv.slice(0, i) in under) under[kv.slice(0, i)] = kv.slice(i + 1); }
@@ -898,6 +903,7 @@ export function startScroll({ params }) {
     updateWords();
     updateFrame();
     post.tick(dt);
+    sandFx?.tick(dt, cam);
     // (At rest the picture is a picture: no frame is drawn until something in it changes.)
     if (dirty > 0 || !still()) { dirty = Math.max(0, dirty - 1); app.frame(dt); }
     if (DEBUG) {

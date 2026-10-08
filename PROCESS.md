@@ -4105,3 +4105,42 @@ and the times it did print disagree with themselves (a frame without its ground 
 with it). The post and line are 970 triangles in two draw calls with no new pass, so there is
 no reason to expect a cost, but it has not been measured. To be timed on a quiet machine.
 
+### The sand under the hero, alive: three options (8 October, waiting for Sam's pick)
+
+"I would like the shadow or the leaf that we see to be a little bit more alive... What if we
+remove everything, the shadow, and the palm leaf can move like with the wind and the shadow
+can move a little bit." The sand is one photograph, with its palm shadows and its leaf in it.
+
+Three ways, behind `?sand=` in `src/scroll/sand-options.js`, recorded next to the page as it
+is (`demo/sand/`, same scroll plan, desktop and phone):
+
+- **shade (Breathing Shade).** The photograph stays. A small shader draws it as itself times
+  its own soft copy read a little upwind, over its soft copy read in place. The soft copy is
+  the picture's mipmap (level 3.3): it has the shade and none of the grain, so the shade
+  slides and the grains stay. Only where the soft copy is well under the picture's average,
+  which is where a palm's shadow is: without that the dunes' own shading swam. The leaf is the
+  only green in the picture, so it is lifted off by colour and turned about its stem.
+- **palm (Live Palm).** Sam's idea. A plate with no shadows, and the page casts them: fronds
+  drawn every frame (a rib that curls, leaflets that each flutter to their own beat), in
+  multiply over the sand and over the card, and a green one in the corner. Drawn small and
+  stretched, which is what makes them soft: a CSS blur on full-size layers cost a fifth of a
+  second a frame once the dive scaled them up. The plate is a stand-in, the hero's sand with
+  its shadowed corners resurfaced (`tools/prepare-ending-sand.mjs`, three passes), flat where
+  the shadows were. The prompt for a real one is in `output/clean-sand-prompt.txt`.
+- **gust (Gust).** The photograph, nearly still, until a gust: its shadows race (the same
+  shader, further), streamers of sand cross the picture from the upwind corner, the card's
+  windward edge lifts. One comes every six and a half seconds and one as the scroll begins.
+  The sand was first drawn grain by grain: as long streaks it read as rain, as small dashes
+  it could not be seen on sand. It is soft pale sprites with a little shade under them now.
+
+Found on the way: twice the shader did nothing and the page looked fine, because it falls
+back to the plain photograph. `patch` and then `cast` are reserved words in GLSL ES 3.
+Subtracting two frames a second apart and getting black is what showed it, both times.
+
+Checked: all eight clips at 60 frames a second with no page errors, and the page without the
+switch against a still from before (the sand, the card and the words are identical).
+
+Weak: on a phone the photograph is cut to its middle, where there are no palm shadows, so
+`shade` moves nothing there and `gust` only has its streamers. `palm` is the only one that
+puts moving shade on a phone. Its drawn leaf is flatter than the photograph around it.
+

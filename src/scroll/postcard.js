@@ -70,7 +70,7 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
   const paper = $('.card__paper'), shadow = $('.card__shadow'), shade = $('.card__shade'), caption = $('.card__caption');
   const captionEls = [...caption.querySelectorAll('span')], captionOwn = captionEls.map((e) => e.textContent);
   let L = null, last = '', posed = null;
-  const tilt = { x: 0, y: 0, tx: 0, ty: 0, nx: 0, tnx: 0, live: 0 };
+  const tilt = { x: 0, y: 0, tx: 0, ty: 0, nx: 0, tnx: 0, live: 0, gx: 0, gy: 0 };
   const state = { pose: 'hero', up: 0, flip: 0, settle: 1 };
 
   function layout() {
@@ -243,7 +243,7 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
     const want = state.pose === 'end' ? 0 : 1 - smooth(0, 0.3, clamp01(state.up));
     tilt.live += (want - tilt.live) * (1 - Math.exp(-8 * dt));
     const k = 1 - Math.exp(-5 * dt);
-    const x = tilt.tx * tilt.live, y = tilt.ty * tilt.live;
+    const x = (tilt.tx + tilt.gx) * tilt.live, y = (tilt.ty + tilt.gy) * tilt.live;
     tilt.x += (x - tilt.x) * k; tilt.y += (y - tilt.y) * k; tilt.nx += (tilt.tnx - tilt.nx) * k;
     if (Math.abs(tilt.x) < 0.002 && Math.abs(x) < 0.002) tilt.x = 0;
     if (Math.abs(tilt.y) < 0.002 && Math.abs(y) < 0.002) tilt.y = 0;
@@ -252,6 +252,8 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
 
   return {
     layout, set, tick, ground, back, state,
+    // (A lean laid on top of the pointer's, in degrees: for the sand demo's gust.)
+    lean(x, y) { tilt.gx = x; tilt.gy = y; },
     get L() { return L; },
     // The resting card's edges on the screen in a pose: { left, right, top, bottom } in pixels.
     box: (pose) => L?.box[pose] ?? null,

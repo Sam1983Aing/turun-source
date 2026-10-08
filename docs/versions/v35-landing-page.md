@@ -130,6 +130,12 @@ are already in `vendor/fonts/` for the standalone file).
 - The foot of the page: the concept note and the credits out, "built with three.js" in. The
   map's credit stays, small (the licence, and this project's own rule).
 
+## Round 11 (8 October 2026: the sand, alive)
+
+- "I would like the shadow or the leaf that we see to be a little bit more alive." Three
+  options are behind `?sand=shade|palm|gust` (`src/scroll/sand-options.js`), recorded in
+  `demo/sand/`. His pick is open. `palm` needs a plate without shadows from him.
+
 ## Found by other versions
 
 Nothing yet.
