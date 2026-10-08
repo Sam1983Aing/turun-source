@@ -35,7 +35,7 @@ if (flag('hero') || !shots.length) shots = HERO;
 const ROUNDS = +flag('rounds', 12);
 const FRAMES = +flag('frames', 8);
 const WIDTH = 1400;
-const BASE = String(flag('url', 'http://localhost:5190/')).replace(/\/?$/, '/');
+const BASE = String(flag('url', 'http://localhost:5290/')).replace(/\/?$/, '/');
 
 // The other build: a tag checked out under captures/.
 const num = (v) => +v.slice(1);

@@ -81,7 +81,7 @@ const b = await launch();
 try {
   for (const name of shots) {
     const shot = SHOTS[name];
-    const page = await b.open(`http://localhost:5190/?shot=${name}&q=1024&pr=1&t=17`, { width: WIDTH, height: Math.round(WIDTH / refAspect(shot.ref)) });
+    const page = await b.open(`http://localhost:5290/?shot=${name}&q=1024&pr=1&t=17`, { width: WIDTH, height: Math.round(WIDTH / refAspect(shot.ref)) });
     await page.waitFor('window.__ready === true');
     await page.front();
     await page.eval(SETUP);

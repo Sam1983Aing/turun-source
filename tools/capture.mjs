@@ -20,7 +20,7 @@
 //   node tools/capture.mjs viewpoint --set="hour=10;haze=4;ev=-0.5"  any page switches (see main.js)
 //   node tools/capture.mjs viewpoint --console      print the page's warnings and errors
 //
-// Needs the local server running (http://localhost:5190, see .claude/launch.json or
+// Needs the local server running (http://localhost:5290, see .claude/launch.json or
 // `python3 tools/serve.py`). Output goes to captures/<shot>[-compare].png
 
 import { spawn } from 'node:child_process';
@@ -36,7 +36,7 @@ const flag = (name, dflt) => {
   if (!a) return dflt;
   return a.includes('=') ? a.slice(a.indexOf('=') + 1) : true;
 };
-const BASE = flag('url', 'http://localhost:5190/');
+const BASE = flag('url', 'http://localhost:5290/');
 const WIDTH = +flag('width', 1400);
 const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 

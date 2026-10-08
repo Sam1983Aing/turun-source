@@ -15,7 +15,7 @@ const flag = (name, dflt) => {
 const RUNS = +flag('runs', 3);
 const [W, H] = String(flag('size', '1512x945')).split('x').map(Number);
 const DPR = +flag('dpr', 2);
-const url = `http://localhost:5190/${flag('set') ? '?' + String(flag('set')).split(';').join('&') : ''}`;
+const url = `http://localhost:5290/${flag('set') ? '?' + String(flag('set')).split(';').join('&') : ''}`;
 
 const rows = [];
 for (let r = 0; r < RUNS; r++) {

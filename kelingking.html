@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 98dd877. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
+  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit c6d747d. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Turun · The walk down to Kelingking Beach</title>
@@ -95169,9 +95169,11 @@ const { decodeBake } = __m["src/terrain/bake-format.js"];
 // Where the assets are (v11): next to the page, or, in the standalone build, on the CDN it sets
 // in globalThis.__klAssets ({ textures, bake }).
 // (hero, heroEnd: the photographs of sand the landing page's postcard lies on, at the top of
-// the page and at its end, v35. heroWalk, heroBeach: surfaces of their own for the two spreads,
-// none yet, so they lie on the hero's.)
-const ASSETS = { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin', hero: 'assets/hero/sand.jpg', heroWalk: null, heroBeach: null, heroEnd: 'assets/hero/sand-end.jpg', ...globalThis.__klAssets };
+// the page and at its end, v35. heroPalm, heroLeaf: the sand with no shadows in it and the
+// leaf's cut-out, for the live palm, which is what the page shows: `hero` is the photograph it
+// had before, behind ?sand=photo. heroWalk, heroBeach: surfaces of their own for the two
+// spreads, none yet, so they lie on the hero's.)
+const ASSETS = { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin', hero: 'assets/hero/sand.jpg', heroPalm: 'assets/hero/sand-clean.jpg', heroLeaf: 'assets/hero/palm-leaf.png', heroWalk: null, heroBeach: null, heroEnd: 'assets/hero/sand-end.jpg', ...globalThis.__klAssets };
 
 // capture: a still for the tools (pixel ratio 1, 2048 terrain, the drawing buffer kept for
 // screenshots). keepBuffer: keep the drawing buffer without the rest (recording the scroll).
@@ -95613,10 +95615,11 @@ __m["src/scroll/sand-options.js"] = (function () {
 // The layers live in the card's world and take the sand's own transform, so they are laid with
 // it for every pose and grow with it into the dive. They settle as the card comes up.
 
-// 02's plate: a stand-in made from the hero's own sand by resurfacing its shadowed corners
-// (tools/prepare-ending-sand.mjs, three passes). Not in the repository: without it the option
-// falls back to plain sand colour.
-const PLATE = 'captures/sand-options/sand-clean.jpg';
+// The live palm's leaf: a picture of its own (assets/hero/palm-leaf.png, cut from the
+// photograph by tools/prepare-palm-sand.mjs), laid where it was in the photograph. Its box as
+// shares of the photograph, from the top left corner, and where its stem would be as shares
+// of that box (outside it, up and to the left): it turns about that.
+const LEAF_BOX = { w: 560 / 3840, h: 680 / 2400, px: -0.103, py: -0.21 };
 // Where the leaf is in the hero's photograph (shares of the picture: its box from the top left
 // corner, and where its stem would be, just outside).
 const LEAF = { x: 0.125, y: 0.27, px: -0.015, py: -0.06 };
@@ -95630,6 +95633,7 @@ const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t
 const CSS = `
 .fx { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: 50% 50%; pointer-events: none; }
 .fx-shade { mix-blend-mode: multiply; }
+.fx-leaf img { position: absolute; display: none; will-change: transform; user-select: none; -webkit-user-drag: none; }
 .table.is-full .fx { visibility: hidden; }`;
 
 // ---------------------------------------------------------------- the photograph, relit
@@ -95731,7 +95735,7 @@ function makeRelight() {
 // third of the way out, each fluttering to its own beat. f: where it starts (shares of the
 // canvas), its heading in degrees, its length and its leaflets' as shares of the canvas's
 // width, how it curls (radians at the tip), how many pairs, how it gives to the wind.
-function frond(g, W, H, f, t, wind, paint) {
+function frond(g, W, H, f, t, wind) {
   const len = f.len * W, n = f.n ?? 30;
   const give = (Math.sin(t * 0.8 + f.ph) * 0.6 + Math.sin(t * 1.7 + f.ph * 2.3) * 0.4) * 0.11 * wind * (f.flex ?? 1);
   const rib = [];
@@ -95743,7 +95747,6 @@ function frond(g, W, H, f, t, wind, paint) {
   }
   g.lineCap = 'round';
   g.lineWidth = Math.max(1, len * 0.007);
-  if (paint) g.strokeStyle = paint(-1);
   g.beginPath();
   rib.forEach(([px, py], i) => (i ? g.lineTo(px, py) : g.moveTo(px, py)));
   g.stroke();
@@ -95755,12 +95758,6 @@ function frond(g, W, H, f, t, wind, paint) {
       const da = a + side * open + beat * wind * (f.flex ?? 1);
       const tx = px + Math.cos(da) * ll, ty = py + Math.sin(da) * ll, mx = px + Math.cos(da) * ll * 0.38, my = py + Math.sin(da) * ll * 0.38;
       const nx = -Math.sin(da) * ll * 0.075, ny = Math.cos(da) * ll * 0.075;
-      if (paint) {
-        // (a leaflet in the sun: darker at the rib, paler to its tip)
-        const k = paint(i * 2 + (side > 0 ? 1 : 0)), gr = g.createLinearGradient(px, py, tx, ty);
-        gr.addColorStop(0, '#2a4a14'); gr.addColorStop(0.4, k); gr.addColorStop(1, '#8fa03a');
-        g.fillStyle = gr;
-      }
       g.beginPath();
       g.moveTo(px, py);
       g.quadraticCurveTo(mx + nx, my + ny, tx, ty);
@@ -95770,20 +95767,17 @@ function frond(g, W, H, f, t, wind, paint) {
   }
 }
 
-// The palms over the hero, in the sand's own space (shares of its canvas: the screen shows
-// about the middle 86% of it). `far` are high up and cast soft shadows, `near` sharper ones.
-// The green frond in the corner casts the last of the near ones.
+// The palms over the hero, in the sand's own space (shares of its canvas, of which the screen
+// shows all but the outer few per cent). `far` are high up and cast soft shadows, `near` a
+// sharper one. They are shadows only: the palms themselves are out of the picture. The one
+// leaf that is in it, in the top left corner, is a picture (LEAF_BOX) and casts its own.
 const PALMS = {
   wide: {
     far: [
       { x: -0.06, y: -0.06, a: 9, len: 0.62, leaf: 0.17, curl: 0.22, ph: 0.4, n: 36 },
       { x: 1.2, y: 0.12, a: 163, len: 0.47, leaf: 0.17, curl: -0.3, ph: 3.3, n: 30 },
     ],
-    near: [
-      { x: 1.14, y: 1.16, a: 219, len: 0.5, leaf: 0.16, curl: 0.28, ph: 5.0, n: 30 },
-      { x: 0.055, y: 0.005, a: 68, len: 0.2, leaf: 0.078, curl: 0.3, ph: 1.2, n: 20, flex: 1.5 },
-    ],
-    leaf: { x: 0.03, y: -0.04, a: 68, len: 0.2, leaf: 0.078, curl: 0.3, ph: 1.2, n: 20, flex: 1.5 },
+    near: [{ x: 1.14, y: 1.16, a: 219, len: 0.5, leaf: 0.16, curl: 0.28, ph: 5.0, n: 30 }],
   },
   tall: {
     far: [
@@ -95791,10 +95785,13 @@ const PALMS = {
       { x: 1.5, y: 0.52, a: 168, len: 0.95, leaf: 0.34, curl: -0.3, ph: 3.3, n: 28 },
     ],
     near: [{ x: 1.45, y: 1.08, a: 212, len: 1.1, leaf: 0.34, curl: 0.28, ph: 5.0, n: 28 }],
-    leaf: null,
   },
 };
-const GREENS = ['#2f5216', '#44691b', '#587c20', '#7f932b', '#4d7320', '#a3a83c'];
+// What a palm's shadow does to the sand under it, as a multiply: measured in the photograph
+// the page had before, where the darkest of the baked shadows came to 0.43, 0.45, 0.41 of the
+// sunlit sand. Nearly neutral, a touch green. (They were first a warm brown, by eye, and the
+// whole hero went dull.) The far ones are fainter, as they are softer.
+const SHADE = { far: 'rgb(192, 193, 184)', near: 'rgb(146, 147, 136)' };
 
 // ---------------------------------------------------------------- sand, blown
 
@@ -95856,13 +95853,15 @@ function makeGrains() {
 
 // ---------------------------------------------------------------- the three options
 
-function sandOption(name, { reduced = false } = {}) {
+function sandOption(name, { reduced = false, plate = null, leaf = null } = {}) {
   if (!['shade', 'palm', 'gust'].includes(name)) return null;
   const style = document.createElement('style');
   style.textContent = CSS;
   document.head.append(style);
 
   let host = null, relight = null, grains = null, shade = null, t = 0, placed = '', moving = true, gustAt = name === 'gust' ? 1.6 : 4, wasY = 0, lit = false;
+  // The leaf's picture, where it lies on the sand's canvas (shares, null if it is off it) and its shadow's shape.
+  let leafBox = null, leafShade = null;
   const layers = [];
   const layer = (cls) => {
     const c = document.createElement('canvas');
@@ -95886,13 +95885,13 @@ function sandOption(name, { reduced = false } = {}) {
     grains?.size(w, h);
     if (shade) {
       for (const k of ['far', 'near']) for (const c of [shade[k], shade.buf[k]]) { c.width = Math.round(w * SOFT[k][0]); c.height = Math.round(h * SOFT[k][0]); }
-      shade.leaf.width = w; shade.leaf.height = h;
     }
   }
 
   return {
     name,
-    plate: name === 'palm' ? PLATE : null,
+    // The sand the live palm lies on: a plate with no shadows in it.
+    plate: name === 'palm' ? plate : null,
     mount({ ground, card, post }) {
       host = { ground, card, post };
       if (name !== 'palm') {
@@ -95901,7 +95900,22 @@ function sandOption(name, { reduced = false } = {}) {
       }
       if (name === 'gust') { grains = makeGrains(); layers.push(grains.el); (relight?.el ?? ground).after(grains.el); }
       if (name === 'palm') {
-        shade = { far: layer('fx-shade'), near: layer('fx-shade'), leaf: layer('fx-leaf'), buf: { far: document.createElement('canvas'), near: document.createElement('canvas') } };
+        shade = { far: layer('fx-shade'), near: layer('fx-shade'), leaf: document.createElement('div'), img: new Image(), buf: { far: document.createElement('canvas'), near: document.createElement('canvas') } };
+        shade.leaf.className = 'fx fx-leaf';
+        shade.leaf.append(shade.img);
+        layers.push(shade.leaf);
+        shade.img.alt = '';
+        shade.img.style.transformOrigin = `${LEAF_BOX.px * 100}% ${LEAF_BOX.py * 100}%`;
+        // (Its shadow: the same shape, filled with the shade's colour.)
+        shade.img.onload = () => {
+          const c = document.createElement('canvas'), x = c.getContext('2d');
+          c.width = Math.round(shade.img.naturalWidth / 2); c.height = Math.round(shade.img.naturalHeight / 2);
+          x.drawImage(shade.img, 0, 0, c.width, c.height);
+          x.globalCompositeOperation = 'source-in';
+          x.fillStyle = SHADE.near; x.fillRect(0, 0, c.width, c.height);
+          leafShade = c; moving = true;
+        };
+        if (leaf) shade.img.src = leaf;
         card.after(shade.far, shade.near, shade.leaf);
       }
       addEventListener('resize', size);
@@ -95909,7 +95923,19 @@ function sandOption(name, { reduced = false } = {}) {
       window.__sandFx = this;
     },
     // scroll.js has drawn the sand's canvas again (another photograph, another size).
-    sandChanged(ground, crop) { relight?.load(ground, crop); lit = false; size(); },
+    sandChanged(ground, crop) {
+      relight?.load(ground, crop);
+      lit = false; moving = true;
+      size();
+      if (!shade) return;
+      // The leaf's picture where the leaf was in the photograph, if that corner is on the canvas
+      // (on a phone the photograph is cut to its middle, and it is not).
+      const box = crop && { left: -crop.sx / crop.sw, top: -crop.sy / crop.sh, width: (LEAF_BOX.w * crop.iw) / crop.sw, height: (LEAF_BOX.h * crop.ih) / crop.sh };
+      leafBox = box && box.left + box.width > 0.03 ? box : null;
+      const st = shade.img.style;
+      st.display = leafBox ? 'block' : 'none';
+      if (leafBox) { st.left = `${leafBox.left * 100}%`; st.top = `${leafBox.top * 100}%`; st.width = `${leafBox.width * 100}%`; st.height = `${leafBox.height * 100}%`; }
+    },
     tick(dt, cam) {
       if (!host) return;
       if (!reduced) t += dt;
@@ -95942,19 +95968,29 @@ function sandOption(name, { reduced = false } = {}) {
         for (const c of [shade.far, shade.near, shade.leaf]) c.style.opacity = seen.toFixed(3);
         if (seen > 0 && (live || moving)) {
           const set = host.ground.clientWidth / host.ground.clientHeight < 0.85 ? PALMS.tall : PALMS.wide;
+          // The leaf turns on its stem, a slow sway with a quicker tremble on it, and leans a little.
+          const turn = (Math.sin(t * 0.9 + 0.6) * 0.62 + Math.sin(t * 2.3 + 1) * 0.26 + Math.sin(t * 5.1) * 0.12) * 2.4 * wind;
+          if (leafBox) shade.img.style.transform = `rotate(${turn.toFixed(3)}deg) skewX(${(Math.sin(t * 1.6 + 2) * 0.9 * wind).toFixed(3)}deg)`;
           for (const k of ['far', 'near']) {
             const b = shade.buf[k], x = b.getContext('2d'), out = shade[k].getContext('2d');
             x.clearRect(0, 0, b.width, b.height);
-            x.fillStyle = x.strokeStyle = k === 'far' ? 'rgb(184, 163, 148)' : 'rgb(166, 143, 128)';
+            x.fillStyle = x.strokeStyle = SHADE[k];
             for (const f of set[k]) frond(x, b.width, b.height, f, t, wind);
+            if (k === 'near' && leafBox && leafShade) {
+              // The leaf's own shadow: its shape again, a little down the sun's way, turning with it.
+              const lx = leafBox.left * b.width, ly = leafBox.top * b.height, lw = leafBox.width * b.width, lh = leafBox.height * b.height;
+              const px = lx + LEAF_BOX.px * lw, py = ly + LEAF_BOX.py * lh;
+              x.save();
+              x.translate(px + 0.014 * b.width, py + 0.034 * b.height);
+              x.rotate(turn * 1.15 * DEG);
+              x.drawImage(leafShade, lx - px, ly - py, lw, lh);
+              x.restore();
+            }
             out.clearRect(0, 0, b.width, b.height);
             out.filter = `blur(${SOFT[k][1]}px)`;
             out.drawImage(b, 0, 0);
             out.filter = 'none';
           }
-          const x = shade.leaf.getContext('2d');
-          x.clearRect(0, 0, shade.leaf.width, shade.leaf.height);
-          if (set.leaf) frond(x, shade.leaf.width, shade.leaf.height, set.leaf, t, wind, (k) => (k < 0 ? '#6f7d2c' : GREENS[(k * 7) % GREENS.length]));
         }
       }
       moving = live;
@@ -97012,8 +97048,11 @@ function startScroll({ params }) {
   stage.prepend(renderer.domElement);
   if (params.has('pr')) app.governor.on = false;
   const post = createPostcard({ reduced, captions: spreadCaptions(), onPose: (pose) => { sandWanted = pose === 'hero' ? 'day' : pose; drawSand(); } });
-  // (Demo: the sand under the card alive, ?sand=shade|palm|gust, sand-options.js.)
-  const sandFx = BARE ? null : sandOption(params.get('sand'), { reduced });
+  // The sand under the card is alive: a plate with no shadows in it, palms' shadows cast on it
+  // and on the card, a leaf that sways (sand-options.js, 'palm'). ?sand=photo is the photograph
+  // the page had before, with its shadows in it and nothing moving. (?sand=shade and ?sand=gust:
+  // the two other ways that were tried, until Sam says they can go.)
+  const sandFx = BARE ? null : sandOption(params.get('sand') ?? 'palm', { reduced, plate: params.get('plate') ?? ASSETS.heroPalm, leaf: ASSETS.heroLeaf });
   sandFx?.mount({ ground: post.ground, card: $('.card'), post });
   // Frames owed (the picture stands still at rest, so frames are only drawn when asked; two,
   // as the haze settles over a frame).
@@ -97230,7 +97269,7 @@ function startScroll({ params }) {
     const g = c.getContext('2d');
     g.imageSmoothingQuality = 'high';
     g.drawImage(img, sx, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
-    sandFx?.sandChanged(c, img === sands.day && !sandFx.plate ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
+    sandFx?.sandChanged(c, img === sands.day ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
   }
   const loadSand = (which, src) => new Promise((done) => {
     const img = new Image();

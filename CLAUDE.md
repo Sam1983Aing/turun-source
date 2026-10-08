@@ -32,7 +32,7 @@ goes live without Sam saying so.
 
 - **The browser pane lies.** It stops rendering when hidden and its screenshots go stale. Use
   `tools/capture.mjs` (headless Chrome, nothing to install) and read numbers back from the
-  page. The server is `python3 tools/serve.py` (`.claude/launch.json`, "kelingking-beach"): port 5190, and
+  page. The server is `python3 tools/serve.py` (`.claude/launch.json`, "kelingking-beach"): port 5290, and
   it tells browsers not to reuse stale files (with plain `http.server`, Safari mixed an old
   script with new ones and the loader hung at 99).
 - **`node --check` on a `.js` file treats it as a script**, so module-only mistakes pass.

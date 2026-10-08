@@ -1,8 +1,22 @@
 # Hero credits
 
-- `sand.jpg`: the sand the landing page's postcard lies on (fine pale sand, a palm's shadow,
-  a shell). Made by Sam Aing on 6 October 2026 as `beach-sand-variation-03-4k.png`, the third of
-  three variations on his first sand image. His notes (`output/beach-sand-variation-prompts.txt`)
+- `sand-clean.jpg`: the sand the landing page's postcard lies on (fine pale sand in broad soft
+  undulations, no shadows, nothing on it). Made by Sam Aing on 8 October 2026 as
+  `sand-ripples-05-wide-undulations.png`, the fifth of five plates he generated without shadows
+  so that the page could cast them itself (`../images/sand/`). Brought to the brightness and
+  warmth of the sand it replaced, and converted to JPEG, by `node tools/prepare-palm-sand.mjs`
+  (each channel multiplied by 1.085, 1.065, 1.04, nothing else).
+
+- `palm-leaf.png`: the green leaf in the hero's top left corner, with a clear background. Cut
+  by the same tool, by colour, out of the corner of `sand.jpg`'s source (below), so it is Sam's
+  picture too. The page turns it on its stem and casts its shadow.
+
+  **Same question as below before these ship publicly:** which product's image generator, and
+  its terms.
+
+- `sand.jpg`: the sand the page had before (fine pale sand, a palm's shadow, a shell), now
+  only behind `?sand=photo`. Made by Sam Aing on 6 October 2026 as `beach-sand-variation-03-4k.png`, the third of
+  three variations on his first sand image. His notes (`../images/prompts/beach-sand-variation-prompts.txt`)
   say: "Generated with built-in image_gen; exported to 3840 x 2400 with sips."
   Converted to JPEG as is, no resizing (`ffmpeg -i beach-sand-variation-03-4k.png -q:v 3 sand.jpg`).
 
@@ -38,4 +52,4 @@
   **Same question as above before this ships publicly:** which product's image generator, and
   its terms.
 
-These two are the only pictures on the page that the scene did not draw.
+These are the only pictures on the page that the scene did not draw.

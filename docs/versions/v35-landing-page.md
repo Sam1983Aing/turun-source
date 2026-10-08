@@ -136,6 +136,14 @@ are already in `vendor/fonts/` for the standalone file).
   options are behind `?sand=shade|palm|gust` (`src/scroll/sand-options.js`), recorded in
   `demo/sand/`. His pick is open. `palm` needs a plate without shadows from him.
 
+## Round 12 (8 October 2026: the live palm)
+
+- Sam liked Live Palm and generated five plates without shadows, "select the one that you
+  think fits best". Plate 05 (wide undulations). The live palm is the page's sand now, with
+  the old photograph's own leaf cut out and swaying.
+- Open: whether the other two options go, and whether Gust's wind at the start of the scroll
+  is wanted on top.
+
 ## Found by other versions
 
 Nothing yet.

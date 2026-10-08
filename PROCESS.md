@@ -4144,3 +4144,39 @@ Weak: on a phone the photograph is cut to its middle, where there are no palm sh
 `shade` moves nothing there and `gust` only has its streamers. `palm` is the only one that
 puts moving shade on a phone. Its drawn leaf is flatter than the photograph around it.
 
+### Round 12: the live palm is the page's sand (8 October)
+
+Sam liked Live Palm best and made five plates of sand with no shadows in them
+(`../images/sand/sand-ripples-01` to `05`), asking for the one that fits.
+
+- **The plate: 05, wide undulations.** All five were put under the live palm in the page
+  (`captures/plates.jpg`). 04 is too busy under small type, 02 is strong and darker, 01 reads
+  as stripes, 03's big curves pull against the lettering. 05 is the calmest, closest to the
+  plate he had chosen before for being "finer, paler, calmer", and its ridges lie across the
+  wind the shadows move in, as wind ripples do.
+- **Its colour.** The new plates are a shade greyer and darker than the sand they replace
+  (the middle of the picture: 219, 199, 169 against 241, 214, 177), and the hero lost its sun.
+  `tools/prepare-palm-sand.mjs` multiplies each channel (1.085, 1.065, 1.04) to bring it back:
+  237, 211, 176.
+- **The shadows' colour.** I had mixed them by eye, a warm brown, and with the greyer plate the
+  whole hero went dull. Measured in the old photograph, a baked palm shadow comes to
+  0.43, 0.45, 0.41 of the sunlit sand: nearly neutral, a touch green. The live ones use that
+  now (`SHADE`).
+- **The leaf is the photograph's own.** The code-drawn one was the weak point. The leaf in the
+  old photograph is cut out by colour (it has far less blue than sand has, lit or shaded:
+  (green - blue) / green over 0.3 keeps it) into `assets/hero/palm-leaf.png`, laid where it
+  was, turned on its stem by a CSS transform, and its shape, filled with the shade's colour,
+  is drawn into the near shadows a little down the sun's way.
+- **It is the page now**, not an option: `?sand=photo` is the old photograph. `shade` and
+  `gust` are still behind the switch until Sam says they can go.
+- The project's preview moved to port 5290: another chat's Vite server had picked 5190.
+
+Checked: the hero, both spreads and the phone (`captures/p1.jpg`, `captures/p1-phone.jpg`),
+the single file rebuilt and opened from `file://` with no errors. The desktop clip runs at
+58 frames a second.
+
+Not proven: the phone clip. It recorded at 35 frames a second twice, and so did the old
+photograph with no palm at all, back to back (a Blender render from another project was
+using the machine). So the palm costs about what the photograph does, but neither was
+measured on a quiet machine.
+

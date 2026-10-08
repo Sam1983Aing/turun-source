@@ -40,7 +40,7 @@ const b = await launch();
 const page = await b.open('about:blank', { width: W, height: H });
 await b.send('Emulation.setDeviceMetricsOverride', { width: W, height: H, deviceScaleFactor: DPR, mobile: PHONE }, page.sessionId);
 if (PHONE) await b.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 }, page.sessionId);
-await b.send('Page.navigate', { url: `${flag('url', 'http://localhost:5190/')}?${q}` }, page.sessionId);
+await b.send('Page.navigate', { url: `${flag('url', 'http://localhost:5290/')}?${q}` }, page.sessionId);
 try {
   await page.waitFor('window.__scroll && window.__scroll.ready === true', 180000);
 } catch (e) {

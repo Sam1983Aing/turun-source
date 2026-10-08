@@ -58,9 +58,11 @@ import { decodeBake } from './terrain/bake-format.js';
 // Where the assets are (v11): next to the page, or, in the standalone build, on the CDN it sets
 // in globalThis.__klAssets ({ textures, bake }).
 // (hero, heroEnd: the photographs of sand the landing page's postcard lies on, at the top of
-// the page and at its end, v35. heroWalk, heroBeach: surfaces of their own for the two spreads,
-// none yet, so they lie on the hero's.)
-export const ASSETS = { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin', hero: 'assets/hero/sand.jpg', heroWalk: null, heroBeach: null, heroEnd: 'assets/hero/sand-end.jpg', ...globalThis.__klAssets };
+// the page and at its end, v35. heroPalm, heroLeaf: the sand with no shadows in it and the
+// leaf's cut-out, for the live palm, which is what the page shows: `hero` is the photograph it
+// had before, behind ?sand=photo. heroWalk, heroBeach: surfaces of their own for the two
+// spreads, none yet, so they lie on the hero's.)
+export const ASSETS = { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin', hero: 'assets/hero/sand.jpg', heroPalm: 'assets/hero/sand-clean.jpg', heroLeaf: 'assets/hero/palm-leaf.png', heroWalk: null, heroBeach: null, heroEnd: 'assets/hero/sand-end.jpg', ...globalThis.__klAssets };
 
 // capture: a still for the tools (pixel ratio 1, 2048 terrain, the drawing buffer kept for
 // screenshots). keepBuffer: keep the drawing buffer without the rest (recording the scroll).

@@ -21,7 +21,7 @@ const flag = (name, dflt) => {
 const { SHOTS } = await import(join(root, 'src/shots.js'));
 const shots = args.filter((a) => !a.startsWith('--'));
 const ROUNDS = +flag('rounds', 9), FRAMES = +flag('frames', 20), WIDTH = +flag('width', 1400);
-const BASE = String(flag('url', 'http://localhost:5190/')).replace(/\/?$/, '/');
+const BASE = String(flag('url', 'http://localhost:5290/')).replace(/\/?$/, '/');
 function refAspect(rel) {
   try {
     const buf = readFileSync(join(root, rel));

@@ -150,8 +150,11 @@ export function startScroll({ params }) {
   stage.prepend(renderer.domElement);
   if (params.has('pr')) app.governor.on = false;
   const post = createPostcard({ reduced, captions: spreadCaptions(), onPose: (pose) => { sandWanted = pose === 'hero' ? 'day' : pose; drawSand(); } });
-  // (Demo: the sand under the card alive, ?sand=shade|palm|gust, sand-options.js.)
-  const sandFx = BARE ? null : sandOption(params.get('sand'), { reduced });
+  // The sand under the card is alive: a plate with no shadows in it, palms' shadows cast on it
+  // and on the card, a leaf that sways (sand-options.js, 'palm'). ?sand=photo is the photograph
+  // the page had before, with its shadows in it and nothing moving. (?sand=shade and ?sand=gust:
+  // the two other ways that were tried, until Sam says they can go.)
+  const sandFx = BARE ? null : sandOption(params.get('sand') ?? 'palm', { reduced, plate: params.get('plate') ?? ASSETS.heroPalm, leaf: ASSETS.heroLeaf });
   sandFx?.mount({ ground: post.ground, card: $('.card'), post });
   // Frames owed (the picture stands still at rest, so frames are only drawn when asked; two,
   // as the haze settles over a frame).
@@ -368,7 +371,7 @@ export function startScroll({ params }) {
     const g = c.getContext('2d');
     g.imageSmoothingQuality = 'high';
     g.drawImage(img, sx, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
-    sandFx?.sandChanged(c, img === sands.day && !sandFx.plate ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
+    sandFx?.sandChanged(c, img === sands.day ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
   }
   const loadSand = (which, src) => new Promise((done) => {
     const img = new Image();
