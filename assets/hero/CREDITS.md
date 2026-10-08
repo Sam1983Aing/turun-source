@@ -7,9 +7,10 @@
   warmth of the sand it replaced, and converted to JPEG, by `node tools/prepare-palm-sand.mjs`
   (each channel multiplied by 1.085, 1.065, 1.04, nothing else).
 
-- `palm-leaf.png`: the green leaf in the hero's top left corner, with a clear background. Cut
-  by the same tool, by colour, out of the corner of `sand.jpg`'s source (below), so it is Sam's
-  picture too. The page turns it on its stem and casts its shadow.
+- `palm-leaf.png`: the palm leaf that hangs into the hero's two top corners, with a clear
+  background. Made by Sam Aing on 8 October 2026 (`../images/sand/palm-leaf.png`, a frond's tip
+  on white, from the prompt in `../images/prompts/palm-leaf-prompt.txt`). The same tool takes
+  the white away (nothing else is changed). The page turns it on its stem and casts its shadow.
 
   **Same question as below before these ship publicly:** which product's image generator, and
   its terms.

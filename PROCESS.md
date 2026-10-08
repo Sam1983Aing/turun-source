@@ -4219,3 +4219,33 @@ Checked: the loader at four points of a real load, every sand screen on desktop 
 (`captures/q4.jpg`, `captures/q5-phone.jpg`), each headline option settled against the page as
 it is (the same line breaks, the letters within a pixel).
 
+### Round 14: a leaf of its own (8 October)
+
+The leaf cut out of the old photograph had rough edges, and Sam offered to make one: "What if
+I generate a transparent PNG image, so you can just position it better."
+
+- **His picture** (`../images/sand/palm-leaf.png`, 1254 px square) is a frond's tip on white,
+  not on a clear background, with the stem at its top left corner. `tools/prepare-palm-sand.mjs`
+  takes the white away. Along the edge a pixel is part leaf and part white: its share of leaf
+  is how far its weakest channel has come from white towards the leaf's own darkness nearby,
+  and its colour is what is left when that much white is taken back out. Only in a band two
+  pixels deep along the edge, or the leaf's sheen (also "leaf with white in it") would go
+  see-through. Looked at on sand and on dark blue at four times the size: no pale fringe.
+- **Hung by the stem.** The leaves were boxes pinned to where the leaf had been in the old
+  photograph. Now each is placed by its stem, outside the frame, with a length and a turn
+  (`LEAVES`), on the sand's canvas and not on the photograph, so they keep their corners on
+  any screen. The turns are what keep them off the words: 46 degrees for the left one, which
+  passes under the firm's name and stops short of the headline, and 19 for the right one,
+  which passes right of the menu and lays its tips over the card's corner. On a phone, one
+  small one on the right.
+- **Its shadow** is the same shape, filled with the shade's colour, drawn a little down the
+  sun's way into the near shadows and turned a touch further than the leaf.
+- **The gust's sand goes under the leaves.** Drawn over them it made them look dusty.
+
+Checked: both corners at twice the density (`captures/r1-2x`), the two other postcards and
+the phone (`captures/r1.jpg`, `captures/r1-phone.jpg`), the single file rebuilt and opened
+from `file://` with no errors. The palm's script costs 0.2 to 0.4 ms a frame at rest.
+
+Not proven: the frame rate in a recording. Another project was rendering in Blender on this
+machine and every clip stuttered, the page without the palm as well.
+

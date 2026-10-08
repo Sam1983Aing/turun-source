@@ -178,9 +178,10 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   them: palm fronds drawn every frame (a rib that curls, leaflets that each flutter to their
   own beat), small and stretched so they are soft, multiplied over the sand and over the
   card, in the colour the baked shadows had in the photograph the page used before. The two
-  leaves in the top corners are one cut-out of that photograph's own leaf
-  (`assets/hero/palm-leaf.png`), the right one mirrored and larger, each turning on its stem
-  with its shadow. Now and then, and as the scroll begins, a gust: sand in the plate's own
+  leaves in the top corners are one picture of a frond's tip with a clear background
+  (`assets/hero/palm-leaf.png`), hung by its stem from outside the frame, the right one
+  mirrored and larger, each turning on its stem with its shadow (`LEAVES` in `palm.js`: where
+  the stem is, how long, how far turned, for a wide screen and a tall one). Now and then, and as the scroll begins, a gust: sand in the plate's own
   colours skims across the sand and over the card. It all settles as you scroll into the
   card. `?sand=photo` shows the old photograph, still. Each place the card
   rests can have its own (`ASSETS.heroWalk`, `heroBeach` in `app.js`, empty for now, and

@@ -6,9 +6,9 @@
 //   shadows   palm fronds drawn every frame (a rib that curls, leaflets that each flutter to
 //             their own beat), small and stretched so they are soft, multiplied over the sand
 //             and over the card: far ones faint, the near one a little stronger
-//   leaves    two real ones, in the top corners: a cut-out of the leaf in the photograph the page
-//             had before (assets/hero/palm-leaf.png), turning on its stem, and the same again
-//             mirrored and a third longer out of the right corner. Each casts its shadow.
+//   leaves    two real ones, hanging into the top corners: one picture of a frond's tip with a
+//             clear background (assets/hero/palm-leaf.png, Sam's), hung twice, the right one
+//             mirrored and longer. Each turns on its stem and casts its shadow.
 //   a gust    now and then, and as the scroll begins: the fronds pull, sand skims across the
 //             sand and over the card in streamers, the card's windward edge lifts
 //
@@ -22,10 +22,26 @@
 const DEG = Math.PI / 180;
 // The wind blows this way across the screen (right and down), as the shadows lie.
 const WIND = [0.83, 0.56];
-// The leaf's picture: its box in the photograph it was cut from, as shares of that photograph,
-// and where its stem would be as shares of the box (outside it, up and to the left). `right`:
-// the second one, mirrored out of the top right corner, this much larger.
-const LEAF = { w: 560 / 3840, h: 680 / 2400, px: -0.103, py: -0.21, right: 1.38 };
+// The leaf's picture is a square with the stem coming in at its top left corner (STEM, as
+// shares of its side) and the leaflets fanning down and to the right, the first of them 14
+// degrees under the horizontal and the last nearly straight down.
+// Where it hangs, for a wide screen and a tall one: where the stem is on the sand's canvas
+// (shares of its width and height: outside it, so only the tips come into the picture), the
+// picture's side as a share of the canvas's width, how far it is turned downward from the
+// picture's own lie (degrees), `flip` for one that hangs from the right (mirrored), and `ph`
+// so that no two sway together.
+// The turns are what keep the leaves off the words: the left one passes under the firm's
+// name and stops short of the headline, the right one passes right of the menu and lays its
+// tips over the card's corner. On a tall screen the left corner is the name's, so there is
+// one, small, on the right.
+const STEM = [0.0, 0.0116];
+const LEAVES = {
+  wide: [
+    { x: 0.029, y: -0.072, size: 0.218, turn: 46, ph: 0.6 },
+    { x: 1.0075, y: -0.032, size: 0.249, turn: 19, flip: true, ph: 2.9 },
+  ],
+  tall: [{ x: 1.049, y: -0.011, size: 0.34, turn: 25, flip: true, ph: 2.9 }],
+};
 // What a palm's shadow does to the sand under it, as a multiply. Measured in the photograph
 // the page had before, the darkest of the baked shadows came to 0.43, 0.45, 0.41 of the sunlit
 // sand: nearly neutral, a touch green. The live ones keep that colour and are fainter. (The
@@ -170,35 +186,40 @@ function makeGust() {
 
 // plate: the sand's photograph (scroll.js loads it as the day's sand). leaf: the leaf's cut-out.
 export function createPalm({ reduced = false, plate = null, leaf = null } = {}) {
-  let host = null, t = 0, placed = '', moving = true, gustAt = 3.2, gustEvery = 9.5, wasY = 0;
+  let host = null, t = 0, placed = '', moving = true, gustAt = 3.2, gustEvery = 9.5, wasY = 0, onPlate = true;
   const layers = [];
   const layer = (tag, cls) => { const e = document.createElement(tag); e.className = `fx ${cls}`; layers.push(e); return e; };
   const shade = { far: layer('canvas', 'fx-shade'), near: layer('canvas', 'fx-shade'), buf: { far: document.createElement('canvas'), near: document.createElement('canvas') } };
-  // The two leaves: a box that turns about the stem, with the picture in it (mirrored in the
-  // right one). `box`: where it lies on the sand's canvas, in shares, or null if it is off it.
+  // The leaves: for each, a box that turns about the stem, with the picture in it (mirrored
+  // in one that hangs from the right). Made for the screen's shape in size().
   const leafWrap = layer('div', 'fx-leaf');
-  const leaves = [{ right: false, ph: 0.6 }, { right: true, ph: 2.9 }].map((l) => {
-    l.el = document.createElement('div');
-    l.img = new Image();
-    l.img.alt = '';
-    l.el.append(l.img);
-    l.el.className = l.right ? 'leaf leaf--right' : 'leaf';
-    l.el.style.transformOrigin = `${(l.right ? 1 - LEAF.px : LEAF.px) * 100}% ${LEAF.py * 100}%`;
-    l.box = null;
-    leafWrap.append(l.el);
-    return l;
-  });
+  let leaves = [], leafSet = null;
+  const leafImg = new Image();
+  function hang(set) {
+    leafSet = set;
+    leafWrap.replaceChildren();
+    leaves = set.map((l) => {
+      const el = document.createElement('div'), img = new Image();
+      img.alt = '';
+      if (leaf) img.src = leaf;
+      el.className = l.flip ? 'leaf leaf--right' : 'leaf';
+      el.style.transformOrigin = `${(l.flip ? 1 - STEM[0] : STEM[0]) * 100}% ${STEM[1] * 100}%`;
+      el.append(img);
+      leafWrap.append(el);
+      return { ...l, el, sway: 0 };
+    });
+  }
   // (A leaf's shadow: its own shape, filled with the shade's colour.)
   let leafShade = null;
-  leaves[0].img.onload = () => {
-    const img = leaves[0].img, c = document.createElement('canvas'), x = c.getContext('2d');
+  leafImg.onload = () => {
+    const img = leafImg, c = document.createElement('canvas'), x = c.getContext('2d');
     c.width = Math.round(img.naturalWidth / 2); c.height = Math.round(img.naturalHeight / 2);
     x.drawImage(img, 0, 0, c.width, c.height);
     x.globalCompositeOperation = 'source-in';
     x.fillStyle = SHADE.near; x.fillRect(0, 0, c.width, c.height);
     leafShade = c; moving = true;
   };
-  if (leaf) for (const l of leaves) l.img.src = leaf;
+  if (leaf) leafImg.src = leaf;
   const gust = reduced ? null : makeGust();
   if (gust) layers.push(gust.el);
 
@@ -212,6 +233,15 @@ export function createPalm({ reduced = false, plate = null, leaf = null } = {}) 
     if (!w || !h) return;
     gust?.size(w, h);
     for (const k of ['far', 'near']) for (const c of [shade[k], shade.buf[k]]) { c.width = Math.round(w * SOFT[k][0]); c.height = Math.round(h * SOFT[k][0]); }
+    const set = w / h < 0.85 ? LEAVES.tall : LEAVES.wide;
+    if (set !== leafSet) hang(set);
+    for (const l of leaves) {
+      // (The box is a square of the canvas's width, placed so that the stem is at x, y.)
+      const st = l.el.style;
+      st.width = `${l.size * 100}%`;
+      st.left = `${(l.x - (l.flip ? 1 - STEM[0] : STEM[0]) * l.size) * 100}%`;
+      st.top = `${(l.y - STEM[1] * l.size * (w / h)) * 100}%`;
+    }
     moving = true;
   }
 
@@ -219,8 +249,10 @@ export function createPalm({ reduced = false, plate = null, leaf = null } = {}) 
     plate,
     mount({ ground, card, post }) {
       host = { ground, post };
-      // Over the card: shadows fall on it, a leaf's tip may lie on it, sand blows across it.
-      card.after(shade.far, shade.near, leafWrap, ...(gust ? [gust.el] : []));
+      // Over the card, from the ground up: sand blows across it, shadows fall on it and on
+      // that sand, and the leaves hang over everything (blown sand stays near the ground: with
+      // it drawn over the leaves they looked dusty).
+      card.after(...(gust ? [gust.el] : []), shade.far, shade.near, leafWrap);
       addEventListener('resize', size);
       size();
     },
@@ -230,20 +262,9 @@ export function createPalm({ reduced = false, plate = null, leaf = null } = {}) 
     sandChanged(ground, crop) {
       size();
       gust?.grains(ground);
-      for (const l of leaves) {
-        // The left leaf where the leaf was in the photograph, the right one against the
-        // opposite edge, if that corner is on the canvas (on a phone the photograph is cut to
-        // its middle, and neither is).
-        const k = l.right ? LEAF.right : 1;
-        const box = crop && { left: ((l.right ? crop.iw * (1 - LEAF.w * k) : 0) - crop.sx) / crop.sw, top: -crop.sy / crop.sh, width: (LEAF.w * k * crop.iw) / crop.sw, height: (LEAF.h * k * crop.ih) / crop.sh };
-        l.box = box && box.left + box.width > 0.03 && box.left < 0.97 ? box : null;
-        // (On a tall screen the right one is hung in the canvas's own corner, smaller: the left
-        // corner is where the name is.)
-        if (!l.box && crop && l.right && ground.width / ground.height < 0.85) { const w = 0.27; l.box = { left: 1 - w, top: 0, width: w, height: (w * (LEAF.h * 2400) / (LEAF.w * 3840)) * (ground.width / ground.height) }; }
-        const st = l.el.style;
-        st.display = l.box ? 'block' : 'none';
-        if (l.box) { st.left = `${l.box.left * 100}%`; st.top = `${l.box.top * 100}%`; st.width = `${l.box.width * 100}%`; st.height = `${l.box.height * 100}%`; }
-      }
+      // (The leaves hang over the plate only: not over the ending's sand.)
+      leafWrap.style.display = crop ? '' : 'none';
+      onPlate = !!crop;
     },
     tick(dt, cam) {
       if (!host) return;
@@ -271,24 +292,24 @@ export function createPalm({ reduced = false, plate = null, leaf = null } = {}) 
         const set = host.ground.clientWidth / host.ground.clientHeight < 0.85 ? PALMS.tall : PALMS.wide;
         // Each leaf turns on its stem: a slow sway with a quicker tremble on it, and a lean.
         for (const l of leaves) {
-          l.turn = (Math.sin(t * 0.9 + l.ph) * 0.62 + Math.sin(t * 2.3 + l.ph * 1.7) * 0.26 + Math.sin(t * 5.1 + l.ph) * 0.12) * 2.4 * wind * (l.right ? -1 : 1);
-          if (l.box) l.el.style.transform = `rotate(${l.turn.toFixed(3)}deg) skewX(${(Math.sin(t * 1.6 + l.ph + 1.4) * 0.9 * wind).toFixed(3)}deg)`;
+          l.sway = (Math.sin(t * 0.9 + l.ph) * 0.62 + Math.sin(t * 2.3 + l.ph * 1.7) * 0.26 + Math.sin(t * 5.1 + l.ph) * 0.12) * 2.2 * wind;
+          l.angle = (l.flip ? -1 : 1) * (l.turn + l.sway);
+          l.el.style.transform = `rotate(${l.angle.toFixed(3)}deg) skewX(${(Math.sin(t * 1.6 + l.ph + 1.4) * 0.8 * wind).toFixed(3)}deg)`;
         }
         for (const k of ['far', 'near']) {
           const b = shade.buf[k], x = b.getContext('2d'), out = shade[k].getContext('2d');
           x.clearRect(0, 0, b.width, b.height);
           x.fillStyle = x.strokeStyle = SHADE[k];
           for (const f of set[k]) frond(x, b.width, b.height, f, t, wind);
-          if (k === 'near' && leafShade) for (const l of leaves) {
-            if (!l.box) continue;
-            // The leaf's own shadow: its shape again, a little down the sun's way, turning with it.
-            const lx = l.box.left * b.width, ly = l.box.top * b.height, lw = l.box.width * b.width, lh = l.box.height * b.height;
-            const px = lx + (l.right ? 1 - LEAF.px : LEAF.px) * lw, py = ly + LEAF.py * lh;
+          if (k === 'near' && leafShade && onPlate) for (const l of leaves) {
+            // The leaf's own shadow: its shape again, a little down the sun's way, turning with
+            // it (and a touch further: the shadow of a thing held up moves more than the thing).
+            const side = l.size * b.width;
             x.save();
-            x.translate(px + 0.014 * b.width, py + 0.034 * b.height);
-            x.rotate(l.turn * 1.15 * DEG);
-            if (l.right) { x.translate(lx + lw / 2 - px, 0); x.scale(-1, 1); x.translate(-(lx + lw / 2 - px), 0); }
-            x.drawImage(leafShade, lx - px, ly - py, lw, lh);
+            x.translate(l.x * b.width + 0.016 * b.width, l.y * b.height + 0.04 * b.height);
+            x.rotate((l.flip ? -1 : 1) * (l.turn + l.sway * 1.15) * DEG);
+            if (l.flip) x.scale(-1, 1);
+            x.drawImage(leafShade, -STEM[0] * side, -STEM[1] * side, side, side);
             x.restore();
           }
           out.clearRect(0, 0, b.width, b.height);

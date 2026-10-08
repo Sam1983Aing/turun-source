@@ -152,6 +152,12 @@ are already in `vendor/fonts/` for the standalone file).
 - The card glossy, "the whole thing".
 - "A nice text headline animation": three options behind `?title=`. His pick is open.
 
+## Round 14 (8 October 2026: his own palm leaf)
+
+- The cut-out leaf had rough edges. Sam generated a leaf of its own (on white) so it could be
+  placed freely. It hangs by its stem in both top corners now.
+- Still open from round 13: which headline animation.
+
 ## Found by other versions
 
 Nothing yet.

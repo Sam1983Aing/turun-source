@@ -183,7 +183,7 @@ html.scroll.at-card #stage { cursor: pointer; }
    turn on their stems, the gust's sand is drawn over everything. */
 .fx { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: 50% 50%; pointer-events: none; }
 .fx-shade { mix-blend-mode: multiply; }
-.fx-leaf .leaf { position: absolute; display: none; will-change: transform; }
+.fx-leaf .leaf { position: absolute; aspect-ratio: 1; will-change: transform; }
 .fx-leaf .leaf img { display: block; width: 100%; height: 100%; user-select: none; -webkit-user-drag: none; }
 .fx-leaf .leaf--right img { transform: scaleX(-1); }
 .table.is-full .fx { visibility: hidden; }
