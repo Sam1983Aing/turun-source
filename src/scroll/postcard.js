@@ -69,6 +69,8 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
   const finish = $('.card__finish'), light = $('.table__light'), stage = $('#stage'), back = $('.back');
   const paper = $('.card__paper'), shadow = $('.card__shadow'), shade = $('.card__shade'), caption = $('.card__caption');
   const captionEls = [...caption.querySelectorAll('span')], captionOwn = captionEls.map((e) => e.textContent);
+  // (From here the card is this script's: until now the stylesheet kept it out of sight.)
+  card.classList.add('is-set');
   let L = null, last = '', posed = null;
   const tilt = { x: 0, y: 0, tx: 0, ty: 0, nx: 0, tnx: 0, live: 0, gx: 0, gy: 0 };
   // The card off the sand, falling onto it as the page opens (drop.js works it out): its height

@@ -78,7 +78,7 @@ html.scroll.loading { overflow: hidden; }
 .hero .display em::after, .sp__head em::after { content: ""; position: absolute; left: -3%; right: -6%; bottom: -0.04em; height: 0.16em;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 40 4 110 3 197 7' fill='none' stroke='%23b4532d' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M30 13.5 C 80 9 140 8.5 186 11' fill='none' stroke='%23b4532d' stroke-width='1.6' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
 
-.button { position: relative; isolation: isolate; overflow: hidden; pointer-events: auto; appearance: none; cursor: pointer; display: inline-flex; align-items: center; gap: 18px; border: 2.5px solid #122640; background: linear-gradient(180deg, #116f8b, #09435f); color: #f8f4ea; text-shadow: 0 1px 2px rgba(3, 28, 44, 0.6); padding: 6px 6px 6px 26px; border-radius: 99px; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; white-space: nowrap;
+.button { position: relative; isolation: isolate; overflow: hidden; pointer-events: auto; appearance: none; cursor: pointer; display: inline-flex; align-items: center; gap: 18px; border: 2px solid #1f5068; background: linear-gradient(180deg, #116f8b, #09435f); color: #f8f4ea; text-shadow: 0 1px 2px rgba(3, 28, 44, 0.6); padding: 6px 6px 6px 26px; border-radius: 99px; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; white-space: nowrap;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35), 0 14px 24px -14px rgba(12, 32, 56, 0.75); transition: box-shadow 0.5s var(--ease), transform 0.3s var(--ease); }
 /* The button's face is the sea, set a little into a dark rim (water-button.js): a net of light
    moves over its floor, it ripples under the pointer and under a press, and now and then a
@@ -99,7 +99,19 @@ html.scroll.loading { overflow: hidden; }
 html.scroll .table { position: fixed; left: 0; top: 0; width: 100vw; height: 100lvh; z-index: 0; overflow: hidden; background: var(--sand); }
 html.scroll .world { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
 html.scroll .table.is-full .world { will-change: auto; }
-html.scroll .ground { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: 50% 50%; will-change: transform; }
+html.scroll .ground { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: 50% 50%; will-change: transform;
+  /* The sand is there from the first paint, before any script has run: the same photograph the
+     script will draw into this canvas, as its background (and under that, while the photograph
+     itself is still on its way, forty pixels of it, which is its colours and nothing more), at
+     about the size and place the script will give it. (Sam: "I want the beach sand background
+     to appear right away, not a solid color." It was the table's plain sand colour until the
+     script had loaded, laid the page out and drawn the sand, and then a fade.) */
+  background: url(../../assets/hero/sand-clean.jpg) center / cover no-repeat, #ecd6b0 url("data:image/jpeg;base64,/9j//gAQTGF2YzYyLjI4LjEwMgD/2wBDAAgSEhUSFRgYGBgYGB0bHR4eHh0dHR0eHh4gICAmJiYgICAeHiAgJCQmJikqKScnJicqKi0tLTY2MzM/P0FNTV3/xABYAAADAQEBAAAAAAAAAAAAAAAAAgMBBwQBAQEBAAAAAAAAAAAAAAAAAAABBRABAAMBAQEBAAAAAAAAAAAAAAERgXEhkaERAQAAAAAAAAAAAAAAAAAAAAD/wAARCAAZACgDASIAAhEAAxEA/9oADAMBAAIRAxEAPwDrN9NcpM+sloKiyegFGp6NUILReqEUmDpZJALfg1ksVH//2Q==") center / cover no-repeat;
+  transform: translate(-1.2%, 0.2%) scale(1.137); }
+@media (max-aspect-ratio: 85/100) { html.scroll .ground { transform: translate(0, -0.9%) scale(1.128); } }
+/* (And the card is not: it is let go above the sand when the page is ready. postcard.js marks
+   it once it has taken it over.) */
+html.scroll .card:not(.is-set) { opacity: 0; }
 html.scroll .card { position: absolute; inset: 0; }
 /* (Each moving part on a layer of its own: the tilt, the turn, the caption's fade and the
    shadow's squeeze are then the compositor's work, and the blurred shadow is painted once.) */
@@ -201,9 +213,9 @@ html.scroll.at-card #stage { cursor: pointer; }
 .gust__puff { position: absolute; opacity: 0; will-change: transform, opacity; }
 .table.is-full .fx { visibility: hidden; }
 html.tool .fx { display: none; }
-/* (The scene comes up out of the plain sand colour once its sand has been drawn.) */
-html.scroll .world { opacity: 0; transition: opacity 0.9s ease; }
-html.scroll .table.sand-in .world { opacity: 1; }
+/* (They come in softly when the script makes them, over the sand that was already there.) */
+.fx { animation: fx-in 1.1s ease both; }
+@keyframes fx-in { from { opacity: 0; } }
 .table.is-full .ground, .table.is-full .card__paper, .table.is-full .card__shadow, .table.is-full .card__shade, .table.is-full .card__finish, .table.is-full .table__light { visibility: hidden; }
 
 /* ------------------------------------------------------------ the back of the card */
@@ -414,10 +426,29 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
    outside their boxes, and a background stops at the box, so each box is padded out and
    pulled back in by as much: nothing moves, and the swashes get their colour. The gradient's
    stops are set for that padded box so the letters take the same part of it as the name does. */
-.hero .display .ch, .hero .display .line { padding: 0.5em 0.55em 0.6em; margin: -0.5em -0.55em -0.6em; color: transparent; -webkit-text-fill-color: transparent;
-  background: linear-gradient(180deg, #3cc4c9 8%, #1c95ad 58%, #0e5d7f 116%); -webkit-background-clip: text; background-clip: text; }
-.hero .display em .ch { background-image: linear-gradient(180deg, #f6a968 8%, #e5804c 58%, #cb5d30 116%); }
+.hero .display .ch, .hero .display .line { --ink: linear-gradient(180deg, #3cc4c9 8%, #1c95ad 58%, #0e5d7f 116%);
+  padding: 0.5em 0.55em 0.6em; margin: -0.5em -0.55em -0.6em; color: transparent; -webkit-text-fill-color: transparent;
+  background: var(--ink); -webkit-background-clip: text; background-clip: text; }
+.hero .display em .ch { --ink: linear-gradient(180deg, #f6a968 8%, #e5804c 58%, #cb5d30 116%); }
 .hero .display .line em { color: #df7646; -webkit-text-fill-color: #df7646; }
+/* Light on the line (Sam: "add some kind of lighting on the headline, moving the gradient
+   slowly", "very subtle"). Two things, both in the letters' own background. A soft band of
+   light crosses the whole line now and then: each letter has the band as a second
+   background, moved by the same animation, and starts it later by as much as it stands
+   further right (--x, its place in the line in pixels, set by title-options.js), so the band
+   is in step from one letter to the next and reads as one light passing. And the sea's
+   gradient under it slides down a little and back, so the letters go a shade lighter and
+   darker. Under the line, a soft shadow of it on the sand. */
+.hero .display { filter: drop-shadow(0 0.028em 0.03em rgba(22, 62, 82, 0.3)); }
+.hero .display .ch { background-image: linear-gradient(100deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.34) 42%, rgba(255, 255, 255, 0.34) 58%, rgba(255, 255, 255, 0) 100%), var(--ink);
+  background-size: 240px 100%, 100% 118%; background-repeat: no-repeat; background-position: -260px 0, 0 0;
+  animation: title-light 11s linear infinite; animation-delay: calc(var(--x, 0) * 1.9ms + 2.5s); }
+@keyframes title-light {
+  0% { background-position: -260px 0, 0 0; }
+  26% { background-position: 1240px 0, 0 55%; }
+  50% { background-position: 1240px 0, 0 100%; }
+  100% { background-position: 1240px 0, 0 0; }
+}
 .hero .display em::after { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 40 4 110 3 197 7' fill='none' stroke='%23df7646' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M30 13.5 C 80 9 140 8.5 186 11' fill='none' stroke='%23df7646' stroke-width='1.6' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
 /* (The stroke under the word can be drawn: a clip opened from the left, --u from 0 to 1.) */
 .hero .display em::after { clip-path: inset(-30% calc((1 - var(--u, 1)) * 100%) -30% -6%); }
@@ -426,8 +457,11 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 /* "Scroll into the postcard": in the hand, a note on the sand under the card's lower left
    corner, written along its edge, with an arrow drawn in the same pen up into the picture.
    (It was under the button, a column away from the thing it points at.) */
-.cue { position: absolute; left: calc(var(--card-left, 50vw) - var(--gutter) + 5.4vw); top: calc(var(--card-bottom, 80vh) + 12px); display: flex; align-items: center; gap: 14px; margin: 0; white-space: nowrap; font: 400 2.34rem/1 var(--hand); color: var(--pen); rotate: -6deg; transform-origin: 0 50%; }
-.cue__arrow { flex: none; width: 66px; height: 29px; overflow: visible; fill: none; stroke: currentColor; stroke-width: 3.3; stroke-linecap: round; stroke-linejoin: round; animation: cue 2.8s ease-in-out infinite; }
+.cue { position: absolute; left: calc(var(--card-left, 50vw) - var(--gutter) + 5.4vw); top: calc(var(--card-bottom, 80vh) + 12px); display: flex; align-items: center; gap: 14px; margin: 0; white-space: nowrap; font: 400 2.34rem/1 var(--hand); color: #df7646; rotate: -6deg; transform-origin: 0 50%; }
+/* (In the headline's orange, graded the same way, the arrow with it: Sam's. It was the pen's blue.) */
+.cue > span { display: inline-block; padding: 0.4em 0.4em 0.5em; margin: -0.4em -0.4em -0.5em; color: transparent; -webkit-text-fill-color: transparent;
+  background: linear-gradient(180deg, #ee9254 14%, #de7444 54%, #c2532a 96%); -webkit-background-clip: text; background-clip: text; }
+.cue__arrow { flex: none; width: 66px; height: 29px; overflow: visible; fill: none; stroke: url(#cue-ink); stroke-width: 3.3; stroke-linecap: round; stroke-linejoin: round; animation: cue 2.8s ease-in-out infinite; }
 @keyframes cue { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(8px, -3px); } }
 
 /* The notes on the way down: one thing each, each in its own place and at its own size. They
@@ -459,6 +493,8 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 .note--xl .body { max-width: 28rem; }
 .at-bl { left: var(--gutter); bottom: clamp(36px, 8.5vh, 104px); max-width: min(70rem, calc(100vw - 2 * var(--gutter) - 80px)); }
 .at-r { right: calc(var(--gutter) + 72px); top: 50%; translate: 0 -50%; width: min(24rem, 30vw); padding-left: 22px; border-left: 1px solid rgba(243, 239, 230, 0.5); }
+/* (On the left, half way up: over the open sea on the way down the steps.) */
+.at-l { left: var(--gutter); top: 50%; translate: 0 -50%; width: min(23rem, 27vw); padding-left: 22px; border-left: 1px solid rgba(243, 239, 230, 0.5); }
 .at-c { left: 50%; translate: -50% 0; bottom: clamp(44px, 12vh, 150px); width: min(64rem, calc(100vw - 2 * var(--gutter))); justify-items: center; text-align: center; }
 /* Over the sand at noon (a light picked by hand on the beach): dark ink, no veil. In the
    page's own evening, and in any other light, the sand is dark enough for cream. */
@@ -513,7 +549,7 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
   .rail__fill { transform-origin: 0 50%; transform: scaleX(0); }
   .rail__stop, .rail__tick, .rail__mark, .rail__end { display: none; }
   .at-bl { bottom: max(26px, calc(env(safe-area-inset-bottom) + 18px)); max-width: calc(100vw - 2 * var(--gutter)); }
-  .at-r { right: var(--gutter); left: var(--gutter); top: auto; bottom: max(26px, calc(env(safe-area-inset-bottom) + 18px)); translate: none; width: auto; padding-left: 16px; }
+  .at-r, .at-l { right: var(--gutter); left: var(--gutter); top: auto; bottom: max(26px, calc(env(safe-area-inset-bottom) + 18px)); translate: none; width: auto; padding-left: 16px; }
   .at-c { bottom: max(30px, calc(env(safe-area-inset-bottom) + 22px)); }
   .note--xl .display { font-size: clamp(2.2rem, 11vw, 3.5rem); }
   .foot { flex-direction: column; align-items: flex-start; gap: 8px; font-size: 9px; letter-spacing: 0.16em; }
@@ -557,4 +593,5 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 @media (prefers-reduced-motion: reduce) {
   .cue__arrow { animation: none; }
   .loader__wave, .loader__unwave { animation: none; }
+  .hero .display .ch, .fx { animation: none; }
 }

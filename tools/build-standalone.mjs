@@ -187,7 +187,9 @@ const swap = (from, to) => {
   html = html.replace(from, () => to);
 };
 html = html.replace(/\n\s*<link rel="preconnect"[^>]*>/g, '').replace(/\n\s*<link rel="stylesheet" href="https:\/\/fonts\.googleapis[^>]*>/, '');
-swap('<link rel="stylesheet" href="src/scroll/page.css">', `<style>\n${fonts}\n${read('src/scroll/page.css')}</style>`);
+// (The stylesheet's own pictures are named from where it lies, two folders down: from the
+// single file they are next door.)
+swap('<link rel="stylesheet" href="src/scroll/page.css">', `<style>\n${fonts}\n${read('src/scroll/page.css').replaceAll('url(../../assets/', 'url(assets/')}</style>`);
 html = html.replace(/\n\s*<script type="importmap">[\s\S]*?<\/script>/, '');
 const libs = ['vendor/gsap.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js'].map((f) => read(f).replaceAll('</script', '<\\/script'));
 swap('<script type="module" src="src/main.js"></script>',

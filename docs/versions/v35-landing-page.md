@@ -176,6 +176,14 @@ are already in `vendor/fonts/` for the standalone file).
   not read), and the page's button rebuilt after it: the sea with a net of light in a dark
   rim, no tiles, no glow.
 
+## Round 17 (9 October 2026)
+
+- The sand from the first moment, not a plain colour. A soft shadow under the headline and
+  light moving over it, "very subtle". The button's rim less navy. The scroll cue in the
+  orange. "We leave at first light" on the left.
+- Postcards two and three on surfaces of their own: prompts written (wood, shallow water).
+- The ending: a wave in code that comes in behind the card, and the card moving with it.
+
 ## Found by other versions
 
 Nothing yet.

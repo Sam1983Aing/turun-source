@@ -65,7 +65,7 @@ void main() {
   float r = S.y * 0.5;
   vec2 q = vec2(max(abs(px.x - S.x * 0.5) - (S.x * 0.5 - r), 0.0), px.y - r);
   float inFromRim = r - length(q);
-  col *= mix(0.5, 1.0, smoothstep(0.0, 7.0 + 5.0 * (1.0 - v.y), inFromRim));
+  col *= mix(0.7, 1.0, smoothstep(0.0, 6.0 + 4.0 * (1.0 - v.y), inFromRim));
   gl_FragColor = vec4(col, 1.0);
 }`;
 

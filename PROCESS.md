@@ -4338,3 +4338,35 @@ Checked at twice the density, at rest and after a press, in its three places (th
 third postcard, the card's back) and on a phone. The single file rebuilt and opened from
 `file://` with no errors.
 
+### Round 17: the first moment, light on the headline, and smaller things (9 October)
+
+- **The sand is there from the first paint.** "It starts with like a blank color background.
+  I want the beach sand background to appear right away." The sand was drawn by the script
+  into a canvas, and until the script had loaded (three.js comes from a CDN), laid the page
+  out and decoded the photograph, the table showed its plain colour, and then faded. Now the
+  canvas has the same photograph as its CSS background, at about the size and place the
+  script will give it, and under that forty pixels of it as a data URI for while the
+  photograph is on its way. The card is kept out of sight by the stylesheet until
+  `postcard.js` takes it over. Checked with the page's scripts blocked: sand and the loader's
+  words, nothing else. The single file's build rewrites that one path, since the stylesheet
+  is inlined there.
+- **A shadow under the headline, and light passing over it.** The shadow is one
+  `drop-shadow` on the heading (a `text-shadow` would be drawn over the gradient: the
+  gradient is the letters' background). The light: each letter has a soft band of white as a
+  second background, moved across by one animation, and starts it later by 1.9 ms for every
+  pixel it stands further right (`--x`, set from the script), so the band is in step from
+  letter to letter and reads as one light crossing the line, every eleven seconds. Under
+  it the sea's gradient slides down a little and back.
+- **The button's rim** is a deep teal-slate, 2 px, where it was navy at 2.5, and the water is
+  less dark under it.
+- **"Scroll into the postcard"** and its arrow are in the headline's orange, a little
+  deeper so the thin script still reads on sand.
+- **"We leave at first light" is on the left**, half way up, over the open sea all the way
+  down the steps (`.at-l`). Looked at from `tau` 1.1 to 1.48: white on deep blue, then on
+  turquoise with its dark patch behind. It was on the right, over the leaves.
+
+Surfaces for the second and third postcards: Sam asked what they should be. Prompts for five
+variations of each are in `../images/prompts/postcard-surface-prompts.txt`: the cliff
+stair's own weathered wood under "The walk" (his idea), and clear shallow water over sand
+under "The beach".
+

@@ -162,7 +162,7 @@ export function startScroll({ params }) {
   // Frames owed (the picture stands still at rest, so frames are only drawn when asked; two,
   // as the haze settles over a frame).
   let dirty = 2;
-  if (BARE) { post.set({ up: 1 }); html.classList.add('bare'); $('.table').classList.add('sand-in'); }
+  if (BARE) { post.set({ up: 1 }); html.classList.add('bare'); }
 
   // ---------------------------------------------------------------- the page in screens
 
@@ -375,8 +375,6 @@ export function startScroll({ params }) {
     g.imageSmoothingQuality = 'high';
     g.drawImage(img, sx, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
     palm?.sandChanged(c, img === sands.day ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
-    // (The scene under the loader comes up out of the plain sand colour once its sand is there.)
-    $('.table').classList.add('sand-in');
   }
   const loadSand = (which, src) => new Promise((done) => {
     const img = new Image();

@@ -32,6 +32,11 @@ export function titleOption(name, { gsap, SplitText, reduced = false } = {}) {
       const s = SplitText.create(el, { type: 'words,chars', charsClass: 'ch' });
       chars = s.chars; words = s.words;
       wordOf = chars.map((c) => words.findIndex((w) => w.contains(c)));
+      // (Where each letter stands in the line, for the light that passes over it: page.css.)
+      const place = () => { const r = el.getBoundingClientRect(); for (const c of chars) c.style.setProperty('--x', Math.round(c.getBoundingClientRect().left - r.left)); };
+      place();
+      addEventListener('resize', place);
+      document.fonts?.ready.then(place);
       rest();
     },
     // Onto the timeline `t` at `at` seconds.
