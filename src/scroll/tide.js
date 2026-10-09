@@ -60,7 +60,8 @@ const VERT = 'attribute vec2 p; varying vec2 v; void main() { v = vec2(p.x * 0.5
 // P the card's sand as the page has drawn it. S the sea's photograph. M its map. C the part of
 // the sand's picture that is drawn (left, top, width, height in heights of the picture). A0,
 // B0: a wave (how far its foam has come, how much of the foam has gone, how far its water
-// reaches, its shape). A1, B1: the sand it has left (how wet, how far in it has dried). U: the
+// reaches, its shape). A1, B1: the sand it has left (how wet, how far in it has dried), and how
+// far into its running back the water is. U: the
 // time, how far the water has carried its surface, and how far along the way anything is drawn.
 const FRAG = `
 precision highp float;
@@ -94,62 +95,110 @@ vec2 src(float a, float r, float sh) {
   float p = b < f ? P0 * pow(b / f, f / P0) : P0 + (b - f);
   return N * p + W * (r * p / b);
 }
-void wave(float a, float r, vec4 w, vec4 x, float k, inout float wet, inout vec4 foam) {
-  if (w.x < -8.0) return;
-  vec2 mf = src(a, r, w.x * k);
+// (A little unevenness that is the same wherever it is asked for: grains, patches, glints.)
+float hash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+float noise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+}
+// One line of the photograph's foam, laid for a front that has come sh. old: how far gone it
+// is (it goes in patches, the weakest bubbles first). churn: how much it is still boiling.
+float lace(float a, float r, float sh, float old, float churn, vec2 q, out vec3 ph, out float df) {
+  vec2 mf = src(a, r, sh);
   vec3 c = chart(mf);
-  float df = edge(c);
+  df = edge(c);
+  // (Fresh foam is never still: its cells are pushed about a little.)
+  mf += (vec2(noise(q * 64.0 + vec2(U.x * 1.4, 0.0)), noise(q * 64.0 + vec2(7.3, -U.x * 1.2))) - 0.5) * 0.0065 * churn;
+  ph = sea(mf);
+  float g = clamp(old * (0.55 + 0.9 * noise(q * 26.0 + sh * 3.0)), 0.0, 1.0);
+  return smoothstep(mix(0.6, 0.93, g), mix(0.82, 1.03, g), least(ph)) * smoothstep(0.04, 0.4, c.b) * (1.0 - old * old);
+}
+void over(inout vec4 foam, vec3 ph, float al) {
+  float both = al + foam.a * (1.0 - al);
+  foam = vec4(mix(foam.rgb, ph, al / max(both, 0.0001)), both);
+}
+// A wave: the sand it has wetted, its foam, and the lip of its front.
+void wave(float a, float r, vec4 w, vec4 x, float k, vec2 q, inout float wet, inout vec4 foam, inout float lip) {
+  if (w.x < -8.0) return;
+  vec3 ph;
+  float df, fresh = 1.0 - w.y;
+  // The front's own foam, and while it is fresh a second line of it just behind: a wave runs
+  // up the sand as a thick rim of foam and thins as it slows.
+  float al = lace(a, r, w.x * k, w.y, fresh, q, ph, df);
   // (How far behind where the foam stopped: the map knows it near the edge, the way itself beyond.)
   float back = mix(-df, EDGE + w.x * k - a, smoothstep(0.05, 0.078, -df));
-  // Wet up to a clear line a little past where the foam stopped, and wetter nearer the water.
-  wet = max(wet, x.x * smoothstep(x.y - 0.008, x.y + 0.008, back) * (0.72 + 0.28 * smoothstep(0.0, 0.16, back - x.y)));
-  if (w.y < 0.999 && c.b > 0.02) {
-    vec3 ph = sea(mf);
-    float al = smoothstep(mix(0.6, 0.9, w.y), mix(0.82, 1.0, w.y), least(ph)) * smoothstep(0.04, 0.4, c.b) * (1.0 - w.y * w.y);
-    float both = al + foam.a * (1.0 - al);
-    foam = vec4(mix(foam.rgb, ph, al / max(both, 0.0001)), both);
-  }
+  // Wet up to a clear line a little past where the foam stopped (not a straight one: it dries
+  // in tongues), and wetter nearer the water.
+  float dry = x.y + (noise(vec2(r * 21.0, a * 21.0) + w.w) - 0.5) * 0.03 * smoothstep(0.0, 0.05, x.y);
+  wet = max(wet, x.x * smoothstep(dry - 0.008, dry + 0.008, back) * (0.72 + 0.28 * smoothstep(0.0, 0.16, back - x.y)));
+  // The front is a rim with some height to it: the low sun behind it lays a thin shade ahead.
+  lip = max(lip, fresh * fresh * step(0.0, df) * (1.0 - smoothstep(0.0, 0.012, df)));
+  if (w.y > 0.999) return;
+  over(foam, ph, al);
+  vec3 p2; float d2;
+  if (fresh > 0.05) over(foam, p2, lace(a, r, w.x * k - 0.019, w.y, fresh, q + 3.1, p2, d2) * fresh * 0.85);
+  // And a thinner line left well behind it, from another stretch of the same foam, as the
+  // surges before it leave theirs.
+  over(foam, p2, lace(a, r + 0.31, w.x * k * 0.8 - 0.035, min(1.0, w.y * 1.5 + 0.25), fresh * 0.5, q + 9.7, p2, d2) * 0.5);
 }
 void main() {
   vec2 m = C.xy + v * C.zw;
-  float a = dot(m, N), r = dot(m, W);
+  float a = dot(m, N), r = dot(m, W), t = U.x;
   if (a > U.z) { gl_FragColor = vec4(0.0); return; }
   float kA = 1.0 + lobes(r, A0.w), kB = 1.0 + lobes(r, B0.w);
+  // Running back, the water leaves some lanes sooner than others.
+  float lA = 1.0 - A1.z * (0.15 * sin(r * 7.3 + A0.w * 1.3) + 0.08 * sin(r * 17.0 + A0.w * 2.1) + 0.15);
+  float lB = 1.0 - B1.z * (0.15 * sin(r * 7.3 + B0.w * 1.3) + 0.08 * sin(r * 17.0 + B0.w * 2.1) + 0.15);
   // The water: the sea at rest, its edge lapping, or as far as a wave has brought it.
-  float lap = 0.011 * sin(U.x * 0.83 + r * 3.1) + 0.006 * sin(U.x * 1.31 - r * 7.3);
-  float sw = max(lap, max(A0.z * kA, B0.z * kB));
+  float lap = 0.011 * sin(t * 0.83 + r * 3.1) + 0.006 * sin(t * 1.31 - r * 7.3);
+  float sw = max(lap, max(A0.z * kA * lA, B0.z * kB * lB));
+  // (Where this point is on the water itself, which goes up the sand and back with the front.)
+  vec2 q = vec2(a - sw, r);
   vec2 ms = src(a, r, sw);
   vec3 k = chart(ms);
-  float ds = edge(k);
-  float cover = 1.0 - smoothstep(-0.004, 0.005, ds), deep = clamp(-ds / NEAR, 0.0, 1.0);
-  float wet = 0.0;
+  // Its edge is never a clean line: small tongues come and go along it.
+  float ds = edge(k) + (noise(vec2(r * 44.0, t * 0.8 + a * 7.0)) - 0.5) * 0.009;
+  float cover = 1.0 - smoothstep(-0.003, 0.004, ds), deep = clamp(-ds / NEAR, 0.0, 1.0), body = smoothstep(0.0, 0.55, deep);
+  float wet = 0.0, lip = 0.0;
   vec4 foam = vec4(0.0);
-  wave(a, r, A0, A1, kA, wet, foam);
-  wave(a, r, B0, B1, kB, wet, foam);
+  wave(a, r, A0, A1, kA, q, wet, foam, lip);
+  wave(a, r, B0, B1, kB, q, wet, foam, lip);
 
   // What the photographed water does to its sand: two copies of it drifting round each other,
   // and mostly the darker of the two, so the light on its floor slides and folds.
-  vec2 o1 = 0.012 * vec2(cos(U.x * 0.52), sin(U.x * 0.52)), o2 = 0.012 * vec2(cos(2.1 - U.x * 0.43), sin(2.1 - U.x * 0.43));
-  vec3 s1 = sea(ms + o1 * deep), s2 = sea(ms + o2 * deep), both = min(s1, s2);
+  vec2 o1 = 0.012 * vec2(cos(t * 0.52), sin(t * 0.52)), o2 = 0.012 * vec2(cos(2.1 - t * 0.43), sin(2.1 - t * 0.43));
+  vec3 s1 = sea(ms + o1 * body), s2 = sea(ms + o2 * body), both = min(s1, s2);
   vec3 lit = (0.3 * (s1 + s2) + 0.5 * both) / SAND;
   // (Where the photograph has its foam, clear thin water: the foam is laid on by its own wave.)
-  lit = mix(lit, vec3(0.9, 0.925, 0.9), smoothstep(0.6, 0.82, least(both)) * smoothstep(0.04, 0.4, k.b));
-  // (Deeper in, a little more of the sea's own colour.)
-  lit *= mix(vec3(1.0), vec3(0.84, 0.965, 0.99), smoothstep(0.08, 0.85, 1.0 - a / max(EDGE + sw, 0.05)) * cover);
-  lit = min(lit, vec3(1.32));
+  lit = mix(lit, vec3(0.94), smoothstep(0.6, 0.82, least(both)) * smoothstep(0.04, 0.4, k.b));
+  // Sand under water is wet sand, never paler than dry: the light plays on that, and is kept
+  // from burning out. Deeper in, a little more of the sea's own colour. At its very edge the
+  // water is too thin to change much.
+  lit = clamp(pow(lit, vec3(0.82)) * vec3(0.9, 0.93, 0.925), 0.6, 1.13);
+  lit *= mix(vec3(1.0), vec3(0.83, 0.965, 0.99), smoothstep(0.08, 0.85, 1.0 - a / max(EDGE + sw, 0.05)));
+  // (Faint lines along the way it is running, carried with it.)
+  lit *= 1.0 + (noise(vec2(q.x * 13.0, q.y * 90.0)) - 0.5) * 0.07 * body;
+  lit = mix(vec3(0.95, 0.955, 0.945), lit, 0.3 + 0.7 * body);
   // The sand under it is seen a little to one side, by the surface's slope (carried with the water).
-  vec2 x = (m - N * U.y * 0.7) * 60.0;
-  vec2 slope = cos(dot(x, vec2(0.955, 0.296)) + U.x * 0.9) * vec2(0.955, 0.296) + cos(dot(x, vec2(-0.737, 0.675)) * 1.7 + U.x * 1.2 + 2.1) * vec2(-0.434, 0.397) + cos(dot(x, vec2(0.315, -0.949)) * 2.6 - U.x * 1.5 + 0.7) * vec2(0.121, -0.365);
-  vec3 under = ground(m + slope * 0.0021 * deep) * lit;
-  // (Its very edge catches the light.)
-  under += vec3(1.0, 0.97, 0.9) * 0.07 * (1.0 - smoothstep(0.0, 0.006, abs(ds + 0.003)));
+  vec2 x = q * 60.0;
+  vec2 slope = cos(dot(x, vec2(0.955, 0.296)) + t * 0.9) * vec2(0.955, 0.296) + cos(dot(x, vec2(-0.737, 0.675)) * 1.7 + t * 1.2 + 2.1) * vec2(-0.434, 0.397) + cos(dot(x, vec2(0.315, -0.949)) * 2.6 - t * 1.5 + 0.7) * vec2(0.121, -0.365);
+  vec3 under = ground(m + (N * slope.x + W * slope.y) * 0.0021 * body) * lit;
+  // Its very edge catches the light, and so do the small faces of its surface, here and gone:
+  // most where it is thin and quick.
+  float spark = noise(q * 205.0 + t * vec2(2.3, 1.1)) * noise(q * 163.0 - t * vec2(1.6, 2.6));
+  float glint = smoothstep(0.43, 0.66, spark);
+  under += vec3(1.0, 0.97, 0.9) * (0.07 * (1.0 - smoothstep(0.0, 0.006, abs(ds + 0.003))) + glint * (0.04 + 0.26 * (1.0 - deep)));
 
-  // The sand the water has left: darker, and just behind the water still shining.
+  // The sand the water has left: darker, and just behind the water still running with it,
+  // shining and glinting. Ahead of a fresh front, the shade of its rim.
   vec3 damp = ground(m) * mix(vec3(1.0), vec3(0.83, 0.805, 0.765), wet);
-  damp += vec3(0.8, 0.88, 0.92) * 0.085 * wet * exp(-max(ds, 0.0) / 0.03);
+  float film = wet * exp(-max(ds, 0.0) / 0.03);
+  damp += vec3(0.8, 0.88, 0.92) * 0.085 * film + vec3(1.0, 0.97, 0.9) * glint * 0.22 * film;
+  damp *= 1.0 - 0.14 * lip;
   vec3 col = mix(damp, min(under, vec3(1.0)), cover);
   col = mix(col, foam.rgb, foam.a);
-  float al = max(max(cover, smoothstep(0.0, 0.1, wet)), foam.a);
+  float al = max(max(max(cover, smoothstep(0.0, 0.1, wet)), foam.a), lip * 0.999);
   gl_FragColor = vec4(col * al, al);
 }`;
 
@@ -233,7 +282,9 @@ export function createTide({ reduced = false, sea = null, map = null } = {}) {
     const end = up + down + DRY;
     const wet = t < 0 ? 0 : 1 - smooth(up + down * 0.85, end, t);
     const dried = (A * 1.45 + 0.05) * smooth(up + down * 0.45, end, t) - 0.014;
-    return { A, foam, gone, water, wet, dried, seed: 1.3 + k * 2.4, alive: t > -LEAD && t < end };
+    // (back: how far into its running back the water is, for the lanes that leave sooner.)
+    const back = t < up ? 0 : smooth(0, 1, clamp01((t - up) / down));
+    return { A, foam, gone, water, wet, dried, back, seed: 1.3 + k * 2.4, alive: t > -LEAD && t < end };
   }
   // The two that can be alive at `clock`: the one whose beat this is, and the one before it.
   // (Before the clock has started there is only the first, standing at the sea's edge.)
@@ -255,7 +306,7 @@ export function createTide({ reduced = false, sea = null, map = null } = {}) {
     ['A', 'B'].forEach((name, i) => {
       const w = ws[i];
       gl.uniform4fv(u[`${name}0`], w ? [w.foam, w.gone, w.water, w.seed] : off);
-      gl.uniform4fv(u[`${name}1`], w ? [w.wet, w.dried, 0, 0] : [0, 9, 0, 0]);
+      gl.uniform4fv(u[`${name}1`], w ? [w.wet, w.dried, w.back, 0] : [0, 9, 0, 0]);
       if (w) { carried = Math.max(carried, w.water); reach = Math.max(reach, w.foam * 1.4 + 0.05); }
     });
     gl.uniform3f(u.U, clock, carried, EDGE + reach + 0.05);

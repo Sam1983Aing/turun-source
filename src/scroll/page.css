@@ -619,7 +619,11 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 /* ------------------------------------------------------------ scene choices on the beach */
 
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.scene-controls { position: fixed; z-index: 11; right: calc(var(--gutter) + 44px); bottom: clamp(26px, 6.5vh, 72px); display: grid; justify-items: end; gap: 8px; opacity: 0; visibility: hidden; color: var(--cream); }
+/* They hang under the firm's name at the top left, their left edges on its left edge, the bar
+   of light first and what a drag does under it. (Sam, round 21: at the bottom right they felt
+   "out of place ... under the name of the company and the coordinates, left align, and make
+   sure the spacing is clean".) */
+.scene-controls { position: fixed; z-index: 11; left: var(--gutter); top: calc(max(18px, env(safe-area-inset-top)) + 44px + 16px); display: grid; justify-items: start; gap: 8px; opacity: 0; visibility: hidden; color: var(--cream); }
 /* The time of day, on the beach: four choices in one bar of smoked glass, the one that is on
    as a light chip in it. (It was bare cream words with a line under one of them, which the
    evening's pale sand and sky swallowed: Sam did not notice it was a control.) */
@@ -645,9 +649,11 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
   .hud__mark span, .hud__nav a:not(.hud__cta), .hud__where .hud__lon, .hud__where .hud__lat { display: none; }
   .hud__mark b { font-size: 26px; }
   .hud__cta { padding: 11px 15px !important; }
-  .scene-controls { right: auto; left: var(--gutter); bottom: auto; top: calc(max(18px, env(safe-area-inset-top)) + 52px); justify-items: start; }
+  /* (A narrow screen: the bar without its own name, and closer chips, so all four fit.) */
+  .scene-controls { top: calc(max(18px, env(safe-area-inset-top)) + 44px + 10px); gap: 6px; }
+  .time-of-day { padding-left: 4px; }
   .time-of-day::before { display: none; }
-  .time-of-day span { padding: 0 9px 0 0; }
+  .time-of-day span { min-height: 36px; padding: 0 12px; letter-spacing: 0.14em; }
   .rail { right: auto; bottom: auto; left: 0; top: 0; width: 100vw; height: 2px; }
   .rail__line, .rail__fill { top: 0; bottom: auto; left: 0; right: 0; width: auto; height: 2px; }
   .rail__line { background: rgba(243, 239, 230, 0.2); box-shadow: none; }

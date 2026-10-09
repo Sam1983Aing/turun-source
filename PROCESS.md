@@ -4580,3 +4580,34 @@ Sam's notes, with four screenshots.
   "Drag to look around / Reset view" a smaller bar under it. The top bar's Reserve is the same
   glass with cream letters where it was a cream outline: it reads on a white sky and on a dark
   cliff alike. `backdrop-filter`, three small areas.
+
+### Round 21: the controls under the name, a name's address, and the wave again (8 October)
+
+- **The beach's controls hang under the firm's name**, top left, their left edges on its left
+  edge (83 px, all three), 22 px under the top bar and 8 px apart. Sam: at the bottom right
+  they felt "out of place ... under the name of the company and the coordinates ... left
+  align, and make sure the spacing is clean". On a narrow screen the bar loses its "Light"
+  label so all four choices fit (21 to 340 px of 390, 20 to 339 of 360). An old phone rule
+  that took the chips' padding away is gone.
+- **The pencilled address** is `maya.ellison@gmail.com`, as Sam gave it (it was
+  `maya@example.com`, which reads as a form's default). A placeholder only: nothing is sent.
+- **The wave, from "a five" towards "at least an eight"** ("I like the concept of the wave
+  coming but it doesn't feel realistic yet ... a better water movement"). What was wrong, by
+  looking at it against the photograph it borrows from: the sheet was milky and paler than the
+  dry sand, its edge was one clean ribbon of foam that slid as a rigid shape, the wet sand
+  ended in a smooth line, and nothing glittered. Changed in `tide.js`:
+  - the foam boils while it is fresh (its cells pushed about by a little noise), is a thick
+    rim as the wave runs up (a second line just behind the front) with a thinner line left
+    well behind from another stretch of the same lace, and goes in patches as it ages;
+  - sand under water is wet sand: the photograph's light over its floor is compressed and
+    kept under the dry sand's own brightness (it was up to 1.32 times it), so the sheet reads
+    as clear water and the footprints under it are darker, not washed out;
+  - the water's edge has small tongues that come and go, and running back it leaves some
+    lanes sooner than others (`back`, a new number per wave);
+  - glints: small bright faces, here and gone, most where the water is thin and on the film
+    it leaves behind, and faint lines along the way it runs;
+  - a thin shade ahead of a fresh front (its rim has some height and the sun is behind it),
+    and the wet line dries in tongues.
+  Everything that belongs to the water is now placed on the water (a coordinate that goes up
+  the sand and back with the front), so it travels with it. Recorded again:
+  `../demos/tide/`.

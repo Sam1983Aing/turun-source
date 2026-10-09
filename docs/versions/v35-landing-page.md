@@ -212,6 +212,13 @@ are already in `vendor/fonts/` for the standalone file).
 - "Scroll into the postcard" with more weight, fitting the scene, same font.
 - The lighting control on the beach easy to see in any light, and the top Reserve button too.
 
+## Round 21 (8 October 2026)
+
+- The lighting control moved to the top left, under the name and the coordinates, left aligned.
+- The pencilled email as a real-looking one: maya.ellison@gmail.com.
+- The wave: "right now I feel it's a five ... try to reach at least an eight", for the water's
+  movement.
+
 ## Found by other versions
 
 Nothing yet.
