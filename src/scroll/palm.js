@@ -25,7 +25,10 @@
 // (Two other ways were built and recorded before this one, in demos/sand/: the old photograph
 // with its baked shadows slid about by a shader, and that with gusts. Sam chose this.)
 
-const DEG = Math.PI / 180;
+// The palms' shadows (their colour, how soft, where the palms are, how a frond is drawn, how a
+// shadow drifts) are first.js's: it runs before the first frame and draws them once, so the
+// page opens with its shadows on the sand, and this script goes on moving the same canvases.
+const { DEG, TAU, frames, SHADE, SOFT, PALMS, DRIFT, frond, driftFrames } = globalThis.__first;
 // The wind blows this way across the screen (right and down), as the shadows lie.
 const WIND = [0.83, 0.56];
 // The leaf's picture is a square with the stem coming in at its top left corner (STEM, as
@@ -48,16 +51,6 @@ const LEAVES = {
   ],
   tall: [{ x: 1.049, y: -0.011, size: 0.34, turn: 25, flip: true, ph: 2.9 }],
 };
-// What a palm's shadow does to the sand under it, as a multiply. Measured in the photograph
-// the page had before, the darkest of the baked shadows came to 0.43, 0.45, 0.41 of the sunlit
-// sand: nearly neutral, a touch green. The live ones keep that colour and are fainter. (The
-// near one was at 0.57 first, and Sam found it hid the card: "a little bit too strong".)
-const SHADE = { far: 'rgb(192, 193, 184)', near: 'rgb(178, 179, 169)' };
-// The cast shadows are soft because they are small: drawn at a quarter (far) and two fifths
-// (near) of the size and stretched, with a little blur as they are copied in. (A CSS blur on
-// full-size layers, tried first, cost a fifth of a second a frame once the dive began to
-// scale them up.)
-const SOFT = { far: [0.25, 1.5], near: [0.4, 1.2] };
 // The browser's own motions repeat after this many seconds (each is a few sines that fit a
 // whole number of times into it, so the loop has no seam), and a gust lasts this long.
 const LOOP = 20, GUST = 3.3;
@@ -66,76 +59,14 @@ const clamp01 = (x) => Math.min(Math.max(x, 0), 1);
 const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
 const el = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
 
-// A frond's shadow: a midrib that curls, and a leaflet each side at every step along it,
-// longest a third of the way out, each fluttering to its own beat. f: where it starts (shares
-// of the canvas), its heading in degrees, its length and its leaflets' as shares of the
-// canvas's width, how it curls (radians at the tip), how many pairs, how it gives to the wind.
-function frond(g, W, H, f, t, wind) {
-  const len = f.len * W, n = f.n ?? 30;
-  const give = (Math.sin(t * 0.8 + f.ph) * 0.6 + Math.sin(t * 1.7 + f.ph * 2.3) * 0.4) * 0.11 * wind * (f.flex ?? 1);
-  const rib = [];
-  let x = f.x * W, y = f.y * H;
-  for (let i = 0; i <= n; i++) {
-    const s = i / n, a = f.a * DEG + (f.curl ?? 0) * s * s + give * Math.pow(s, 1.4);
-    rib.push([x, y, a, s]);
-    x += (Math.cos(a) * len) / n; y += (Math.sin(a) * len) / n;
-  }
-  g.lineCap = 'round';
-  g.lineWidth = Math.max(1, len * 0.007);
-  g.beginPath();
-  rib.forEach(([px, py], i) => (i ? g.lineTo(px, py) : g.moveTo(px, py)));
-  g.stroke();
-  for (let i = 2; i <= n; i++) {
-    const [px, py, a, s] = rib[i];
-    const ll = f.leaf * W * (0.3 + 0.7 * Math.sin(Math.PI * Math.pow(s, 0.75))) * (1 - 0.2 * s), open = (62 - 30 * s) * DEG;
-    for (const side of [-1, 1]) {
-      const beat = Math.sin(t * (2.1 + 0.37 * ((i * 7 + (side > 0 ? 3 : 0)) % 5)) + i * 0.9 + f.ph) * 0.085 + Math.sin(t * 0.8 + f.ph + s * 2) * 0.05;
-      const da = a + side * open + beat * wind * (f.flex ?? 1);
-      const tx = px + Math.cos(da) * ll, ty = py + Math.sin(da) * ll, mx = px + Math.cos(da) * ll * 0.38, my = py + Math.sin(da) * ll * 0.38;
-      const nx = -Math.sin(da) * ll * 0.075, ny = Math.cos(da) * ll * 0.075;
-      g.beginPath();
-      g.moveTo(px, py);
-      g.quadraticCurveTo(mx + nx, my + ny, tx, ty);
-      g.quadraticCurveTo(mx - nx, my - ny, px, py);
-      g.fill();
-    }
-  }
-}
-
-// The palms over the sand, in the sand's own space (shares of its canvas, of which the screen
-// shows all but the outer few per cent). They are shadows only: the palms themselves are out
-// of the picture.
-const PALMS = {
-  wide: {
-    far: [
-      { x: -0.06, y: -0.06, a: 9, len: 0.62, leaf: 0.17, curl: 0.22, ph: 0.4, n: 36 },
-      { x: 1.2, y: 0.12, a: 163, len: 0.47, leaf: 0.17, curl: -0.3, ph: 3.3, n: 30 },
-    ],
-    near: [{ x: 1.14, y: 1.16, a: 219, len: 0.48, leaf: 0.16, curl: 0.28, ph: 5.0, n: 30 }],
-  },
-  tall: {
-    far: [
-      { x: -0.35, y: 0.0, a: 22, len: 1.25, leaf: 0.36, curl: 0.3, ph: 0.4, n: 30 },
-      { x: 1.5, y: 0.52, a: 168, len: 0.95, leaf: 0.34, curl: -0.3, ph: 3.3, n: 28 },
-    ],
-    near: [{ x: 1.45, y: 1.08, a: 212, len: 1.1, leaf: 0.34, curl: 0.28, ph: 5.0, n: 28 }],
-  },
-};
 
 // ---------------------------------------------------------------- what the browser moves
 
-// Keyframes for a motion that loops without a seam: `at(u)` gives the transform at u (0 to 1
-// round the loop), sampled closely enough to go straight from one to the next.
-const frames = (n, at) => Array.from({ length: n + 1 }, (_, i) => ({ transform: at(i / n) }));
-const TAU = Math.PI * 2;
 // A leaf on its stem: a slow sway with a quicker tremble on it, and a lean. `k`: how much.
 const swayFrames = (ph, k = 1) => frames(120, (u) => {
   const r = (Math.sin(TAU * 3 * u + ph) * 0.62 + Math.sin(TAU * 7 * u + ph * 1.7) * 0.26 + Math.sin(TAU * 16 * u + ph) * 0.12) * 2.0 * k;
   return `rotate(${r.toFixed(3)}deg) skewX(${(Math.sin(TAU * 5 * u + ph + 1.4) * 0.7 * k).toFixed(3)}deg)`;
 });
-// A whole shadow, drifting a little: the palm that casts it is swaying.
-const driftFrames = (ph, k = 1) => frames(48, (u) =>
-  `translate(${((Math.sin(TAU * 2 * u + ph) * 0.24 + Math.sin(TAU * 5 * u + ph * 2) * 0.1) * k).toFixed(3)}%, ${(Math.sin(TAU * 3 * u + ph + 1) * 0.2 * k).toFixed(3)}%) rotate(${(Math.sin(TAU * 3 * u + ph) * 0.28 * k).toFixed(3)}deg)`);
 
 // ---------------------------------------------------------------- sand, blown
 
@@ -262,14 +193,16 @@ export function createPalm({ reduced = false, plate = null, leaf = null } = {}) 
   // draws the fronds on, which the browser drifts.
   const shade = {};
   for (const k of ['far', 'near']) {
-    const wrap = layer('fx-shade'), cv = el('canvas', 'fx__fill');
-    wrap.append(cv);
-    loop(cv, driftFrames(k === 'far' ? 0.4 : 2.2, k === 'far' ? 1 : 1.3));
+    // (The page comes with them already drawn, by first.js before the first frame: those are
+    // taken over as they are. Made here only where the page has none.)
+    let wrap = document.querySelector(`.fx-first[data-shade="${k}"]`), cv = wrap?.querySelector('canvas');
+    if (wrap) layers.push(wrap); else { wrap = layer('fx-shade'); cv = el('canvas', 'fx__fill'); wrap.append(cv); }
+    loop(cv, driftFrames(...DRIFT[k]));
     shade[k] = { wrap, cv, buf: el('canvas') };
   }
   // The leaves, and under them their shadows: twice the same boxes, one holding the picture
   // and one its shape filled with the shade's colour, moved by the same motions.
-  const leafShadeWrap = layer('fx-shade'), leafWrap = layer('fx-leaf');
+  const leafShadeWrap = layer('fx-shade fx-leafshade'), leafWrap = layer('fx-leaf');
   const leafImg = new Image();
   let leaves = [], leafSet = null;
   function hang(set) {
@@ -279,22 +212,24 @@ export function createPalm({ reduced = false, plate = null, leaf = null } = {}) 
       // A box that is turned to the leaf's lie, in it one that sways, in it one that a gust
       // pulls, in it the picture (mirrored in one that hangs from the right).
       const part = (pic, k) => {
-        const box = el('div', l.flip ? 'leaf leaf--right' : 'leaf'), sway = el('div', 'leaf__in'), pull = el('div', 'leaf__in');
+        const box = el('div', l.flip ? 'leaf leaf--right' : 'leaf'), come = el('div', 'leaf__in'), sway = el('div', 'leaf__in'), pull = el('div', 'leaf__in');
         pic.classList.add('leaf__pic');
-        for (const e of [box, sway, pull]) e.style.transformOrigin = `${(l.flip ? 1 - STEM[0] : STEM[0]) * 100}% ${STEM[1] * 100}%`;
+        for (const e of [box, come, sway, pull]) e.style.transformOrigin = `${(l.flip ? 1 - STEM[0] : STEM[0]) * 100}% ${STEM[1] * 100}%`;
         box.style.transform = `rotate(${(l.flip ? -1 : 1) * l.turn}deg)`;
-        box.append(sway); sway.append(pull); pull.append(pic);
+        box.append(come); come.append(sway); sway.append(pull); pull.append(pic);
+        if (!arrived) come.style.opacity = '0';
         loop(sway, swayFrames(l.ph, k));
-        return { box, pull };
+        return { box, pull, come };
       };
       const img = new Image();
       img.alt = '';
       if (leaf) img.src = leaf;
       const top = part(img, 1), shadow = el('canvas'), under = part(shadow, 1.15);
       leafWrap.append(top.box); leafShadeWrap.append(under.box);
-      return { ...l, top, under, shadow };
+      return { ...l, top, under, shadow, img };
     });
     cast();
+    if (leafImg.complete && leafImg.naturalWidth) arrive();
   }
   // (A leaf's shadow: its own shape, filled with the shade's colour, a little soft.)
   function cast() {
@@ -309,7 +244,25 @@ export function createPalm({ reduced = false, plate = null, leaf = null } = {}) 
       x.fillStyle = SHADE.near; x.fillRect(0, 0, c.width, c.height);
     }
   }
-  leafImg.onload = cast;
+  // The leaves come into the picture once, when their picture is ready to be drawn: each swings
+  // down on its stem from a little way out, with its shadow, as a frond let go by the wind
+  // does. (They were faded in with everything else the script made, which read as things
+  // turning up late. Now what is there is there from the first frame, and this is a motion.)
+  let arrived = false;
+  function arrive() {
+    if (arrived) return;
+    arrived = true;
+    Promise.all(leaves.map((l) => (l.img.decode ? l.img.decode().catch(() => {}) : null))).then(() => {
+      leaves.forEach((l, i) => {
+        for (const p of [l.top, l.under]) {
+          p.come.style.opacity = '';
+          if (!reduced) p.come.animate([{ opacity: 0, transform: `rotate(${l.flip ? 11 : -11}deg)` }, { opacity: 1, offset: 0.45 }, { opacity: 1, transform: 'rotate(0deg)' }],
+            { duration: 2100, delay: 120 + i * 260, easing: 'cubic-bezier(0.2, 0.75, 0.2, 1)', fill: 'backwards' });
+        }
+      });
+    });
+  }
+  leafImg.onload = () => { cast(); arrive(); };
   if (leaf) leafImg.src = leaf;
   const gust = reduced ? null : makeGust();
   if (gust) layers.push(gust.el);
@@ -360,10 +313,16 @@ export function createPalm({ reduced = false, plate = null, leaf = null } = {}) 
       // Over the card, from the ground up: sand blows across it, shadows fall on it and on
       // that sand, and the leaves hang over everything (blown sand stays near the ground: with
       // it drawn over the leaves they looked dusty).
-      card.after(...(gust ? [gust.el] : []), shade.far.wrap, shade.near.wrap, leafShadeWrap, leafWrap);
+      // (The two palms' shadows are in the page already, after the card, if first.js drew them:
+      // they are not moved.)
+      if (shade.far.wrap.isConnected) { if (gust) card.after(gust.el); shade.near.wrap.after(leafShadeWrap, leafWrap); }
+      else card.after(...(gust ? [gust.el] : []), shade.far.wrap, shade.near.wrap, leafShadeWrap, leafWrap);
       addEventListener('resize', size);
       size();
     },
+    // The sand has just been laid again (postcard.js): everything over it goes with it at once,
+    // not a frame later.
+    sync() { if (!host) return; const tf = host.ground.style.transform; placed = tf; for (const e of layers) e.style.transform = tf; },
     // The page has begun: the script is free, and the leaflets start to flutter.
     wake() { awake = true; moving = true; },
     // (A gust, now: for the checks.)

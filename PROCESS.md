@@ -4550,3 +4550,33 @@ Sam's notes, with four screenshots.
   here!"), the price on one line (`US$ 240 / walker`, and small at the far end `Six a morning
   · April to October`), and a name pencilled in the form ("Maya Ellison", her address under
   it), which goes as soon as a real one is typed.
+
+### Round 20: the first frame, the cue as a caption, the controls on glass (8 October)
+
+- **The page opens in one motion** ("when I reload the page it feels like I have the white
+  sand, and then the sand with some shadow ... it goes super fast but I notice it"). Recorded
+  and looked at frame by frame: the sand was in the first paint (round 17), the palms' shadows
+  and the leaves were made by the modules about half a second later and faded in over 1.1 s,
+  and the sand itself moved as the script laid it properly, because the stylesheet could only
+  guess where (measured: 23 px at 1512 x 945, 63 px and 2% at 2000 x 1146, 68 px at 1920 x
+  1080). Now `src/scroll/first.js`, a plain script the page waits for, runs before anything
+  is painted. It holds the layout (`layoutFor`, with `POSES` and the sand's oversize) and the
+  palms' shadows (`frond`, `PALMS`, their colours and drift): `postcard.js` and `palm.js`
+  take them from `globalThis.__first` and have no copies. It lays the sand where the page
+  will have it (0.0 px of movement at takeover at all five sizes tried) and draws the two
+  shadows into canvases that are in the markup, which `palm.js` then takes over and goes on
+  moving. The leaves are not faded in any more: each swings down on its stem with its shadow
+  once its picture is decoded (2.1 s). `palm.sync()` after every `post.layout()` so the layers
+  over the sand never lag it by a frame. The single file's build inlines `first.js` where it
+  stands. Before and after: `../demos/load/`.
+- **"Scroll into the postcard" set as the card's caption is** ("it feels a little bit
+  disconnected ... just a text overlay ... more weight"): small capitals, spaced, medium
+  weight, the caption's ink, a little light under it, the arrow a touch heavier. It sits right
+  under "Kelingking Beach, Nusa Penida" and reads as the next line of the card.
+- **The beach's controls on smoked glass** ("the contrast is so low because of the evening
+  light. I didn't notice there was a control to change the lighting ... the button reserve on
+  the top right is not really visible ... make sure it can adapt itself"). The time of day is
+  one bar (what is behind it blurred and darkened), the one that is on a cream chip in it, and
+  "Drag to look around / Reset view" a smaller bar under it. The top bar's Reserve is the same
+  glass with cream letters where it was a cream outline: it reads on a white sky and on a dark
+  cliff alike. `backdrop-filter`, three small areas.

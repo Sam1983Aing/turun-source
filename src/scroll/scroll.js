@@ -159,6 +159,8 @@ export function startScroll({ params }) {
   // photograph the page had before, with its shadows in it and nothing moving.
   const palm = BARE || params.get('sand') === 'photo' ? null : createPalm({ reduced, plate: params.get('plate') ?? ASSETS.heroPalm, leaf: ASSETS.heroLeaf });
   palm?.mount({ ground: post.ground, card: $('.card'), post });
+  // (Without the live palm, the shadows first.js drew for it go.)
+  if (!palm) document.querySelectorAll('.fx-first').forEach((e) => e.remove());
   // And at the ending the sea in the sand's top corner comes in and goes out (tide.js). ?tide=0: the still.
   const tide = BARE || params.get('tide') === '0' ? null : createTide({ reduced, sea: ASSETS.heroSea, map: ASSETS.heroTide });
   tide?.mount({ ground: post.ground, post });
@@ -333,6 +335,7 @@ export function startScroll({ params }) {
     unit = h;
     track.style.height = `${page.screens * unit + innerHeight}px`;
     post.layout();
+    palm?.sync();
     spreads?.layout(post);
     drawSand(true);
     dirty = 2;

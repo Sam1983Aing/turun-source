@@ -45,7 +45,12 @@
           <div class="card__shade"></div>
         </div>
       </div>
+      <!-- The two palms' shadows on the sand, and the script that draws them and lays the sand
+           before the first frame (src/scroll/first.js). palm.js takes them over and moves them. -->
+      <div class="fx fx-shade fx-first" data-shade="far" aria-hidden="true"><canvas class="fx__fill"></canvas></div>
+      <div class="fx fx-shade fx-first" data-shade="near" aria-hidden="true"><canvas class="fx__fill"></canvas></div>
     </div>
+    <script src="src/scroll/first.js"></script>
     <div class="table__light"></div>
 
     <!-- The back of the same card, at the end: the message side is the day, the address side

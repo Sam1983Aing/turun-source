@@ -26,27 +26,11 @@ const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t
 const lerp = (a, b, t) => a + (b - a) * t;
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-// The card's shape and where it rests, as shares of the screen. x, y: the middle of the paper.
-// w, h: the most of the screen its picture may take. rz: its turn on the sand, in degrees.
-const POSES = {
-  wide: {
-    shape: 1.5,
-    hero: { x: 0.705, y: 0.5, w: 0.4, h: 0.52, rz: -6 },
-    walk: { x: 0.71, y: 0.5, w: 0.39, h: 0.5, rz: 3.5 },      // the first spread: card right, words left
-    beach: { x: 0.29, y: 0.5, w: 0.39, h: 0.5, rz: 5 },       // the second: card left, words right
-    end: { x: 0.57, y: 0.492, rz: -4 },                       // the ending: right of the tide's edge
-  },
-  tall: {
-    shape: 0.66,
-    hero: { x: 0.52, y: 0.672, w: 0.56, h: 0.5, rz: -4.5 },
-    walk: { x: 0.5, y: 0.74, w: 0.6, h: 0.3, rz: 3.5 },       // card low, words above
-    beach: { x: 0.5, y: 0.275, w: 0.6, h: 0.29, rz: -3.5 },   // card high, words below
-    end: { x: 0.5, y: 0.46, rz: -1.5 },
-  },
-};
-// The white border as a share of the picture's width: sides and top, and the wider foot that
-// carries the caption.
-const BORDER = 0.042, FOOT = 0.108;
+// The card's places (POSES), its border, how much larger than the screen the sand is laid and
+// the whole layout for a screen of a given size are first.js's: it runs before the first frame
+// and lays the sand by them, so this script takes over a page that is already where it puts it.
+const { layoutFor, OPEN } = globalThis.__first;
+
 // How far the eye is from the card for the tilt and the flip, in screen pixels.
 const EYE = 1900;
 // Turning over at the end: the card is picked up as it turns, this share of its own width at
@@ -54,10 +38,6 @@ const EYE = 1900;
 // own plane on the way, as a hand would do it and a hinge would not. Its two faces darken by
 // up to SHADE as they turn from the light.
 const LIFT = 0.16, TIP = -5, TWIST = 2.2, SHADE = 0.36;
-// The sand is laid a little larger than the screen at rest: on the way up the card's world
-// turns and slides against it, and an edge of the photograph must never come into view. How
-// much larger is worked out for each pose and screen (sandOver), plus this much to spare.
-const SAND_SPARE = 1.015;
 
 // captions: what is printed under the picture in each pose, { pose: [left, right] } (the hero's
 // is in the page's markup and stands for any pose not named). onPose(pose): called when the
@@ -86,31 +66,11 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
   const state = { pose: 'hero', up: 0, flip: 0, settle: 1 };
 
   function layout() {
-    const vw = table.clientWidth, vh = table.clientHeight, tall = vw / vh < 0.85;
-    const R = tall ? POSES.tall : POSES.wide;
-    // The picture: the middle of the frame, cut to a postcard's shape.
-    const shape = tall ? R.shape : Math.min(vw / vh, R.shape);
-    const cw = Math.min(vw, vh * shape), ch = cw / shape;
-    const b = cw * BORDER, bb = cw * FOOT;
-    const pw = cw + 2 * b, ph = ch + b + bb;
-    const P = {}, sand = {}, box = {};
-    for (const name of ['hero', 'walk', 'beach', 'end']) {
-      const p = R[name];
-      // At the end the card is as big as the screen lets it be: its back has to be read.
-      const s = name === 'end' ? (tall ? Math.min((0.92 * vw) / pw, (0.74 * vh) / ph) : Math.min(Math.min(0.66 * vw, 1040) / pw, (0.7 * vh) / ph))
-        : Math.min((p.w * vw) / cw, (p.h * vh) / ch);
-      const r = (p.rz * Math.PI) / 180, off = ((bb - b) / 2) * s;
-      // The world's move at rest: the picture's middle sits `off` above the paper's.
-      const tx = p.x * vw + Math.sin(r) * off - vw / 2, ty = p.y * vh - Math.cos(r) * off - vh / 2;
-      P[name] = { x: p.x, y: p.y, rz: p.rz, s, tx, ty };
-      // The sand for this pose: the inverse of the world's transform at rest, a little larger.
-      const over = sandOver(P[name], vw, vh) * SAND_SPARE;
-      sand[name] = `scale(${(over / s).toFixed(5)}) rotate(${(-p.rz).toFixed(3)}deg) translate(${(-tx).toFixed(2)}px, ${(-ty).toFixed(2)}px)`;
-      // The paper's edges on the screen at rest (it is turned), for the words beside it.
-      const hw = (pw * s * Math.abs(Math.cos(r)) + ph * s * Math.abs(Math.sin(r))) / 2, hh = (pw * s * Math.abs(Math.sin(r)) + ph * s * Math.abs(Math.cos(r))) / 2;
-      box[name] = { left: p.x * vw - hw, right: p.x * vw + hw, top: p.y * vh - hh, bottom: p.y * vh + hh };
-    }
-    L = { vw, vh, tall, cw, ch, b, bb, pw, ph, P, sand, box };
+    // (Where everything goes for a screen of this size is worked out in first.js, which has
+    // already laid the sand by it before this script ran.)
+    const vw = table.clientWidth, vh = table.clientHeight;
+    L = layoutFor(vw, vh);
+    const { cw, ch, b, bb, pw, ph, P, box } = L;
     posed = null;
     card.style.setProperty('--cw', `${cw.toFixed(1)}px`);
     card.style.setProperty('--ch', `${ch.toFixed(1)}px`);
@@ -127,23 +87,6 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
     html.style.setProperty('--card-bottom', `${box.hero.bottom.toFixed(0)}px`);
     last = '';
     apply();
-  }
-
-  // How much larger than the screen the sand has to be at rest in a pose for it to cover the
-  // screen all the way up: every corner of the screen, at every step of the world's move
-  // (as apply() makes it), taken back into the sand's own frame.
-  function sandOver(P, vw, vh) {
-    let k = 1;
-    for (let i = 0; i <= 80; i++) {
-      const e = i / 80, m = Math.pow(1 - e, 1.6), se = Math.exp((1 - e) * Math.log(P.s));
-      const a = ((P.rz - P.rz * m) * Math.PI) / 180, cos = Math.cos(a), sin = Math.sin(a), f = P.s / se;
-      for (const [qx, qy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
-        const x = (qx * vw) / 2 - P.tx * m, y = (qy * vh) / 2 - P.ty * m;
-        const wx = f * (cos * x - sin * y), wy = f * (sin * x + cos * y);
-        k = Math.max(k, Math.abs(wx) / (vw / 2 - Math.sign(wx) * P.tx), Math.abs(wy) / (vh / 2 - Math.sign(wy) * P.ty));
-      }
-    }
-    return k;
   }
 
   // pose: where the card rests (a name in POSES). up: 0 at rest there, 1 its picture is the
@@ -190,7 +133,7 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
       return;
     }
     // Scale goes exponentially (a steady zoom), place and turn settle early.
-    const s = Math.exp((1 - e) * Math.log(P.s)) * (1 + 0.07 * (1 - state.settle));
+    const s = Math.exp((1 - e) * Math.log(P.s)) * (1 + OPEN * (1 - state.settle));
     const m = Math.pow(1 - e, 1.6);
     world.style.transform = `translate3d(${(P.tx * m).toFixed(2)}px, ${(P.ty * m).toFixed(2)}px, 0) rotate(${(P.rz * m).toFixed(3)}deg) scale(${s.toFixed(5)})`;
 

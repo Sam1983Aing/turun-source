@@ -206,6 +206,12 @@ are already in `vendor/fonts/` for the standalone file).
   leaves with its text. Less dark behind "Nobody else is here".
 - The card's back: an inspiring, happy message, the price on one clean line, a fictional name.
 
+## Round 20 (8 October 2026)
+
+- The first load as one continuous motion: no bare sand before the shadows.
+- "Scroll into the postcard" with more weight, fitting the scene, same font.
+- The lighting control on the beach easy to see in any light, and the top Reserve button too.
+
 ## Found by other versions
 
 Nothing yet.

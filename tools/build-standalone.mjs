@@ -192,6 +192,8 @@ html = html.replace(/\n\s*<link rel="preconnect"[^>]*>/g, '').replace(/\n\s*<lin
 swap('<link rel="stylesheet" href="src/scroll/page.css">', `<style>\n${fonts}\n${read('src/scroll/page.css').replaceAll('url(../../assets/', 'url(assets/')}</style>`);
 html = html.replace(/\n\s*<script type="importmap">[\s\S]*?<\/script>/, '');
 const libs = ['vendor/gsap.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js'].map((f) => read(f).replaceAll('</script', '<\\/script'));
+// (The first frame's script is a classic one already: it goes in as it is, where it stands.)
+swap('<script src="src/scroll/first.js"></script>', `<script>\n${read('src/scroll/first.js')}</script>`);
 swap('<script type="module" src="src/main.js"></script>',
   `<script>\n${libs.join('\n')}\n</script>\n<script>\nwindow.__klAssets = ${JSON.stringify(ASSETS)};\n${code}\n</script>`);
 swap('<head>', `<head>\n  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit ${commit}. Assets: ${BASE} -->${linked.length ? `\n  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?${linked.map((f) => `family=${f}`).join('&')}&display=swap">` : ''}`);

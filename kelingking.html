@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 6cf79d1. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
+  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 82105a4. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Turun · The walk down to Kelingking Beach</title>
@@ -230,8 +230,10 @@ html.scroll.at-card #stage { cursor: pointer; }
 .gust__puff { position: absolute; opacity: 0; will-change: transform, opacity; }
 .table.is-full .fx { visibility: hidden; }
 html.tool .fx { display: none; }
-/* (They come in softly when the script makes them, over the sand that was already there.) */
+/* (They come in softly when the script makes them, over the sand that was already there. Not
+   the palms' shadows, which are in the first frame, nor the leaves, which swing in: palm.js.) */
 .fx { animation: fx-in 1.1s ease both; }
+.fx-first, .fx-leaf, .fx-leafshade { animation: none; }
 @keyframes fx-in { from { opacity: 0; } }
 .table.is-full .ground, .table.is-full .card__paper, .table.is-full .card__shadow, .table.is-full .card__shade, .table.is-full .card__finish, .table.is-full .table__light { visibility: hidden; }
 
@@ -448,7 +450,12 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 .hud__nav a { position: relative; padding: 12px 0; }
 .hud__nav a:not(.hud__cta)::after { content: ""; position: absolute; left: 0; right: 0; bottom: 6px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: 100% 50%; transition: transform 0.6s var(--ease); }
 .hud__nav a:not(.hud__cta):hover::after, .hud__nav a:not(.hud__cta):focus-visible::after { transform: scaleX(1); transform-origin: 0 50%; }
-.hud__cta { padding: 12px 18px !important; border: 1px solid currentColor; border-radius: 99px; transition: background 0.5s var(--ease), color 0.5s var(--ease), border-color 0.5s var(--ease); }
+/* The way to book, inside the picture: on a piece of smoked glass (what is behind it, blurred
+   and darkened a little), so it reads on a white evening sky as well as on a dark cliff.
+   Sam, round 20: "because of the lighting, even the button reserve on the top right is not
+   really visible ... make sure it can adapt itself". It was an outline in cream, and cream on
+   a pale sky is nothing. */
+.hud__cta { padding: 12px 18px !important; border: 1px solid rgba(255, 255, 255, 0.34); border-radius: 99px; background: rgba(18, 17, 14, 0.46); -webkit-backdrop-filter: blur(14px) saturate(1.35); backdrop-filter: blur(14px) saturate(1.35); color: var(--cream) !important; text-shadow: none; box-shadow: 0 10px 28px -14px rgba(0, 0, 0, 0.5); transition: background 0.5s var(--ease), color 0.5s var(--ease), border-color 0.5s var(--ease); }
 .hud__cta:hover, .hud__cta:focus-visible { background: var(--cream); color: var(--ink) !important; border-color: var(--cream); text-shadow: none; }
 .hud a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .hud__nav { order: 3; }
@@ -540,14 +547,14 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 .hero .body { color: rgba(20, 18, 14, 0.82); max-width: 29rem; }
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 30px; margin-top: 6px; }
 /* "Scroll into the postcard": a small line on the sand under the card's lower left corner,
-   set along its edge, with an arrow drawn up into the picture. In the plain face and the ink of
-   the words under the headline: Sam, round 18, "that text is not important enough to have the
-   same creative writing font ... the same as the one we're using for the subtitle underneath
-   the headline". The hand is for headlines only. (It was in the hand: the pen's blue, then the
-   headline's orange, then the sea's colours. And under the button before that, a column away
-   from the thing it points at.) The arrow keeps the sea's colours. */
-.cue { position: absolute; left: calc(var(--card-left, 50vw) - var(--gutter) + 5.4vw); top: calc(var(--card-bottom, 80vh) + 20px); display: flex; align-items: center; gap: 14px; margin: 0; white-space: nowrap; font: 400 clamp(1.02rem, 0.95rem + 0.26vw, 1.16rem)/1 var(--type); color: rgba(20, 18, 14, 0.82); rotate: -6deg; transform-origin: 0 50%; }
-.cue__arrow { flex: none; width: 46px; height: 20px; overflow: visible; fill: none; stroke: url(#cue-ink); stroke-width: 3.6; stroke-linecap: round; stroke-linejoin: round; animation: cue 2.8s ease-in-out infinite; }
+   set along its edge, with an arrow drawn up into the picture. It is set as the card's own
+   caption is, just above it (small capitals, spaced, medium weight, the same ink), so it reads
+   as the next line of the card and not as words laid over the page. (Sam, round 20: "it feels
+   a little bit disconnected from the rest ... a text overlay that doesn't match much ... more
+   weight". Before: the subtitle's light sentence case, and before that the hand, in the pen's
+   blue, the headline's orange and the sea's colours in turn.) The arrow keeps the sea's colours. */
+.cue { position: absolute; left: calc(var(--card-left, 50vw) - var(--gutter) + 5.4vw); top: calc(var(--card-bottom, 80vh) + 22px); display: flex; align-items: center; gap: 16px; margin: 0; white-space: nowrap; font: 500 12px/1 var(--type); letter-spacing: 0.22em; text-transform: uppercase; color: #3b342a; text-shadow: 0 1px 0 rgba(255, 250, 238, 0.5); rotate: -6deg; transform-origin: 0 50%; }
+.cue__arrow { flex: none; width: 44px; height: 19px; overflow: visible; fill: none; stroke: url(#cue-ink); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; animation: cue 2.8s ease-in-out infinite; }
 @keyframes cue { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(8px, -3px); } }
 
 /* The notes on the way down: one thing each, each in its own place and at its own size. They
@@ -629,18 +636,22 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 /* ------------------------------------------------------------ scene choices on the beach */
 
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.scene-controls { position: fixed; z-index: 11; right: calc(var(--gutter) + 44px); bottom: clamp(26px, 6.5vh, 72px); display: grid; justify-items: end; gap: 2px; opacity: 0; visibility: hidden; color: var(--cream); text-shadow: var(--shadow); }
-.time-of-day { display: flex; align-items: center; margin: 0; padding: 0; border: 0; }
-.time-of-day::before { content: "Light"; margin-right: 10px; font: 500 11px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.7; }
+.scene-controls { position: fixed; z-index: 11; right: calc(var(--gutter) + 44px); bottom: clamp(26px, 6.5vh, 72px); display: grid; justify-items: end; gap: 8px; opacity: 0; visibility: hidden; color: var(--cream); }
+/* The time of day, on the beach: four choices in one bar of smoked glass, the one that is on
+   as a light chip in it. (It was bare cream words with a line under one of them, which the
+   evening's pale sand and sky swallowed: Sam did not notice it was a control.) */
+.time-of-day { display: flex; align-items: center; gap: 2px; margin: 0; padding: 4px 4px 4px 18px; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 99px; background: rgba(18, 17, 14, 0.44); -webkit-backdrop-filter: blur(14px) saturate(1.35); backdrop-filter: blur(14px) saturate(1.35); box-shadow: 0 12px 30px -14px rgba(0, 0, 0, 0.55); }
+.time-of-day::before { content: "Light"; margin-right: 8px; font: 500 10.5px/1 var(--sans); letter-spacing: 0.22em; text-transform: uppercase; color: rgba(243, 239, 230, 0.66); }
 .time-of-day label { position: relative; cursor: pointer; }
 .time-of-day input { position: absolute; width: 1px; height: 1px; opacity: 0; }
-.time-of-day span { display: grid; place-items: center; min-height: 44px; padding: 0 9px; font: 500 11px/1 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; color: rgba(243,239,230,.72); transition: color 0.5s var(--ease); }
-.time-of-day label:hover span { color: var(--cream); }
-.time-of-day input:checked + span { color: var(--cream); box-shadow: inset 0 -13px 0 -12px var(--accent); }
-.time-of-day input:focus-visible + span { outline: 2px solid var(--cream); outline-offset: -4px; }
-.beach-look { display: flex; align-items: center; gap: 12px; padding-right: 9px; font: 400 11px/1.4 var(--sans); }
+.time-of-day span { display: grid; place-items: center; min-height: 38px; padding: 0 14px; border-radius: 99px; font: 500 11px/1 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; color: rgba(243, 239, 230, 0.86); transition: color 0.4s var(--ease), background 0.4s var(--ease); }
+.time-of-day label:hover span { color: #fff; background: rgba(255, 255, 255, 0.12); }
+.time-of-day input:checked + span { color: var(--ink); background: var(--cream); }
+.time-of-day input:focus-visible + span { outline: 2px solid var(--cream); outline-offset: 2px; }
+/* (And under it, on glass of its own, what a drag does here and the way back.) */
+.beach-look { display: flex; align-items: center; gap: 12px; padding: 0 16px; min-height: 34px; border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 99px; background: rgba(18, 17, 14, 0.38); -webkit-backdrop-filter: blur(14px) saturate(1.35); backdrop-filter: blur(14px) saturate(1.35); font: 400 11.5px/1.4 var(--sans); color: rgba(243, 239, 230, 0.9); }
 .beach-look[hidden] { display: none; }
-.look-reset { cursor: pointer; border: 0; border-bottom: 1px solid currentColor; padding: 10px 0; background: none; color: inherit; font: inherit; }
+.look-reset { cursor: pointer; border: 0; border-bottom: 1px solid currentColor; padding: 3px 0; background: none; color: inherit; font: inherit; }
 .look-reset:focus-visible { outline: 2px solid var(--cream); outline-offset: 4px; }
 .look-reset:disabled { opacity: .5; cursor: default; border-bottom-color: transparent; }
 .lighting-dissolve { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; object-fit: fill; }
@@ -675,8 +686,8 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
   .hero__actions { position: absolute; left: 0; right: 0; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 16px); margin: 0; justify-content: space-between; flex-wrap: nowrap; }
   .hero__actions .button { padding: 4px 4px 4px 18px; gap: 12px; }
   .button::after { width: 32px; height: 32px; }
-  .cue { left: auto; right: 8px; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 26px); font-size: 1rem; gap: 8px; rotate: -5deg; transform-origin: 100% 50%; }
-  .cue__arrow { width: 34px; height: 15px; rotate: 100deg; }
+  .cue { left: auto; right: 8px; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 26px); font-size: 11px; gap: 9px; rotate: -5deg; transform-origin: 100% 50%; }
+  .cue__arrow { width: 32px; height: 14px; rotate: 100deg; }
   /* The back of the card stands upright: the message, then the lines to fill in. */
   .back__in { grid-template-columns: 1fr; grid-template-rows: auto 1fr; padding: 8.5cqh 7cqw 5cqh; row-gap: 3.4cqh; }
   .back__in::before { display: none; }
@@ -728,7 +739,226 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
           <div class="card__shade"></div>
         </div>
       </div>
+      <!-- The two palms' shadows on the sand, and the script that draws them and lays the sand
+           before the first frame (src/scroll/first.js). palm.js takes them over and moves them. -->
+      <div class="fx fx-shade fx-first" data-shade="far" aria-hidden="true"><canvas class="fx__fill"></canvas></div>
+      <div class="fx fx-shade fx-first" data-shade="near" aria-hidden="true"><canvas class="fx__fill"></canvas></div>
     </div>
+    <script>
+// The first frame (v35 round 20).
+//
+// A plain script, not a module, and the page waits for it: it runs before anything is painted.
+// Sam, on reloading the page: "it feels like I have the white sand, and then the sand with some
+// shadow ... it goes super fast but I notice it ... find a way that it feels like one motion
+// from the first load until the end." The sand was there from the first paint (the stylesheet
+// has it), but the palms' shadows were made by the page's modules, which arrive half a second
+// later: they faded in over bare sand, and the sand itself moved over a little as the script
+// laid it properly (the stylesheet could only guess where: 63 px out on a 2000 px screen).
+//
+// So the two things that have to be right in the first frame are worked out here, by the same
+// code the page goes on using (postcard.js and palm.js take these from globalThis.__first, they
+// have no copies of their own):
+//
+//   where the sand lies    the whole layout for this screen (layoutFor), and from it the sand's
+//                          place as the page will have it while it loads
+//   the palms' shadows     drawn once, as they stand before any wind, into the canvases that
+//                          are already in the page. palm.js takes those same canvases over.
+//
+// What comes after is motion, not arrival: the leaves swing in, a gust passes, the name fills,
+// the card falls.
+(() => {
+  const DEG = Math.PI / 180;
+
+  // ---------------------------------------------------------------- where things lie
+
+// The card's shape and where it rests, as shares of the screen. x, y: the middle of the paper.
+// w, h: the most of the screen its picture may take. rz: its turn on the sand, in degrees.
+const POSES = {
+  wide: {
+    shape: 1.5,
+    hero: { x: 0.705, y: 0.5, w: 0.4, h: 0.52, rz: -6 },
+    walk: { x: 0.71, y: 0.5, w: 0.39, h: 0.5, rz: 3.5 },      // the first spread: card right, words left
+    beach: { x: 0.29, y: 0.5, w: 0.39, h: 0.5, rz: 5 },       // the second: card left, words right
+    end: { x: 0.57, y: 0.492, rz: -4 },                       // the ending: right of the tide's edge
+  },
+  tall: {
+    shape: 0.66,
+    hero: { x: 0.52, y: 0.672, w: 0.56, h: 0.5, rz: -4.5 },
+    walk: { x: 0.5, y: 0.74, w: 0.6, h: 0.3, rz: 3.5 },       // card low, words above
+    beach: { x: 0.5, y: 0.275, w: 0.6, h: 0.29, rz: -3.5 },   // card high, words below
+    end: { x: 0.5, y: 0.46, rz: -1.5 },
+  },
+};
+// The white border as a share of the picture's width: sides and top, and the wider foot that
+// carries the caption.
+const BORDER = 0.042, FOOT = 0.108;
+// The sand is laid a little larger than the screen at rest: on the way up the card's world
+// turns and slides against it, and an edge of the photograph must never come into view. How
+// much larger is worked out for each pose and screen (sandOver), plus this much to spare.
+const SAND_SPARE = 1.015;
+// While the page loads the card's world is this much larger than at rest (it settles as the
+// page opens: postcard.js, `settle`).
+const OPEN = 0.07;
+
+// How much larger than the screen the sand has to be at rest in a pose for it to cover the
+// screen all the way up: every corner of the screen, at every step of the world's move
+// (as apply() makes it), taken back into the sand's own frame.
+function sandOver(P, vw, vh) {
+  let k = 1;
+  for (let i = 0; i <= 80; i++) {
+    const e = i / 80, m = Math.pow(1 - e, 1.6), se = Math.exp((1 - e) * Math.log(P.s));
+    const a = ((P.rz - P.rz * m) * Math.PI) / 180, cos = Math.cos(a), sin = Math.sin(a), f = P.s / se;
+    for (const [qx, qy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+      const x = (qx * vw) / 2 - P.tx * m, y = (qy * vh) / 2 - P.ty * m;
+      const wx = f * (cos * x - sin * y), wy = f * (sin * x + cos * y);
+      k = Math.max(k, Math.abs(wx) / (vw / 2 - Math.sign(wx) * P.tx), Math.abs(wy) / (vh / 2 - Math.sign(wy) * P.ty));
+    }
+  }
+  return k;
+}
+
+
+// Everything's size and place for a screen vw by vh. P: for each pose, where the card rests
+// and the world's move there. sand: the sand's own transform in each (the inverse of the
+// world's at rest, a little larger). over: how much larger. box: the paper's edges on the screen.
+function layoutFor(vw, vh) {
+  const tall = vw / vh < 0.85, over = {};
+  const R = tall ? POSES.tall : POSES.wide;
+  // The picture: the middle of the frame, cut to a postcard's shape.
+  const shape = tall ? R.shape : Math.min(vw / vh, R.shape);
+  const cw = Math.min(vw, vh * shape), ch = cw / shape;
+  const b = cw * BORDER, bb = cw * FOOT;
+  const pw = cw + 2 * b, ph = ch + b + bb;
+  const P = {}, sand = {}, box = {};
+  for (const name of ['hero', 'walk', 'beach', 'end']) {
+    const p = R[name];
+    // At the end the card is as big as the screen lets it be: its back has to be read.
+    const s = name === 'end' ? (tall ? Math.min((0.92 * vw) / pw, (0.74 * vh) / ph) : Math.min(Math.min(0.66 * vw, 1040) / pw, (0.7 * vh) / ph))
+      : Math.min((p.w * vw) / cw, (p.h * vh) / ch);
+    const r = (p.rz * Math.PI) / 180, off = ((bb - b) / 2) * s;
+    // The world's move at rest: the picture's middle sits `off` above the paper's.
+    const tx = p.x * vw + Math.sin(r) * off - vw / 2, ty = p.y * vh - Math.cos(r) * off - vh / 2;
+    P[name] = { x: p.x, y: p.y, rz: p.rz, s, tx, ty };
+    // The sand for this pose: the inverse of the world's transform at rest, a little larger.
+    const lay = sandOver(P[name], vw, vh) * SAND_SPARE;
+    over[name] = lay;
+    sand[name] = `scale(${(lay / s).toFixed(5)}) rotate(${(-p.rz).toFixed(3)}deg) translate(${(-tx).toFixed(2)}px, ${(-ty).toFixed(2)}px)`;
+    // The paper's edges on the screen at rest (it is turned), for the words beside it.
+    const hw = (pw * s * Math.abs(Math.cos(r)) + ph * s * Math.abs(Math.sin(r))) / 2, hh = (pw * s * Math.abs(Math.sin(r)) + ph * s * Math.abs(Math.cos(r))) / 2;
+    box[name] = { left: p.x * vw - hw, right: p.x * vw + hw, top: p.y * vh - hh, bottom: p.y * vh + hh };
+  }
+  return { vw, vh, tall, cw, ch, b, bb, pw, ph, P, sand, box, over };
+}
+
+  // ---------------------------------------------------------------- the palms' shadows
+
+// What a palm's shadow does to the sand under it, as a multiply. Measured in the photograph
+// the page had before, the darkest of the baked shadows came to 0.43, 0.45, 0.41 of the sunlit
+// sand: nearly neutral, a touch green. The live ones keep that colour and are fainter. (The
+// near one was at 0.57 first, and Sam found it hid the card: "a little bit too strong".)
+const SHADE = { far: 'rgb(192, 193, 184)', near: 'rgb(178, 179, 169)' };
+// The cast shadows are soft because they are small: drawn at a quarter (far) and two fifths
+// (near) of the size and stretched, with a little blur as they are copied in. (A CSS blur on
+// full-size layers, tried first, cost a fifth of a second a frame once the dive began to
+// scale them up.)
+const SOFT = { far: [0.25, 1.5], near: [0.4, 1.2] };
+// A frond's shadow: a midrib that curls, and a leaflet each side at every step along it,
+// longest a third of the way out, each fluttering to its own beat. f: where it starts (shares
+// of the canvas), its heading in degrees, its length and its leaflets' as shares of the
+// canvas's width, how it curls (radians at the tip), how many pairs, how it gives to the wind.
+function frond(g, W, H, f, t, wind) {
+  const len = f.len * W, n = f.n ?? 30;
+  const give = (Math.sin(t * 0.8 + f.ph) * 0.6 + Math.sin(t * 1.7 + f.ph * 2.3) * 0.4) * 0.11 * wind * (f.flex ?? 1);
+  const rib = [];
+  let x = f.x * W, y = f.y * H;
+  for (let i = 0; i <= n; i++) {
+    const s = i / n, a = f.a * DEG + (f.curl ?? 0) * s * s + give * Math.pow(s, 1.4);
+    rib.push([x, y, a, s]);
+    x += (Math.cos(a) * len) / n; y += (Math.sin(a) * len) / n;
+  }
+  g.lineCap = 'round';
+  g.lineWidth = Math.max(1, len * 0.007);
+  g.beginPath();
+  rib.forEach(([px, py], i) => (i ? g.lineTo(px, py) : g.moveTo(px, py)));
+  g.stroke();
+  for (let i = 2; i <= n; i++) {
+    const [px, py, a, s] = rib[i];
+    const ll = f.leaf * W * (0.3 + 0.7 * Math.sin(Math.PI * Math.pow(s, 0.75))) * (1 - 0.2 * s), open = (62 - 30 * s) * DEG;
+    for (const side of [-1, 1]) {
+      const beat = Math.sin(t * (2.1 + 0.37 * ((i * 7 + (side > 0 ? 3 : 0)) % 5)) + i * 0.9 + f.ph) * 0.085 + Math.sin(t * 0.8 + f.ph + s * 2) * 0.05;
+      const da = a + side * open + beat * wind * (f.flex ?? 1);
+      const tx = px + Math.cos(da) * ll, ty = py + Math.sin(da) * ll, mx = px + Math.cos(da) * ll * 0.38, my = py + Math.sin(da) * ll * 0.38;
+      const nx = -Math.sin(da) * ll * 0.075, ny = Math.cos(da) * ll * 0.075;
+      g.beginPath();
+      g.moveTo(px, py);
+      g.quadraticCurveTo(mx + nx, my + ny, tx, ty);
+      g.quadraticCurveTo(mx - nx, my - ny, px, py);
+      g.fill();
+    }
+  }
+}
+
+// The palms over the sand, in the sand's own space (shares of its canvas, of which the screen
+// shows all but the outer few per cent). They are shadows only: the palms themselves are out
+// of the picture.
+const PALMS = {
+  wide: {
+    far: [
+      { x: -0.06, y: -0.06, a: 9, len: 0.62, leaf: 0.17, curl: 0.22, ph: 0.4, n: 36 },
+      { x: 1.2, y: 0.12, a: 163, len: 0.47, leaf: 0.17, curl: -0.3, ph: 3.3, n: 30 },
+    ],
+    near: [{ x: 1.14, y: 1.16, a: 219, len: 0.48, leaf: 0.16, curl: 0.28, ph: 5.0, n: 30 }],
+  },
+  tall: {
+    far: [
+      { x: -0.35, y: 0.0, a: 22, len: 1.25, leaf: 0.36, curl: 0.3, ph: 0.4, n: 30 },
+      { x: 1.5, y: 0.52, a: 168, len: 0.95, leaf: 0.34, curl: -0.3, ph: 3.3, n: 28 },
+    ],
+    near: [{ x: 1.45, y: 1.08, a: 212, len: 1.1, leaf: 0.34, curl: 0.28, ph: 5.0, n: 28 }],
+  },
+};
+// Keyframes for a motion that loops without a seam: `at(u)` gives the transform at u (0 to 1
+// round the loop), sampled closely enough to go straight from one to the next.
+const frames = (n, at) => Array.from({ length: n + 1 }, (_, i) => ({ transform: at(i / n) }));
+const TAU = Math.PI * 2;
+// A whole shadow, drifting a little: the palm that casts it is swaying.
+const driftFrames = (ph, k = 1) => frames(48, (u) =>
+  `translate(${((Math.sin(TAU * 2 * u + ph) * 0.24 + Math.sin(TAU * 5 * u + ph * 2) * 0.1) * k).toFixed(3)}%, ${(Math.sin(TAU * 3 * u + ph + 1) * 0.2 * k).toFixed(3)}%) rotate(${(Math.sin(TAU * 3 * u + ph) * 0.28 * k).toFixed(3)}deg)`);
+
+// How each of the two shadows drifts (driftFrames' phase and size).
+const DRIFT = { far: [0.4, 1], near: [2.2, 1.3] };
+// The wind before the page has begun (palm.js: its breeze at no time, with no gust).
+const WIND0 = 0.7 * (0.55 + 0.2 * Math.sin(1.7));
+
+  globalThis.__first = { DEG, TAU, frames, POSES, OPEN, layoutFor, SHADE, SOFT, PALMS, DRIFT, WIND0, frond, driftFrames, sand0: null };
+
+  // ---------------------------------------------------------------- the first frame
+
+  const table = document.querySelector('.table'), ground = document.querySelector('.ground');
+  if (!document.documentElement.classList.contains('scroll') || !table || !ground) return;
+  const vw = table.clientWidth, vh = table.clientHeight;
+  if (!vw || !vh) return;
+  // The sand, where the page has it while it loads: the world's move at rest there and the
+  // sand's own undo each other but for their sizes, about where the card lies.
+  const L = layoutFor(vw, vh), k = (1 + OPEN) * L.over.hero;
+  const lie = `translate(${((1 - k) * L.P.hero.tx).toFixed(2)}px, ${((1 - k) * L.P.hero.ty).toFixed(2)}px) scale(${k.toFixed(5)})`;
+  globalThis.__first.sand0 = lie;
+  ground.style.transform = lie;
+  for (const wrap of document.querySelectorAll('.fx-first')) {
+    const kind = wrap.dataset.shade, cv = wrap.querySelector('canvas'), buf = document.createElement('canvas');
+    wrap.style.transform = lie;
+    cv.width = buf.width = Math.round(vw * SOFT[kind][0]);
+    cv.height = buf.height = Math.round(vh * SOFT[kind][0]);
+    const x = buf.getContext('2d'), out = cv.getContext('2d');
+    x.fillStyle = x.strokeStyle = SHADE[kind];
+    for (const f of (L.tall ? PALMS.tall : PALMS.wide)[kind]) frond(x, buf.width, buf.height, f, 0, WIND0);
+    out.filter = `blur(${SOFT[kind][1]}px)`;
+    out.drawImage(buf, 0, 0);
+    // (And where its drift begins, so that nothing moves when the drift is started.)
+    cv.style.transform = driftFrames(...DRIFT[kind])[0].transform;
+  }
+})();
+</script>
     <div class="table__light"></div>
 
     <!-- The back of the same card, at the end: the message side is the day, the address side
@@ -95979,7 +96209,10 @@ __m["src/scroll/palm.js"] = (function () {
 // (Two other ways were built and recorded before this one, in demos/sand/: the old photograph
 // with its baked shadows slid about by a shader, and that with gusts. Sam chose this.)
 
-const DEG = Math.PI / 180;
+// The palms' shadows (their colour, how soft, where the palms are, how a frond is drawn, how a
+// shadow drifts) are first.js's: it runs before the first frame and draws them once, so the
+// page opens with its shadows on the sand, and this script goes on moving the same canvases.
+const { DEG, TAU, frames, SHADE, SOFT, PALMS, DRIFT, frond, driftFrames } = globalThis.__first;
 // The wind blows this way across the screen (right and down), as the shadows lie.
 const WIND = [0.83, 0.56];
 // The leaf's picture is a square with the stem coming in at its top left corner (STEM, as
@@ -96002,16 +96235,6 @@ const LEAVES = {
   ],
   tall: [{ x: 1.049, y: -0.011, size: 0.34, turn: 25, flip: true, ph: 2.9 }],
 };
-// What a palm's shadow does to the sand under it, as a multiply. Measured in the photograph
-// the page had before, the darkest of the baked shadows came to 0.43, 0.45, 0.41 of the sunlit
-// sand: nearly neutral, a touch green. The live ones keep that colour and are fainter. (The
-// near one was at 0.57 first, and Sam found it hid the card: "a little bit too strong".)
-const SHADE = { far: 'rgb(192, 193, 184)', near: 'rgb(178, 179, 169)' };
-// The cast shadows are soft because they are small: drawn at a quarter (far) and two fifths
-// (near) of the size and stretched, with a little blur as they are copied in. (A CSS blur on
-// full-size layers, tried first, cost a fifth of a second a frame once the dive began to
-// scale them up.)
-const SOFT = { far: [0.25, 1.5], near: [0.4, 1.2] };
 // The browser's own motions repeat after this many seconds (each is a few sines that fit a
 // whole number of times into it, so the loop has no seam), and a gust lasts this long.
 const LOOP = 20, GUST = 3.3;
@@ -96020,76 +96243,14 @@ const clamp01 = (x) => Math.min(Math.max(x, 0), 1);
 const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
 const el = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
 
-// A frond's shadow: a midrib that curls, and a leaflet each side at every step along it,
-// longest a third of the way out, each fluttering to its own beat. f: where it starts (shares
-// of the canvas), its heading in degrees, its length and its leaflets' as shares of the
-// canvas's width, how it curls (radians at the tip), how many pairs, how it gives to the wind.
-function frond(g, W, H, f, t, wind) {
-  const len = f.len * W, n = f.n ?? 30;
-  const give = (Math.sin(t * 0.8 + f.ph) * 0.6 + Math.sin(t * 1.7 + f.ph * 2.3) * 0.4) * 0.11 * wind * (f.flex ?? 1);
-  const rib = [];
-  let x = f.x * W, y = f.y * H;
-  for (let i = 0; i <= n; i++) {
-    const s = i / n, a = f.a * DEG + (f.curl ?? 0) * s * s + give * Math.pow(s, 1.4);
-    rib.push([x, y, a, s]);
-    x += (Math.cos(a) * len) / n; y += (Math.sin(a) * len) / n;
-  }
-  g.lineCap = 'round';
-  g.lineWidth = Math.max(1, len * 0.007);
-  g.beginPath();
-  rib.forEach(([px, py], i) => (i ? g.lineTo(px, py) : g.moveTo(px, py)));
-  g.stroke();
-  for (let i = 2; i <= n; i++) {
-    const [px, py, a, s] = rib[i];
-    const ll = f.leaf * W * (0.3 + 0.7 * Math.sin(Math.PI * Math.pow(s, 0.75))) * (1 - 0.2 * s), open = (62 - 30 * s) * DEG;
-    for (const side of [-1, 1]) {
-      const beat = Math.sin(t * (2.1 + 0.37 * ((i * 7 + (side > 0 ? 3 : 0)) % 5)) + i * 0.9 + f.ph) * 0.085 + Math.sin(t * 0.8 + f.ph + s * 2) * 0.05;
-      const da = a + side * open + beat * wind * (f.flex ?? 1);
-      const tx = px + Math.cos(da) * ll, ty = py + Math.sin(da) * ll, mx = px + Math.cos(da) * ll * 0.38, my = py + Math.sin(da) * ll * 0.38;
-      const nx = -Math.sin(da) * ll * 0.075, ny = Math.cos(da) * ll * 0.075;
-      g.beginPath();
-      g.moveTo(px, py);
-      g.quadraticCurveTo(mx + nx, my + ny, tx, ty);
-      g.quadraticCurveTo(mx - nx, my - ny, px, py);
-      g.fill();
-    }
-  }
-}
-
-// The palms over the sand, in the sand's own space (shares of its canvas, of which the screen
-// shows all but the outer few per cent). They are shadows only: the palms themselves are out
-// of the picture.
-const PALMS = {
-  wide: {
-    far: [
-      { x: -0.06, y: -0.06, a: 9, len: 0.62, leaf: 0.17, curl: 0.22, ph: 0.4, n: 36 },
-      { x: 1.2, y: 0.12, a: 163, len: 0.47, leaf: 0.17, curl: -0.3, ph: 3.3, n: 30 },
-    ],
-    near: [{ x: 1.14, y: 1.16, a: 219, len: 0.48, leaf: 0.16, curl: 0.28, ph: 5.0, n: 30 }],
-  },
-  tall: {
-    far: [
-      { x: -0.35, y: 0.0, a: 22, len: 1.25, leaf: 0.36, curl: 0.3, ph: 0.4, n: 30 },
-      { x: 1.5, y: 0.52, a: 168, len: 0.95, leaf: 0.34, curl: -0.3, ph: 3.3, n: 28 },
-    ],
-    near: [{ x: 1.45, y: 1.08, a: 212, len: 1.1, leaf: 0.34, curl: 0.28, ph: 5.0, n: 28 }],
-  },
-};
 
 // ---------------------------------------------------------------- what the browser moves
 
-// Keyframes for a motion that loops without a seam: `at(u)` gives the transform at u (0 to 1
-// round the loop), sampled closely enough to go straight from one to the next.
-const frames = (n, at) => Array.from({ length: n + 1 }, (_, i) => ({ transform: at(i / n) }));
-const TAU = Math.PI * 2;
 // A leaf on its stem: a slow sway with a quicker tremble on it, and a lean. `k`: how much.
 const swayFrames = (ph, k = 1) => frames(120, (u) => {
   const r = (Math.sin(TAU * 3 * u + ph) * 0.62 + Math.sin(TAU * 7 * u + ph * 1.7) * 0.26 + Math.sin(TAU * 16 * u + ph) * 0.12) * 2.0 * k;
   return `rotate(${r.toFixed(3)}deg) skewX(${(Math.sin(TAU * 5 * u + ph + 1.4) * 0.7 * k).toFixed(3)}deg)`;
 });
-// A whole shadow, drifting a little: the palm that casts it is swaying.
-const driftFrames = (ph, k = 1) => frames(48, (u) =>
-  `translate(${((Math.sin(TAU * 2 * u + ph) * 0.24 + Math.sin(TAU * 5 * u + ph * 2) * 0.1) * k).toFixed(3)}%, ${(Math.sin(TAU * 3 * u + ph + 1) * 0.2 * k).toFixed(3)}%) rotate(${(Math.sin(TAU * 3 * u + ph) * 0.28 * k).toFixed(3)}deg)`);
 
 // ---------------------------------------------------------------- sand, blown
 
@@ -96216,14 +96377,16 @@ function createPalm({ reduced = false, plate = null, leaf = null } = {}) {
   // draws the fronds on, which the browser drifts.
   const shade = {};
   for (const k of ['far', 'near']) {
-    const wrap = layer('fx-shade'), cv = el('canvas', 'fx__fill');
-    wrap.append(cv);
-    loop(cv, driftFrames(k === 'far' ? 0.4 : 2.2, k === 'far' ? 1 : 1.3));
+    // (The page comes with them already drawn, by first.js before the first frame: those are
+    // taken over as they are. Made here only where the page has none.)
+    let wrap = document.querySelector(`.fx-first[data-shade="${k}"]`), cv = wrap?.querySelector('canvas');
+    if (wrap) layers.push(wrap); else { wrap = layer('fx-shade'); cv = el('canvas', 'fx__fill'); wrap.append(cv); }
+    loop(cv, driftFrames(...DRIFT[k]));
     shade[k] = { wrap, cv, buf: el('canvas') };
   }
   // The leaves, and under them their shadows: twice the same boxes, one holding the picture
   // and one its shape filled with the shade's colour, moved by the same motions.
-  const leafShadeWrap = layer('fx-shade'), leafWrap = layer('fx-leaf');
+  const leafShadeWrap = layer('fx-shade fx-leafshade'), leafWrap = layer('fx-leaf');
   const leafImg = new Image();
   let leaves = [], leafSet = null;
   function hang(set) {
@@ -96233,22 +96396,24 @@ function createPalm({ reduced = false, plate = null, leaf = null } = {}) {
       // A box that is turned to the leaf's lie, in it one that sways, in it one that a gust
       // pulls, in it the picture (mirrored in one that hangs from the right).
       const part = (pic, k) => {
-        const box = el('div', l.flip ? 'leaf leaf--right' : 'leaf'), sway = el('div', 'leaf__in'), pull = el('div', 'leaf__in');
+        const box = el('div', l.flip ? 'leaf leaf--right' : 'leaf'), come = el('div', 'leaf__in'), sway = el('div', 'leaf__in'), pull = el('div', 'leaf__in');
         pic.classList.add('leaf__pic');
-        for (const e of [box, sway, pull]) e.style.transformOrigin = `${(l.flip ? 1 - STEM[0] : STEM[0]) * 100}% ${STEM[1] * 100}%`;
+        for (const e of [box, come, sway, pull]) e.style.transformOrigin = `${(l.flip ? 1 - STEM[0] : STEM[0]) * 100}% ${STEM[1] * 100}%`;
         box.style.transform = `rotate(${(l.flip ? -1 : 1) * l.turn}deg)`;
-        box.append(sway); sway.append(pull); pull.append(pic);
+        box.append(come); come.append(sway); sway.append(pull); pull.append(pic);
+        if (!arrived) come.style.opacity = '0';
         loop(sway, swayFrames(l.ph, k));
-        return { box, pull };
+        return { box, pull, come };
       };
       const img = new Image();
       img.alt = '';
       if (leaf) img.src = leaf;
       const top = part(img, 1), shadow = el('canvas'), under = part(shadow, 1.15);
       leafWrap.append(top.box); leafShadeWrap.append(under.box);
-      return { ...l, top, under, shadow };
+      return { ...l, top, under, shadow, img };
     });
     cast();
+    if (leafImg.complete && leafImg.naturalWidth) arrive();
   }
   // (A leaf's shadow: its own shape, filled with the shade's colour, a little soft.)
   function cast() {
@@ -96263,7 +96428,25 @@ function createPalm({ reduced = false, plate = null, leaf = null } = {}) {
       x.fillStyle = SHADE.near; x.fillRect(0, 0, c.width, c.height);
     }
   }
-  leafImg.onload = cast;
+  // The leaves come into the picture once, when their picture is ready to be drawn: each swings
+  // down on its stem from a little way out, with its shadow, as a frond let go by the wind
+  // does. (They were faded in with everything else the script made, which read as things
+  // turning up late. Now what is there is there from the first frame, and this is a motion.)
+  let arrived = false;
+  function arrive() {
+    if (arrived) return;
+    arrived = true;
+    Promise.all(leaves.map((l) => (l.img.decode ? l.img.decode().catch(() => {}) : null))).then(() => {
+      leaves.forEach((l, i) => {
+        for (const p of [l.top, l.under]) {
+          p.come.style.opacity = '';
+          if (!reduced) p.come.animate([{ opacity: 0, transform: `rotate(${l.flip ? 11 : -11}deg)` }, { opacity: 1, offset: 0.45 }, { opacity: 1, transform: 'rotate(0deg)' }],
+            { duration: 2100, delay: 120 + i * 260, easing: 'cubic-bezier(0.2, 0.75, 0.2, 1)', fill: 'backwards' });
+        }
+      });
+    });
+  }
+  leafImg.onload = () => { cast(); arrive(); };
   if (leaf) leafImg.src = leaf;
   const gust = reduced ? null : makeGust();
   if (gust) layers.push(gust.el);
@@ -96314,10 +96497,16 @@ function createPalm({ reduced = false, plate = null, leaf = null } = {}) {
       // Over the card, from the ground up: sand blows across it, shadows fall on it and on
       // that sand, and the leaves hang over everything (blown sand stays near the ground: with
       // it drawn over the leaves they looked dusty).
-      card.after(...(gust ? [gust.el] : []), shade.far.wrap, shade.near.wrap, leafShadeWrap, leafWrap);
+      // (The two palms' shadows are in the page already, after the card, if first.js drew them:
+      // they are not moved.)
+      if (shade.far.wrap.isConnected) { if (gust) card.after(gust.el); shade.near.wrap.after(leafShadeWrap, leafWrap); }
+      else card.after(...(gust ? [gust.el] : []), shade.far.wrap, shade.near.wrap, leafShadeWrap, leafWrap);
       addEventListener('resize', size);
       size();
     },
+    // The sand has just been laid again (postcard.js): everything over it goes with it at once,
+    // not a frame later.
+    sync() { if (!host) return; const tf = host.ground.style.transform; placed = tf; for (const e of layers) e.style.transform = tf; },
     // The page has begun: the script is free, and the leaflets start to flutter.
     wake() { awake = true; moving = true; },
     // (A gust, now: for the checks.)
@@ -97563,27 +97752,11 @@ const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t
 const lerp = (a, b, t) => a + (b - a) * t;
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-// The card's shape and where it rests, as shares of the screen. x, y: the middle of the paper.
-// w, h: the most of the screen its picture may take. rz: its turn on the sand, in degrees.
-const POSES = {
-  wide: {
-    shape: 1.5,
-    hero: { x: 0.705, y: 0.5, w: 0.4, h: 0.52, rz: -6 },
-    walk: { x: 0.71, y: 0.5, w: 0.39, h: 0.5, rz: 3.5 },      // the first spread: card right, words left
-    beach: { x: 0.29, y: 0.5, w: 0.39, h: 0.5, rz: 5 },       // the second: card left, words right
-    end: { x: 0.57, y: 0.492, rz: -4 },                       // the ending: right of the tide's edge
-  },
-  tall: {
-    shape: 0.66,
-    hero: { x: 0.52, y: 0.672, w: 0.56, h: 0.5, rz: -4.5 },
-    walk: { x: 0.5, y: 0.74, w: 0.6, h: 0.3, rz: 3.5 },       // card low, words above
-    beach: { x: 0.5, y: 0.275, w: 0.6, h: 0.29, rz: -3.5 },   // card high, words below
-    end: { x: 0.5, y: 0.46, rz: -1.5 },
-  },
-};
-// The white border as a share of the picture's width: sides and top, and the wider foot that
-// carries the caption.
-const BORDER = 0.042, FOOT = 0.108;
+// The card's places (POSES), its border, how much larger than the screen the sand is laid and
+// the whole layout for a screen of a given size are first.js's: it runs before the first frame
+// and lays the sand by them, so this script takes over a page that is already where it puts it.
+const { layoutFor, OPEN } = globalThis.__first;
+
 // How far the eye is from the card for the tilt and the flip, in screen pixels.
 const EYE = 1900;
 // Turning over at the end: the card is picked up as it turns, this share of its own width at
@@ -97591,10 +97764,6 @@ const EYE = 1900;
 // own plane on the way, as a hand would do it and a hinge would not. Its two faces darken by
 // up to SHADE as they turn from the light.
 const LIFT = 0.16, TIP = -5, TWIST = 2.2, SHADE = 0.36;
-// The sand is laid a little larger than the screen at rest: on the way up the card's world
-// turns and slides against it, and an edge of the photograph must never come into view. How
-// much larger is worked out for each pose and screen (sandOver), plus this much to spare.
-const SAND_SPARE = 1.015;
 
 // captions: what is printed under the picture in each pose, { pose: [left, right] } (the hero's
 // is in the page's markup and stands for any pose not named). onPose(pose): called when the
@@ -97623,31 +97792,11 @@ function createPostcard({ reduced = false, captions = {}, onPose = null } = {}) 
   const state = { pose: 'hero', up: 0, flip: 0, settle: 1 };
 
   function layout() {
-    const vw = table.clientWidth, vh = table.clientHeight, tall = vw / vh < 0.85;
-    const R = tall ? POSES.tall : POSES.wide;
-    // The picture: the middle of the frame, cut to a postcard's shape.
-    const shape = tall ? R.shape : Math.min(vw / vh, R.shape);
-    const cw = Math.min(vw, vh * shape), ch = cw / shape;
-    const b = cw * BORDER, bb = cw * FOOT;
-    const pw = cw + 2 * b, ph = ch + b + bb;
-    const P = {}, sand = {}, box = {};
-    for (const name of ['hero', 'walk', 'beach', 'end']) {
-      const p = R[name];
-      // At the end the card is as big as the screen lets it be: its back has to be read.
-      const s = name === 'end' ? (tall ? Math.min((0.92 * vw) / pw, (0.74 * vh) / ph) : Math.min(Math.min(0.66 * vw, 1040) / pw, (0.7 * vh) / ph))
-        : Math.min((p.w * vw) / cw, (p.h * vh) / ch);
-      const r = (p.rz * Math.PI) / 180, off = ((bb - b) / 2) * s;
-      // The world's move at rest: the picture's middle sits `off` above the paper's.
-      const tx = p.x * vw + Math.sin(r) * off - vw / 2, ty = p.y * vh - Math.cos(r) * off - vh / 2;
-      P[name] = { x: p.x, y: p.y, rz: p.rz, s, tx, ty };
-      // The sand for this pose: the inverse of the world's transform at rest, a little larger.
-      const over = sandOver(P[name], vw, vh) * SAND_SPARE;
-      sand[name] = `scale(${(over / s).toFixed(5)}) rotate(${(-p.rz).toFixed(3)}deg) translate(${(-tx).toFixed(2)}px, ${(-ty).toFixed(2)}px)`;
-      // The paper's edges on the screen at rest (it is turned), for the words beside it.
-      const hw = (pw * s * Math.abs(Math.cos(r)) + ph * s * Math.abs(Math.sin(r))) / 2, hh = (pw * s * Math.abs(Math.sin(r)) + ph * s * Math.abs(Math.cos(r))) / 2;
-      box[name] = { left: p.x * vw - hw, right: p.x * vw + hw, top: p.y * vh - hh, bottom: p.y * vh + hh };
-    }
-    L = { vw, vh, tall, cw, ch, b, bb, pw, ph, P, sand, box };
+    // (Where everything goes for a screen of this size is worked out in first.js, which has
+    // already laid the sand by it before this script ran.)
+    const vw = table.clientWidth, vh = table.clientHeight;
+    L = layoutFor(vw, vh);
+    const { cw, ch, b, bb, pw, ph, P, box } = L;
     posed = null;
     card.style.setProperty('--cw', `${cw.toFixed(1)}px`);
     card.style.setProperty('--ch', `${ch.toFixed(1)}px`);
@@ -97664,23 +97813,6 @@ function createPostcard({ reduced = false, captions = {}, onPose = null } = {}) 
     html.style.setProperty('--card-bottom', `${box.hero.bottom.toFixed(0)}px`);
     last = '';
     apply();
-  }
-
-  // How much larger than the screen the sand has to be at rest in a pose for it to cover the
-  // screen all the way up: every corner of the screen, at every step of the world's move
-  // (as apply() makes it), taken back into the sand's own frame.
-  function sandOver(P, vw, vh) {
-    let k = 1;
-    for (let i = 0; i <= 80; i++) {
-      const e = i / 80, m = Math.pow(1 - e, 1.6), se = Math.exp((1 - e) * Math.log(P.s));
-      const a = ((P.rz - P.rz * m) * Math.PI) / 180, cos = Math.cos(a), sin = Math.sin(a), f = P.s / se;
-      for (const [qx, qy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
-        const x = (qx * vw) / 2 - P.tx * m, y = (qy * vh) / 2 - P.ty * m;
-        const wx = f * (cos * x - sin * y), wy = f * (sin * x + cos * y);
-        k = Math.max(k, Math.abs(wx) / (vw / 2 - Math.sign(wx) * P.tx), Math.abs(wy) / (vh / 2 - Math.sign(wy) * P.ty));
-      }
-    }
-    return k;
   }
 
   // pose: where the card rests (a name in POSES). up: 0 at rest there, 1 its picture is the
@@ -97727,7 +97859,7 @@ function createPostcard({ reduced = false, captions = {}, onPose = null } = {}) 
       return;
     }
     // Scale goes exponentially (a steady zoom), place and turn settle early.
-    const s = Math.exp((1 - e) * Math.log(P.s)) * (1 + 0.07 * (1 - state.settle));
+    const s = Math.exp((1 - e) * Math.log(P.s)) * (1 + OPEN * (1 - state.settle));
     const m = Math.pow(1 - e, 1.6);
     world.style.transform = `translate3d(${(P.tx * m).toFixed(2)}px, ${(P.ty * m).toFixed(2)}px, 0) rotate(${(P.rz * m).toFixed(3)}deg) scale(${s.toFixed(5)})`;
 
@@ -98105,6 +98237,8 @@ function startScroll({ params }) {
   // photograph the page had before, with its shadows in it and nothing moving.
   const palm = BARE || params.get('sand') === 'photo' ? null : createPalm({ reduced, plate: params.get('plate') ?? ASSETS.heroPalm, leaf: ASSETS.heroLeaf });
   palm?.mount({ ground: post.ground, card: $('.card'), post });
+  // (Without the live palm, the shadows first.js drew for it go.)
+  if (!palm) document.querySelectorAll('.fx-first').forEach((e) => e.remove());
   // And at the ending the sea in the sand's top corner comes in and goes out (tide.js). ?tide=0: the still.
   const tide = BARE || params.get('tide') === '0' ? null : createTide({ reduced, sea: ASSETS.heroSea, map: ASSETS.heroTide });
   tide?.mount({ ground: post.ground, post });
@@ -98279,6 +98413,7 @@ function startScroll({ params }) {
     unit = h;
     track.style.height = `${page.screens * unit + innerHeight}px`;
     post.layout();
+    palm?.sync();
     spreads?.layout(post);
     drawSand(true);
     dirty = 2;

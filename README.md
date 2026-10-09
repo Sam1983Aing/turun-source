@@ -202,6 +202,11 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   photograph is from its water's edge) and prints the numbers `tide.js` has as constants.
   `?tide=0`: no sea. Opened from the disk (the single file), the browser will not let a picture
   into a shader: no sea there either, the card lies on its sand.
+- **The first frame** (`src/scroll/first.js`) is a plain script the page waits for. It works out
+  the layout for the screen and lays the sand where the page will have it, and draws the palms'
+  shadows once, before anything is painted, so the page opens complete. `postcard.js` and
+  `palm.js` take the layout and the shadows' drawing from it (`globalThis.__first`): change
+  `POSES`, `PALMS` or `frond` there.
 - **The palm over it is alive** (`palm.js`). The sand has no shadows in it. The page casts
   them: palm fronds drawn by the script (a rib that curls, leaflets that each flutter to their
   own beat), small and stretched so they are soft, multiplied over the sand and over the
