@@ -22,8 +22,8 @@ travel page around it, is the scene's: [sam1983aing.github.io/kelingking](https:
 ## Four ways to use this
 
 1. **Just look at it.** Open the live page above and scroll. Once you are in the picture, drag
-   the scene to look around. On the beach a line at the foot of the screen changes the time of
-   day (Morning, Noon, Evening, Night).
+   the scene to look around. On the beach a bar under the name at the top left changes the time
+   of day (Morning, Noon, Evening, Night).
 2. **Keep a copy.** Download [`kelingking.html`](kelingking.html) (the download button on that
    page) and double-click it. It's the whole page in one file. It fetches about 35 MB of
    textures and terrain the first time, and still runs without internet, just plainer.
