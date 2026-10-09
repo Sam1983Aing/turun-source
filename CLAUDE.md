@@ -10,7 +10,10 @@ The bar is photoreal water, sand and rock, plants that feel alive, and a page wo
 The scene was built in versions v1 to v34 in `Projects/Claude Code/012 Nusa Penida` (public
 as `Sam1983Aing/kelingking`, live on GitHub Pages). The landing page was v35 there. On
 8 October 2026 it became its own project: this folder is a copy of that repo with its whole
-history, on `main`, with no GitHub repo of its own yet.
+history, on `main`. Since 8 October 2026 it is public as `Sam1983Aing/turun` (remote `origin`)
+and live at `https://sam1983aing.github.io/turun/`, served by GitHub Pages from `main`'s root:
+**a push to `main` changes the live site within a minute or two.** So a push is a publish
+here, and needs Sam's word each time.
 
 - `012 Nusa Penida` is the remote `scene`, to bring a scene fix over (`git fetch scene`, then
   cherry-pick). Nothing is ever pushed there from here.

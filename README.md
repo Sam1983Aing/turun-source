@@ -13,8 +13,9 @@ surf at Kelingking is dangerous and swimming is banned.
 This repository is the landing page. It grew out of the scene's own repository
 (`Sam1983Aing/kelingking`, the descent alone, v1 to v34) and carries that history.
 
-**[Open the live page](https://sam1983aing.github.io/kelingking/)** (a laptop with Chrome or
-Safari works best, it takes about 10 seconds to load)
+**[Open the live page](https://sam1983aing.github.io/turun/)** (a laptop with Chrome or
+Safari works best, it takes about 10 seconds to load). The descent on its own, without the
+travel page around it, is the scene's: [sam1983aing.github.io/kelingking](https://sam1983aing.github.io/kelingking/).
 
 ![The clifftop viewpoint, final version](docs/gallery/v34/viewpoint.jpg)
 
