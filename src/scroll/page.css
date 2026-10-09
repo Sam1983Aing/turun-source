@@ -319,7 +319,7 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
    hero's words are. --c-left, --c-right, --c-top, --c-bottom: the resting card's edges. */
 .sp { position: fixed; inset: 0; z-index: 5; visibility: hidden; pointer-events: none; color: var(--ink); }
 .sp.is-on a { pointer-events: auto; }
-.sp__text { position: absolute; top: 0; bottom: 0; box-sizing: border-box; padding-bottom: 3vh; display: grid; align-content: center; gap: clamp(14px, 2.4vh, 28px); }
+.sp__text { container: sp / inline-size; position: absolute; top: 0; bottom: 0; box-sizing: border-box; padding-bottom: 3vh; display: grid; align-content: center; gap: clamp(14px, 2.4vh, 28px); }
 /* The first: words left of the card. The second: words right of it. */
 .sp--walk .sp__text { left: var(--gutter); width: calc(var(--c-left, 50vw) - var(--gutter) - 3.5vw); }
 .sp--beach .sp__text { left: calc(var(--c-right, 50vw) + 3.5vw); right: var(--gutter); }
@@ -331,25 +331,86 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 .sp__head em { color: #df7646; }
 .sp__mask { display: block; }
 .sp__ln { display: block; white-space: nowrap; }
-/* The rule draws itself across under the headline. */
-.sp__rule { display: block; height: 1px; background: var(--accent-deep); transform-origin: 0 50%; }
-.sp__rows { margin: 0; display: grid; }
-.sp__rows div { display: grid; grid-template-columns: 8.2rem 1fr; align-items: baseline; padding: 12px 0; border-bottom: 1px solid rgba(20, 18, 14, 0.26); }
-/* (Ink, not the accent: small terracotta type sank into the palm's shadows on the sand.) */
-.sp__rows dt { font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(20, 18, 14, 0.86); }
-.sp__rows dd { margin: 0; font: 400 clamp(1.06rem, 0.94rem + 0.4vw, 1.3rem)/1.3 var(--type); }
-.sp__price { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; font: 400 1.04rem/1.3 var(--type); color: rgba(20, 18, 14, 0.82); }
-.sp__price b { font: 500 2rem/1 var(--type); letter-spacing: -0.01em; color: var(--ink); margin-right: -8px; }
+/* Under the headline, the thing itself is drawn (round 18, Sam's pick of three layouts, "The
+   Line": the first had a long rule and three rows of label and fact, and he found it
+   "average"). For the walk, its staircase: a level at the railing, twenty-four steps, a level
+   of sand, with a dot that walks down it to where this card is. For the beach, the day: an
+   arc from breakfast to the boat with its sun at the top. Each draws itself as the words come
+   in: spreads.js takes --d from 0 to 1 on the drawing (data-sp-draw), which is the line's
+   dash, the dot's way along it (--way, up to --share of it) and the small parts' fade. The
+   three stations are words laid over the drawing. */
+.spl { position: relative; margin-top: 6px; max-width: 700px; --d: 1; }
+.spl svg { display: block; width: 100%; height: auto; overflow: visible; }
+.spl__sea { fill: none; stroke: rgba(20, 18, 14, 0.36); stroke-width: 1; stroke-dasharray: 1 6; stroke-linecap: round; }
+.spl__path { fill: none; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--d)); }
+.spl__tick { fill: none; stroke: rgba(20, 18, 14, 0.4); stroke-width: 1; opacity: var(--d); }
+.spl__dot { fill: #f7efe0; stroke: #12708c; stroke-width: 1.6; opacity: calc(var(--d) * 3); }
+.spl__dot--here { stroke: #cb5d30; }
+.spl__walker { offset-path: var(--way); offset-rotate: 0deg; offset-distance: calc(var(--d) * var(--share) * 100%); fill: #e5804c; opacity: calc(var(--d) * 6); }
+.spl__halo { fill: #e5804c; opacity: 0.26; transform-box: fill-box; transform-origin: center; animation: spl-halo 2.6s ease-in-out infinite; }
+@keyframes spl-halo { 0%, 100% { transform: scale(0.7); opacity: 0.3; } 50% { transform: scale(1.25); opacity: 0.08; } }
+.spl__st { position: absolute; display: grid; align-content: start; gap: 5px; }
+.spl__st b { font: 500 clamp(1.2rem, 1rem + 0.5vw, 1.5rem)/1 var(--type); letter-spacing: -0.005em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.spl__st span { font: 500 10.5px/1.35 var(--type); letter-spacing: 0.18em; text-transform: uppercase; color: rgba(20, 18, 14, 0.7); }
+.spl__st i { font: 500 10.5px/1 var(--type); font-style: normal; letter-spacing: 0.2em; text-transform: uppercase; color: #cb5d30; }
+.spl--walk .spl__st--0 { left: 0; top: 43%; }
+.spl--walk .spl__st--1 { left: 43%; top: 9%; }
+.spl--walk .spl__st--2 { right: 0; bottom: 40%; text-align: right; }
+/* (The day's two ends are written under the ends of its arc, and "all day" inside it.) */
+.spl--beach { display: grid; grid-template-columns: 1fr 1fr; }
+.spl--beach svg { grid-column: 1 / -1; }
+.spl--beach .spl__st span { font: 400 0.98rem/1.32 var(--type); letter-spacing: 0; text-transform: none; color: rgba(20, 18, 14, 0.8); text-wrap: balance; }
+.spl--beach .spl__st--0, .spl--beach .spl__st--2 { position: static; max-width: 82%; margin-top: -16px; }
+.spl--beach .spl__st--2 { justify-self: end; text-align: right; }
+.spl--beach .spl__st--1 { left: 27%; width: 46%; top: 0; padding-top: 12.4%; text-align: center; }
+/* The one sentence under the walk's drawing. */
+.sp__line { margin: 4px 0 0; max-width: 700px; padding-top: 17px; border-top: 1px solid rgba(20, 18, 14, 0.22); font: 400 1.12rem/1.4 var(--type); color: rgba(20, 18, 14, 0.86); }
+/* What it costs and the way in, under the beach's: the price with "/ walker" beside it and the
+   season small under it, and the button at the far end, in line with the drawing's. (Sam: "the
+   price slash a walker, then the month underneath". It was one run of words: the price, "a
+   walker, April to October", the button.) */
+.sp__price { margin: 6px 0 0; max-width: 700px; padding-top: 20px; border-top: 1px solid rgba(20, 18, 14, 0.22); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; }
+.sp__cost { margin: 0; display: grid; grid-template-columns: auto auto; justify-content: start; align-items: baseline; gap: 8px 9px; }
+.sp__cost b { font: 500 2.1rem/1 var(--type); letter-spacing: -0.012em; color: var(--ink); }
+.sp__cost span { font: 400 1.1rem/1 var(--type); color: rgba(20, 18, 14, 0.72); }
+.sp__cost small { grid-column: 1 / -1; font: 500 10.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(20, 18, 14, 0.7); }
+@media (prefers-reduced-motion: reduce) { .spl__halo { animation: none; } }
+/* In a column too narrow to write on the drawing (a tall screen, or a narrow column on a wide
+   one), its three stations stand in a row under it, and its empty margins are taken back. */
+@container sp (max-width: 500px) {
+  .spl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 10px; margin-top: 0; }
+  .spl svg { grid-column: 1 / -1; margin: -3.4% 0 -5.2%; }
+  .spl .spl__st { position: static; max-width: none; width: auto; margin-top: 0; padding-top: 0; justify-self: stretch; text-align: left; }
+  .spl .spl__st--1 { text-align: center; }
+  .spl .spl__st--2 { text-align: right; }
+  .spl__st b { font-size: 1.08rem; }
+  .spl__st span { font-size: 9px; letter-spacing: 0.12em; }
+  .spl--beach .spl__st span { font-size: 0.8rem; letter-spacing: 0; }
+  .spl__tick { display: none; }
+}
 /* A tall screen: the card low and the words above it, then the card high and the words below. */
 @media (max-aspect-ratio: 85/100) {
   .sp .sp__text { left: var(--gutter); right: var(--gutter); width: auto; padding: 0; gap: 10px; }
   .sp--walk .sp__text { top: calc(max(18px, env(safe-area-inset-top)) + 58px); bottom: calc(100% - var(--c-top, 50vh) + 10px); }
   .sp--beach .sp__text { top: calc(var(--c-bottom, 50vh) + 12px); bottom: max(14px, env(safe-area-inset-bottom)); }
   .sp__head { font-size: clamp(2.3rem, 11.2vw, 4.2rem); margin: 0.12em 0 0.08em; }
-  .sp__rows div { grid-template-columns: 6.4rem 1fr; padding: 8px 0; }
-  .sp__rows dd { font-size: 1.02rem; }
-  .sp__price b { font-size: 1.5rem; }
+  .sp__line { margin-top: 0; padding-top: 10px; font-size: 0.98rem; }
+  .sp__price { margin-top: 0; padding-top: 11px; gap: 10px 20px; }
+  .sp__cost { gap: 6px 8px; }
+  .sp__cost b { font-size: 1.6rem; }
   .sp__price .button { padding: 4px 4px 4px 18px; gap: 12px; }
+}
+/* (A short phone: a little smaller all round, so the words stay between the name and the card.) */
+@media (max-aspect-ratio: 85/100) and (max-height: 720px) {
+  .sp .sp__text { gap: 7px; }
+  .sp__head { font-size: clamp(2rem, 9.4vw, 3.4rem); }
+  .spl { gap: 5px 10px; }
+  .spl__st { gap: 3px; }
+  .spl__st b { font-size: 1rem; }
+  .sp__line { padding-top: 7px; font-size: 0.9rem; line-height: 1.32; }
+  .sp__price { padding-top: 8px; gap: 7px 20px; }
+  .sp__cost { gap: 5px 8px; }
+  .sp__cost b { font-size: 1.42rem; }
 }
 
 /* ------------------------------------------------------------ the frame around the scene */

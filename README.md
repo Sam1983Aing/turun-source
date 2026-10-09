@@ -186,8 +186,8 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   slower than the scroll (`FIRST_LEG`).
 - **The sand** is a photograph: `assets/hero/sand-clean.jpg` (pale sand with nothing on it)
   under the hero, `assets/hero/sand-walk.jpg` (the cliff path's gravel, a wooden rail tied with
-  blue cord down its right edge) under the second postcard, `assets/hero/sand-beach.jpg` (sand
-  with a line of footprints) under the third, `assets/hero/sand-end.jpg` (the tide's edge in
+  blue cord down its right edge) under the second postcard, `assets/hero/sand-beach.jpg` (clear
+  shallow water over pale sand) under the third, `assets/hero/sand-end.jpg` (the tide's edge in
   evening light) under the ending. With the leaf below, they are the only pictures on the page
   the scene did not draw. `tools/prepare-spread-sand.mjs` makes the two in the middle from
   Sam's plates. `?under=walk:url,beach:url` tries another picture under a spread.

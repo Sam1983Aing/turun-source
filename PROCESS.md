@@ -4483,3 +4483,17 @@ the postcard move along with the wave ... for now just use the image we have alr
   the headline), its arrow smaller and still in the sea's colours. Sam: "that text is not
   important enough to have the same creative writing font ... I will keep this font for only
   headline." The hand is on headlines, the card's back and nowhere else on the sand screens.
+- **The third postcard: the turquoise shallows and The Line.** Sam looked at the five
+  pictures and the three layouts through links and chose `beach-02.png` ("I'm using this
+  image, with this layout"). With both postcards on The Line the choosing is over: the two
+  drawings and their stations are in `index.html` now (the staircase's path written out, the
+  dot's way given to the stylesheet as `--way`), their styles in `page.css` (`.spl`), and
+  `spread-options.js`, its hook, the `?spread=` switch, the old rule and rows, Ledger and
+  Figures are gone. `tools/prepare-spread-sand.mjs` takes `beach-02` by default.
+- **The price, set properly** (Sam: "the price slash a walker, then the month underneath ...
+  a cleaner way"): `US$ 240 / walker`, `APRIL TO OCTOBER` small under it, a hairline above,
+  and the button at the far end in line with the end of the arc. On a phone the button goes
+  under. Looked at 1024 x 768, 1280 x 720, 1512 x 945, 1920 x 1080, 390 x 844 and 375 x 667
+  (words from 299 to 660 px under a card that ends at 294, on a 667 px screen: tightened a
+  little more for phones under 720 px high after that). Arriving, leaving, coming back, with
+  and without reduced motion: as before the move.

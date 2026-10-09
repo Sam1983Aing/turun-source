@@ -27,20 +27,19 @@ export function createSpreads({ reduced = false, onReserve, SplitText = null } =
   const list = [...document.querySelectorAll('.sp[data-hold]')].map((node) => {
     node.querySelectorAll('a[href="#reserve"]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); onReserve?.(); }));
     const q = (sel) => [...node.querySelectorAll(sel)];
-    // (small: what fades up, in the page's order. draw: what is drawn, a line or a rule, by its
-    // own --d going from 0 to 1. spread-options.js adds to both.)
+    // (small: what fades up, in the page's order. draw: what is drawn, the walk's staircase and
+    // the day's arc, by its own --d going from 0 to 1: page.css, .spl.)
     const title = SplitText ? titleOption('write', { gsap, SplitText }) : null;
     title?.split(node.querySelector('.sp__head'));
-    const s = { id: node.dataset.hold, node, on: false, tl: null, up: 1, rising: false, title, rule: q('.sp__rule'), small: q('.sp__label, .sp__rows div, .sp__price, [data-sp-in]'), draw: q('[data-sp-draw]') };
+    const s = { id: node.dataset.hold, node, on: false, tl: null, up: 1, rising: false, title, small: q('.sp__label, .sp__price, [data-sp-in]'), draw: q('[data-sp-draw]') };
     node.inert = true;
     rest(s);
     return s;
   });
 
-  // Before the words come in: the headline unwritten, the rule undrawn.
+  // Before the words come in: the headline unwritten, the drawing undrawn.
   function rest(s) {
     s.title?.rest();
-    gsap.set(s.rule, { scaleX: 0, opacity: 1 });
     gsap.set(s.small, { opacity: 0, y: 12 });
     if (s.draw.length) gsap.set(s.draw, { '--d': 0, opacity: 1 });
   }
@@ -50,7 +49,6 @@ export function createSpreads({ reduced = false, onReserve, SplitText = null } =
     const d = 1.1, t = (s.tl = gsap.timeline());
     t.set(s.node, { visibility: 'visible' });
     s.title?.show(t, 0);
-    t.to(s.rule, { scaleX: 1, duration: d * 1.3, ease: EASE }, 0.25);
     t.to(s.small, { opacity: 1, y: 0, duration: d * 0.9, ease: EASE, stagger: 0.07 }, 0.3);
     if (s.draw.length) t.to(s.draw, { '--d': 1, duration: 1.7, ease: 'power2.inOut', stagger: 0.14 }, 0.55);
     if (reduced) t.progress(1);
@@ -59,7 +57,7 @@ export function createSpreads({ reduced = false, onReserve, SplitText = null } =
     s.tl?.kill();
     const d = reduced ? 0 : 0.4, t = (s.tl = gsap.timeline());
     s.title?.hide(t);
-    t.to([...s.rule, ...s.small, ...s.draw], { opacity: 0, duration: d * 0.7, ease: EASE }, 0);
+    t.to([...s.small, ...s.draw], { opacity: 0, duration: d * 0.7, ease: EASE }, 0);
     t.set(s.node, { visibility: 'hidden' });
   }
 

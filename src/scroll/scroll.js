@@ -50,7 +50,6 @@ import { walkLine } from '../trail/route.js';
 import { buildDescent, makePace, STOPS } from './path.js';
 import { createPostcard } from './postcard.js';
 import { createSpreads, spreadCaptions } from './spreads.js';
-import { spreadOption } from './spread-options.js';
 
 gsap.registerPlugin(SplitText);
 
@@ -354,8 +353,8 @@ export function startScroll({ params }) {
   // card's world by postcard.js. One for each place the card comes to rest, if there is one
   // (ASSETS.hero, heroWalk, heroBeach, heroEnd): palm shadows on pale sand for the hero, the
   // tide's edge in evening light for the ending, and for the spreads the cliff path's gravel
-  // with its wooden rail (the second postcard) and sand with footprints (the third): Sam's
-  // plates, his picks. postcard.js says which, as the card changes pose behind
+  // with its wooden rail (the second postcard) and clear shallow water over sand (the third):
+  // Sam's plates, his picks. postcard.js says which, as the card changes pose behind
   // the full-screen picture. (?under=walk:url,beach:url tries a picture under a spread without
   // adding it to the page.) The one in use is drawn into a
   // canvas at the photograph's own size, not set as a background: the browser draws a
@@ -380,7 +379,7 @@ export function startScroll({ params }) {
     const g = c.getContext('2d');
     g.imageSmoothingQuality = 'high';
     g.drawImage(img, sx, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
-    // (The palm's leaves hang over sand: the hero's and the third postcard's. Not over the path
+    // (The palm's leaves hang over the hero's sand and the third postcard's shallows. Not over the path
     // under the second, where one would cover the post and its cord, and not at the ending.)
     palm?.sandChanged(c, img === sands.day || img === sands.beach ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
     tide?.sandChanged(c, img === sands.end ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
@@ -631,9 +630,6 @@ export function startScroll({ params }) {
     } });
   }
   const places = { walk: () => page.screensAt(1), boat: () => page.screensAt(4.97), reserve: () => page.screens };
-  // (The walk's spread is set as The Line, Sam's pick. ?spread=ledger, figures or line: the
-  // third postcard's in each of the three ways, until he picks for it too.)
-  if (!BARE) spreadOption(params.get('spread'));
   const spreads = BARE ? null : createSpreads({ reduced, SplitText, onReserve: () => travel(places.reserve()) });
   document.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', (e) => {
     e.preventDefault();

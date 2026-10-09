@@ -55,8 +55,8 @@
 
 - `sand-walk.jpg` and `sand-beach.jpg`: what the second and third postcards lie on. Made by Sam
   Aing on 8 October 2026 as `walk-05.png` (pale gravel of a cliff path, a wooden post and rail
-  lashed with blue cord along the right edge) and `beach-04.png` (fine sand, a line of bare
-  footprints in the lower left), two of ten plates in `../images/sand/`. His notes with the
+  lashed with blue cord along the right edge) and `beach-02.png` (clear shallow water over pale
+  sand, turquoise on the left and fading to the right), two of ten plates in `../images/sand/`. His notes with the
   prompts (`../images/prompts/postcard-surfaces-prompts.txt`) say: "Generated with built-in
   imagegen. Requested: 3840 x 2400. Returned originals: 1586 x 992; no resizing applied."
   Doubled in size, sharpened a little and converted to JPEG by
