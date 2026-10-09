@@ -4497,3 +4497,56 @@ the postcard move along with the wave ... for now just use the image we have alr
   (words from 299 to 660 px under a card that ends at 294, on a 667 px screen: tightened a
   little more for phones under 720 px high after that). Arriving, leaving, coming back, with
   and without reduced motion: as before the move.
+
+### Round 19: the last card on the footprints, a sea that is a photograph's, and the page's manners (8 October)
+
+Sam's notes, with four screenshots.
+
+- **The last card lies on the footprints** ("use the footstep image that we used on the third
+  postcard ... I think that fits well for the wave"): `assets/hero/sand-end.jpg` is his
+  `beach-04.png` now. The picture it lay on is kept as `sand-end-sea.jpg` and is never shown:
+  the wave is made out of it.
+- **The wave, rebuilt** ("make it ultra detailed and ultra realistic, for the movement"). The
+  footprints' picture has no sea in it, so nothing can be borrowed in place any more.
+  `tide.js` carries the other photograph's sea over it:
+  - the water is what that photograph's water does to its own sand, colour over colour
+    (`sea / its sand`, 0.892 0.778 0.633 from the tool), done to the sand under the card. The
+    footprints are there under it, and the net of light is the photographed one. It moves:
+    two copies drift round each other and mostly the darker is taken;
+  - the foam is that photograph's, by its whiteness, along each wave's front, thinning from
+    its weakest bubbles;
+  - wet sand behind to a clear line, drying back, and a shine just behind the leaving water;
+  - the sea's edge rests at 0.30 along the way (short of the first footprint) and laps;
+  - how the photograph is laid: at the front, as far behind its edge as the point is behind
+    the front. From there back to the corner by `p = P0 (a / f)^(f / P0)` along and `p / a`
+    across, which stretches it by the same amount everywhere. (First try: squeezed along and
+    pulled across near the corner, and the light came out as rays from the corner. Second:
+    the fronts' short steep lobes turned the front across the way the foam is laid and drew
+    the lace out into streaks along the left edge. The lobes are long and shallow now.)
+  - sizes 0.11 to 0.38 of the picture's height, a wave every 7.8 s, up in 2.3 to 2.9 s and
+    back twice as slowly, the foam dragged back 13% and left.
+  Recorded: `../demos/tide/tide-desktop.mp4`, `tide-phone.mp4`. From the disk there is no sea
+  (the pictures cannot be read into a shader): the card lies on its sand.
+- **The page waits at a postcard for its words** ("if the user scroll too fast, it cannot
+  continue moving on before the text animation and content is displayed", for the second and
+  the third). While a spread's words are coming in (`spreads.holding()`), `placeCamera` keeps
+  the scroll inside that card's rest. Tried with a real wheel at 240 px every 16 ms for four
+  seconds from a screen and a half above each card: the page stops at the card for 2.3 s, the
+  drawing goes from 0 to 1, then it moves on. Not in the recorder, and not during a jump.
+- **No letters left behind.** A note's lines left through their masks by 105% of their height,
+  and the tails of the letters (the g of "light", the y of "Stay") stayed in the mask's top
+  edge until the block was put away: small white and orange marks. They travel 150% now and
+  fade as they clear. The thin rule beside a side note was the block's border and stood alone
+  for the same half second: it is its own stroke now, drawn down with the words and back up
+  with them ("the line should disappear smoothly along the text").
+- **"Then it gets steep" comes later**: from `tau` 2.44 (it was 2.32), when the camera has
+  turned onto the steps.
+- **Less dark behind "Nobody else is here"** ("I can kind of see that dark circle, even though
+  it's smooth"): 0.12 where it was 0.22, and softer.
+- **The foot of the page**: the two credits centred, "Back up to the railing" gone (the name at
+  the top left does that).
+- **The card's back**: the message is a happy one now ("Four hundred steps down a cliff before
+  breakfast, then a whole beach to ourselves. I haven't stopped smiling since. Wish you were
+  here!"), the price on one line (`US$ 240 / walker`, and small at the far end `Six a morning
+  · April to October`), and a name pencilled in the form ("Maya Ellison", her address under
+  it), which goes as soon as a real one is typed.

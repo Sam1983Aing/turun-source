@@ -1,12 +1,14 @@
-// Makes the map the ending's wave needs (src/scroll/tide.js, v35 round 17): where the water is
-// in the picture of the sand under the last card (assets/hero/sand-end.jpg), as a small picture
-// the shader can ask "how far is this point from the water's edge?"
+// Makes the map the ending's wave needs (src/scroll/tide.js, v35 rounds 17 and 19): where the
+// water is in the picture the wave takes its water and foam from (assets/hero/sand-end-sea.jpg:
+// sand with the sea's edge in its top left corner, from Sam's concept "the last wave"), as a
+// small picture the shader can ask "how far is this point from the water's edge?"
+// (Until round 19 the last card lay on that picture itself. It lies on sand with footprints
+// now, assets/hero/sand-end.jpg, and the sea is carried over it from this one.)
 //
 //   assets/hero/sand-end-tide.png    640 x 400, the whole photograph
 //     red     the distance to the water's edge, finely, near it: 128 on the edge, one step
 //             for NEAR / 127 of the picture's height, more on the sand and less in the water
-//     green   how near the foam is, loosely (the white band, blurred wide): where the painted
-//             water must not be shown as it is, because its foam has moved on
+//     green   how near the foam is, loosely (the white band, blurred wide)
 //     blue    how much foam there is here (the same band, blurred only a little): where
 //             white in the photograph is foam and not a glint on the water
 //
@@ -28,7 +30,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const SRC = join(root, 'assets/hero/sand-end.jpg'), OUT = join(root, 'assets/hero/sand-end-tide.png');
+const SRC = join(root, 'assets/hero/sand-end-sea.jpg'), OUT = join(root, 'assets/hero/sand-end-tide.png');
 const W = 640, H = 400;            // the map (the photograph is 3840 x 2400: one cell is six pixels)
 const NEAR = 0.08;                 // what red spans each way, in heights of the picture
 const WHITE = 196;                 // from here up in every channel a pixel is foam
@@ -176,4 +178,9 @@ console.log(`assets/hero/sand-end-tide.png  ${W} x ${H}`);
 console.log(`  the wave runs along  [${n[0].toFixed(4)}, ${n[1].toFixed(4)}]   (x right, y down, in heights of the picture)`);
 console.log(`  the edge is at       ${p0.toFixed(4)} along it, and wanders from ${lo.toFixed(3)} to +${hi.toFixed(3)}`);
 console.log(`  the foam goes        ${deep.toFixed(3)} deep behind the edge at its deepest`);
+// The sand's own colour in this picture, a little way out from the water: what the water's
+// colours are measured against (tide.js lays them over another sand as so much more or less).
+let sr = 0, sg = 0, sb = 0, sn = 0;
+for (let i = 0; i < N; i++) { const d = Math.sqrt(toWater[i]) * S; if (!water[i] && d > 0.12 && d < 0.45) { sr += raw[i * 3]; sg += raw[i * 3 + 1]; sb += raw[i * 3 + 2]; sn++; } }
+console.log(`  its sand is          [${(sr / sn / 255).toFixed(3)}, ${(sg / sn / 255).toFixed(3)}, ${(sb / sn / 255).toFixed(3)}]`);
 console.log(`  NEAR ${NEAR}  (tide.js has the same)`);

@@ -234,14 +234,19 @@ html.tool .fx { display: none; }
 .back__plan { margin: 0; padding: 0; list-style: none; display: grid; gap: 1.5cqh; font: 400 max(11.5px, 1.46cqw)/1.35 var(--type); color: var(--ink-dim); }
 .back__plan li { display: grid; grid-template-columns: 5.6cqw 1fr; align-items: baseline; }
 .back__plan time { font-weight: 500; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; color: var(--accent-deep); }
-.back__price { margin: 0; padding-top: 2.6cqh; border-top: 1px solid rgba(20, 18, 14, 0.18); font: 400 max(11.5px, 1.46cqw)/1.4 var(--type); color: var(--ink-dim); text-wrap: balance; }
-.back__price b { font: 500 2.4cqw/1 var(--type); letter-spacing: -0.01em; color: var(--ink); margin-right: 0.3em; }
+/* (One line: the price with "/ walker" beside it, and what goes with it small at the far end.
+   Sam, round 19: "into one line, maybe make it cleaner". It was a sentence after the number.) */
+.back__price { margin: 0; padding-top: 2.6cqh; border-top: 1px solid rgba(20, 18, 14, 0.18); display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.6cqh 0.8cqw; font: 400 max(11.5px, 1.46cqw)/1.4 var(--type); color: var(--ink-dim); }
+.back__price b { font: 500 2.4cqw/1 var(--type); letter-spacing: -0.01em; color: var(--ink); }
+.back__price small { margin-left: auto; font: 500 max(9px, 0.98cqw)/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(20, 18, 14, 0.6); }
 .back__addr { position: relative; padding-left: 5cqw; display: grid; align-content: end; gap: 2.5cqh; }
 .back__to { margin: 0 0 0.4cqh; font: 400 2.7cqw/1 var(--hand); color: var(--pen); }
 .field { display: grid; gap: 0.7cqh; border-bottom: 1px solid rgba(20, 18, 14, 0.5); padding-bottom: 0.8cqh; }
 .field span { font: 500 max(9px, 0.98cqw)/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(20, 18, 14, 0.6); }
 .field input, .field select { appearance: none; -webkit-appearance: none; width: 100%; min-height: max(26px, 3.3cqw); border: 0; border-radius: 0; padding: 0; background: none; color: var(--pen); font: 400 max(20px, 2.64cqw)/1.1 var(--hand); }
 .field input:focus-visible, .field select:focus-visible { outline: none; }
+/* (A name pencilled in, so the card reads as written on: it goes as soon as a real one is typed.) */
+.field input::placeholder { color: rgba(23, 37, 61, 0.34); opacity: 1; }
 .field:focus-within { border-bottom-color: var(--accent-deep); box-shadow: 0 1px 0 var(--accent-deep); }
 .field--two { grid-template-columns: 1.3fr 1fr; gap: 3cqw; border: 0; padding: 0; }
 .field--two label { display: grid; gap: 0.7cqh; border-bottom: 1px solid rgba(20, 18, 14, 0.5); padding-bottom: 0.8cqh; }
@@ -542,7 +547,7 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
    note's round patch alone now, which fades to nothing with no edge.) */
 .note .display { font-family: var(--type); font-weight: 500; text-shadow: 0 1px 2px rgba(10, 9, 7, 0.3); }
 .note .display em { font-style: normal; display: inline; }
-/* (A clean face keeps to its line box: a tight mask, and the lines travel 105% of their height.) */
+/* (A clean face keeps to its line box: a tight mask, and the lines travel 150% of their height, which takes the tails of their letters clear of it.) */
 .note .line-mask { clip-path: inset(-0.1em -0.25em -0.16em -0.25em); }
 .note .label { font: 500 11px/1.3 var(--sans); letter-spacing: 0.2em; }
 .note .body { font: 400 clamp(0.95rem, 0.9rem + 0.2vw, 1.06rem)/1.55 var(--sans); }
@@ -560,7 +565,9 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 .note.is-on::before { opacity: 1; }
 /* (Over the sand, with its bright ripples, a wider one. It was much deeper, 0.7 at its middle,
    and Sam saw it as a dark glow behind the words.) */
-.note.on-light::before { --dark: 0.22; }
+/* (Lighter and wider behind the words on the beach: Sam could still make out "that dark
+   circle, even though it's smooth".) */
+.note.on-light::before { --dark: 0.12; --soft: clamp(60px, 7.4vw, 132px); }
 .note.on-light .body { color: var(--cream); }
 .note .label { display: flex; align-items: baseline; gap: 14px; color: var(--cream); }
 .note .label b { position: relative; padding-left: 20px; font-weight: 500; font-variant-numeric: tabular-nums; }
@@ -571,9 +578,15 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 .at-c .display { margin-left: 0; }
 .note--xl .body { max-width: 28rem; }
 .at-bl { left: var(--gutter); bottom: clamp(36px, 8.5vh, 104px); max-width: min(70rem, calc(100vw - 2 * var(--gutter) - 80px)); }
-.at-r { right: calc(var(--gutter) + 72px); top: 50%; translate: 0 -50%; width: min(24rem, 30vw); padding-left: 22px; border-left: 1px solid rgba(243, 239, 230, 0.5); }
+.at-r { right: calc(var(--gutter) + 72px); top: 50%; translate: 0 -50%; width: min(24rem, 30vw); padding-left: 22px; }
 /* (On the left, half way up: over the open sea on the way down the steps.) */
-.at-l { left: var(--gutter); top: 50%; translate: 0 -50%; width: min(23rem, 27vw); padding-left: 22px; border-left: 1px solid rgba(243, 239, 230, 0.5); }
+.at-l { left: var(--gutter); top: 50%; translate: 0 -50%; width: min(23rem, 27vw); padding-left: 22px; }
+/* The thin rule down a side note's left edge. It is drawn down as the words come in and goes
+   with them, drawn back up and fading. (It was the block's border, so it stood there alone
+   until the block was put away, after the words had left: Sam, round 19, "when the text
+   disappears, the line should disappear smoothly along the text".) */
+.at-l::after, .at-r::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: rgba(243, 239, 230, 0.5); transform-origin: 50% 0; transform: scaleY(0); opacity: 0; transition: transform 0.45s var(--ease), opacity 0.4s linear; pointer-events: none; }
+.at-l.is-on::after, .at-r.is-on::after { transform: scaleY(1); opacity: 1; transition: transform 1.3s var(--ease) 0.12s, opacity 0.5s linear 0.12s; }
 /* (The dark behind it is less than half of what the other notes have: over the deep blue of
    the sea here the words read without it. Sam, round 18: "remove at least fifty percent the
    dark background behind it.") */
@@ -590,13 +603,11 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 .bright-light .note.on-light .body { color: var(--ink-dim); }
 
 /* The foot of the page, on the sand under the card's back. */
-.foot { left: var(--gutter); right: var(--gutter); bottom: max(22px, env(safe-area-inset-bottom)); display: flex; justify-content: space-between; align-items: center; gap: 24px; color: rgba(20, 18, 14, 0.8); font: 500 10.5px/1.4 var(--type); letter-spacing: 0.2em; text-transform: uppercase; }
+.foot { left: var(--gutter); right: var(--gutter); bottom: max(22px, env(safe-area-inset-bottom)); display: flex; justify-content: center; align-items: center; gap: 24px; text-align: center; color: rgba(20, 18, 14, 0.8); font: 500 10.5px/1.4 var(--type); letter-spacing: 0.2em; text-transform: uppercase; }
 .foot p { margin: 0; color: var(--ink); }
 /* (The map's credit stays, small: the terrain is made from OpenStreetMap's data.) */
 .foot p span { margin-left: 18px; padding-left: 18px; border-left: 1px solid rgba(20, 18, 14, 0.3); color: rgba(20, 18, 14, 0.62); }
 .foot a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-.foot__top { appearance: none; border: 0; border-bottom: 1px solid currentColor; padding: 6px 0; background: none; color: var(--ink); cursor: pointer; font: 500 11.5px/1 var(--type); letter-spacing: 0.2em; text-transform: uppercase; white-space: nowrap; }
-.foot__top:focus-visible { outline: 2px solid var(--accent-deep); outline-offset: 4px; }
 
 /* ------------------------------------------------------------ scene choices on the beach */
 
@@ -635,7 +646,7 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
   .at-r, .at-l { right: var(--gutter); left: var(--gutter); top: auto; bottom: max(26px, calc(env(safe-area-inset-bottom) + 18px)); translate: none; width: auto; padding-left: 16px; }
   .at-c { bottom: max(30px, calc(env(safe-area-inset-bottom) + 22px)); }
   .note--xl .display { font-size: clamp(2.2rem, 11vw, 3.5rem); }
-  .foot { flex-direction: column; align-items: flex-start; gap: 8px; font-size: 9px; letter-spacing: 0.16em; }
+  .foot { flex-direction: column; align-items: center; gap: 8px; font-size: 9px; letter-spacing: 0.16em; }
   .foot p span { margin-left: 10px; padding-left: 10px; }
 }
 
@@ -660,8 +671,9 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
   .wide-only { display: none; }
   .hero__actions { padding-right: 4px; }
   .back__plan { display: none; }
-  .back__price { padding-top: 1.6cqh; font-size: max(11px, 3.1cqw); }
+  .back__price { padding-top: 1.6cqh; gap: 1cqh 1.6cqw; font-size: max(11px, 3.1cqw); }
   .back__price b { font-size: 5cqw; }
+  .back__price small { flex-basis: 100%; margin-left: 0; font-size: max(9px, 2.3cqw); letter-spacing: 0.16em; }
   .back__addr { padding: 0; gap: 1.5cqh; align-content: end; position: static; }
   .back__addr .button { margin-top: 0.6cqh; padding: 4px 4px 4px 18px; gap: 12px; }
   .back__to { font-size: 6cqw; }

@@ -60,7 +60,7 @@ const REVEAL = 1.1;
 // lines are in a hand that swings well outside its line box, so the masks clip further out
 // (page.css) and the lines have further to go. Inside the picture they are in a serif, which
 // keeps to its box.
-const LINE_OFF = 235, LINE_OFF_CLEAN = 105;
+const LINE_OFF = 235, LINE_OFF_CLEAN = 150;
 // How quickly the camera catches up with the scroll (per second): Lenis already smooths the
 // wheel, this only takes the edge off jumps (keys, the scrollbar, a touch fling).
 const FOLLOW = 9;
@@ -160,7 +160,7 @@ export function startScroll({ params }) {
   const palm = BARE || params.get('sand') === 'photo' ? null : createPalm({ reduced, plate: params.get('plate') ?? ASSETS.heroPalm, leaf: ASSETS.heroLeaf });
   palm?.mount({ ground: post.ground, card: $('.card'), post });
   // And at the ending the sea in the sand's top corner comes in and goes out (tide.js). ?tide=0: the still.
-  const tide = BARE || params.get('tide') === '0' ? null : createTide({ reduced, map: ASSETS.heroTide });
+  const tide = BARE || params.get('tide') === '0' ? null : createTide({ reduced, sea: ASSETS.heroSea, map: ASSETS.heroTide });
   tide?.mount({ ground: post.ground, post });
   if (!BARE) waterButtons({ reduced });
   // Frames owed (the picture stands still at rest, so frames are only drawn when asked; two,
@@ -441,9 +441,23 @@ export function startScroll({ params }) {
   // from rest (cardAt).
   const cam = { y: 0, screens: sStart, tau: BARE ? 0 : TAU0, pose: null, hero: BARE ? 1 : 0, out: 0, card: BARE ? null : 'hero', up: BARE ? 1 : 0 };
   const inScene = () => cam.up >= 1;
+  // A spread's words are still coming in (spreads.js): the page stays at that card until they
+  // are there, however hard it is scrolled. Inside the stretch where the card is at rest (and a
+  // hair to each side, short of where the words would go again) the scroll is free. Past it, it
+  // is put back. (A fast scroll used to carry on through: the words were
+  // cut off half written and the card was already growing again.)
+  const wait = { ask: null };
+  function held(target) {
+    const id = RECORD || traveling || rewinding ? null : wait.ask?.();
+    const h = id && cards.find((x) => x.id === id);
+    if (!h) return target;
+    const to = Math.min(h.y + h.len + SPREAD.out * 0.02, Math.max(h.y - SPREAD.in * 0.02, target));
+    if (Math.abs(to - target) * unit > 1) { if (lenis) lenis.scrollTo(to * unit, { immediate: true, force: true }); else scrollTo(0, to * unit); }
+    return to;
+  }
   function placeCamera(dt, snap = false) {
     if (!(unit > 0)) return;
-    const target = scrollY() / unit;
+    const target = held(scrollY() / unit);
     cam.y = (snap || reduced || !Number.isFinite(cam.y)) ? target : cam.y + (target - cam.y) * (1 - Math.exp(-FOLLOW * dt));
     if (Math.abs(target - cam.y) < 1e-4) cam.y = target;
     cam.screens = page.camAt(cam.y);
@@ -631,6 +645,7 @@ export function startScroll({ params }) {
   }
   const places = { walk: () => page.screensAt(1), boat: () => page.screensAt(4.97), reserve: () => page.screens };
   const spreads = BARE ? null : createSpreads({ reduced, SplitText, onReserve: () => travel(places.reserve()) });
+  if (spreads) wait.ask = () => spreads.holding();
   document.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', (e) => {
     e.preventDefault();
     travel(places[el.dataset.go]());
@@ -662,7 +677,7 @@ export function startScroll({ params }) {
         k.byEl.set(d, self.lines);
         k.lines = [...k.byEl.values()].flat();
         k.tl?.progress(1);
-        gsap.set(self.lines, { yPercent: k.on ? 0 : k.off });
+        gsap.set(self.lines, { yPercent: k.on ? 0 : k.off, autoAlpha: k.on ? 1 : 0 });
       } });
     }
     gsap.set(after, { autoAlpha: 0, y: 14 });
@@ -705,7 +720,7 @@ export function startScroll({ params }) {
     t.set(k.el, { visibility: 'visible' });
     k.el.classList.add('is-on');
     const d = reduced ? 0 : REVEAL;
-    if (k.lines.length) t.to(k.lines, { yPercent: 0, duration: d, ease: EASE, stagger: 0.09 }, 0);
+    if (k.lines.length) { t.set(k.lines, { autoAlpha: 1 }, 0); t.to(k.lines, { yPercent: 0, duration: d, ease: EASE, stagger: 0.09 }, 0); }
     if (k.title) titleFx.show(t, 0);
     // The small words come in after the line, one after another.
     t.to(k.after, { autoAlpha: 1, y: 0, duration: d, ease: EASE, stagger: 0.07 }, reduced ? 0 : 0.35);
@@ -715,7 +730,11 @@ export function startScroll({ params }) {
     const t = (k.tl = gsap.timeline());
     k.el.classList.remove('is-on');
     const d = reduced ? 0 : 0.7;
-    if (k.lines.length) t.to(k.lines, { yPercent: -k.off, duration: d, ease: EASE, stagger: 0.04 }, 0);
+    // (A line leaves through its mask and is gone: it also fades as it clears, and travels well
+    // past the mask. At 105% of its height the tails of its letters stayed in the mask's top
+    // edge until the block was put away, as small white marks: Sam, round 19, "it leaves a trail
+    // of the letter".)
+    if (k.lines.length) { t.to(k.lines, { yPercent: -k.off, duration: d, ease: EASE, stagger: 0.04 }, 0); t.to(k.lines, { autoAlpha: 0, duration: d * 0.3, ease: 'none', stagger: 0.04 }, d * 0.2); }
     if (k.title) titleFx.hide(t);
     t.to(k.after, { autoAlpha: 0, y: -8, duration: d * 0.8, ease: EASE }, 0);
     t.set(k.el, { visibility: 'hidden' });

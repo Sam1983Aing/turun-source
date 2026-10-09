@@ -62,6 +62,13 @@ export function createSpreads({ reduced = false, onReserve, SplitText = null } =
   }
 
   return {
+    // Which spread's words are still on their way in (its id), or null. The page waits at that
+    // card for them (scroll.js). Sam, round 19: "if the user scroll too fast, it cannot continue
+    // moving on before the text animation and content is displayed".
+    holding() {
+      for (const s of list) if (s.on && s.tl && s.tl.progress() < 0.92) return s.id;
+      return null;
+    },
     // Where each card rests (postcard.js): its words keep clear of it.
     layout(post) {
       for (const s of list) {

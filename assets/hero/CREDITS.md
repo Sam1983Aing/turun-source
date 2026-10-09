@@ -35,8 +35,14 @@
   **Still for Sam to confirm before this ships publicly:** which product's image generator
   that is, and that its terms allow publishing the output in a public repository.
 
-- `sand-end.jpg`: the sand under the card at the end of the page (fine sand in evening light,
-  the tide's foam in the top left corner). From Sam Aing's concept picture for the ending,
+- `sand-end.jpg`: the sand under the card at the end of the page (fine sand, a line of bare
+  footprints across its lower left). Made by Sam Aing on 8 October 2026 as `beach-04.png`, one
+  of the ten plates described under `sand-walk.jpg` below (same generator, same notes). Doubled
+  in size, sharpened a little and converted to JPEG by `node tools/prepare-spread-sand.mjs`.
+
+- `sand-end-sea.jpg`: the picture the ending's wave takes its water and foam from (fine sand in
+  evening light, the tide's foam and a corner of sea at its top left). It is never shown as it
+  is. Until round 19 it was `sand-end.jpg`, the sand under the last card. From Sam Aing's concept picture for the ending,
   `ending-concept-05-tide-line.png` ("THE LAST WAVE", 6 October 2026; his notes in
   `output/ending-concept-prompts.txt`: "Created with built-in image_gen. Exports upscaled to
   3840 x 2400 pixels."). The concept has a postcard painted into it. The page lays its own, so
@@ -48,7 +54,8 @@
   removed, leaving only the sand. Keep everything else the same: the foam and the thin strip of
   aqua water in the top left corner, the fine pale damp sand, the low golden afternoon light
   from the upper left. Sharp focus across the whole image. No objects, no text, no people."
-  Saved as `assets/hero/sand-end.jpg` it replaces this one as is.
+  Saved as `assets/hero/sand-end-sea.jpg` it replaces this one as is (then run
+  `node tools/prepare-ending-tide.mjs`).
 
   **Same question as above before this ships publicly:** which product's image generator, and
   its terms.
@@ -65,7 +72,7 @@
   **Same question as above before these ship publicly:** which product's image generator, and
   its terms.
 
-- `sand-end-tide.png`: not a picture to look at. A map made from `sand-end.jpg` by
+- `sand-end-tide.png`: not a picture to look at. A map made from `sand-end-sea.jpg` by
   `node tools/prepare-ending-tide.mjs` (how far each point is from the painted water's edge,
   and where its foam is), for the wave at the ending. Nothing in it but what that picture has.
 

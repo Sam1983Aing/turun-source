@@ -1,4 +1,5 @@
-// Makes the sand under the card at the end of the page (assets/hero/sand-end.jpg) from Sam's
+// Makes the picture the ending's wave takes its sea and foam from (assets/hero/sand-end-sea.jpg:
+// until round 19 it was the sand under the last card itself, assets/hero/sand-end.jpg) from Sam's
 // concept picture for the ending, "05 tide line" (ending-concept-05-tide-line.png: sand, a
 // line of foam in the top left corner, and a postcard painted into it with its shadow).
 //
@@ -35,7 +36,7 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const opt = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3);
 const SRC = process.argv.slice(2).find((a) => !a.startsWith('--')) ?? join(root, '../images/ending-concepts/ending-concept-05-tide-line.png');
-const OUT = opt('out') ? join(root, opt('out')) : join(root, 'assets/hero/sand-end.jpg');
+const OUT = opt('out') ? join(root, opt('out')) : join(root, 'assets/hero/sand-end-sea.jpg');
 const W = 3840, H = 2400, CELL = 16;
 
 // The painted card and its shadow, with room to spare (pixels in the 3840 x 2400 picture).

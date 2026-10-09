@@ -194,6 +194,18 @@ are already in `vendor/fonts/` for the standalone file).
 - Prompt ideas for the surface under postcard two: rocky stairs, rocks, path, wood handrails.
 - Open: which layout. Whether the wave's size, pace and the card's movement are right.
 
+## Round 19 (8 October 2026)
+
+- Postcard three: the turquoise shallows with The Line, and a cleaner price ("price slash a
+  walker, then the month underneath").
+- The last postcard on the footprints picture, and its wave "ultra detailed and ultra
+  realistic, for the movement".
+- The foot of the page centred, without "Back up to the railing".
+- A fast scroll must not carry on past a postcard before its words are in (second and third).
+- "Then it gets steep" a beat later. No trail of letters when a headline leaves. The side rule
+  leaves with its text. Less dark behind "Nobody else is here".
+- The card's back: an inspiring, happy message, the price on one clean line, a fictional name.
+
 ## Found by other versions
 
 Nothing yet.
