@@ -475,18 +475,33 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
    were in the serif, with that word in italic, until Sam asked for a sans here. The hand is
    only for the paper.) */
 .note { display: grid; gap: clamp(12px, 1.8vh, 20px); text-shadow: var(--shadow); }
-.note .display { font-family: var(--type); font-weight: 500; }
+/* (The heading has only the close shadow, not the note's wide soft one: its lines are inside
+   masks, for their reveal, and a mask cuts a 30 px glow off square a few pixels out from the
+   letters. That square was hidden while the dark patch behind a note was strong. With the
+   patch behind "We leave at first light" lightened, Sam saw it: "I see the straight edges ...
+   even though it's super subtle ... it bothers me." The soft darkening behind a heading is the
+   note's round patch alone now, which fades to nothing with no edge.) */
+.note .display { font-family: var(--type); font-weight: 500; text-shadow: 0 1px 2px rgba(10, 9, 7, 0.3); }
 .note .display em { font-style: normal; display: inline; }
 /* (A clean face keeps to its line box: a tight mask, and the lines travel 105% of their height.) */
 .note .line-mask { clip-path: inset(-0.1em -0.25em -0.16em -0.25em); }
 .note .label { font: 500 11px/1.3 var(--sans); letter-spacing: 0.2em; }
 .note .body { font: 400 clamp(0.95rem, 0.9rem + 0.2vw, 1.06rem)/1.55 var(--sans); }
 /* A soft dark patch behind each, so the words read over sky, sea and scrub alike. */
-.note::before { content: ""; position: absolute; inset: -24% -18%; z-index: -1; background: radial-gradient(closest-side, rgba(12, 11, 9, 0.5), rgba(12, 11, 9, 0.22) 55%, rgba(12, 11, 9, 0)); opacity: 0; transition: opacity 1.2s var(--ease); pointer-events: none; }
+/* The dark behind a note, so that white words read on whatever the scene has there. It is the
+   shape of the words' own block, even all the way across it, and goes to nothing in every
+   direction as a blur does, with no line anywhere that an eye can find: the block itself in
+   the dark's colour, rounded, and round it a shadow of the same colour as wide as its blur
+   (so the two meet without a step). --dark: how dark. --soft: how far it takes to fade.
+   (Round 18. It was an oval that faded in three straight stretches: its corners, where a
+   note's small lines are, got nearly nothing, and its ends could be seen. Sam, on "Stay until
+   the light turns": "darker behind the white text, but we don't see the straight edge".) */
+.note::before { content: ""; position: absolute; inset: 9% 5%; z-index: -1; border-radius: 30% / 44%; --dark: 0.27; --soft: clamp(44px, 5.2vw, 92px);
+  background: rgba(12, 11, 9, var(--dark)); box-shadow: 0 0 var(--soft) var(--soft) rgba(12, 11, 9, var(--dark)); opacity: 0; transition: opacity 1.2s var(--ease); pointer-events: none; }
 .note.is-on::before { opacity: 1; }
 /* (Over the sand, with its bright ripples, a wider one. It was much deeper, 0.7 at its middle,
    and Sam saw it as a dark glow behind the words.) */
-.note.on-light::before { inset: -40% -14%; background: radial-gradient(closest-side, rgba(12, 11, 9, 0.3), rgba(12, 11, 9, 0.15) 58%, rgba(12, 11, 9, 0)); }
+.note.on-light::before { --dark: 0.22; }
 .note.on-light .body { color: var(--cream); }
 .note .label { display: flex; align-items: baseline; gap: 14px; color: var(--cream); }
 .note .label b { position: relative; padding-left: 20px; font-weight: 500; font-variant-numeric: tabular-nums; }
@@ -503,7 +518,7 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 /* (The dark behind it is less than half of what the other notes have: over the deep blue of
    the sea here the words read without it. Sam, round 18: "remove at least fifty percent the
    dark background behind it.") */
-.note.at-l::before { background: radial-gradient(closest-side, rgba(12, 11, 9, 0.2), rgba(12, 11, 9, 0.09) 55%, rgba(12, 11, 9, 0)); }
+.note.at-l::before { --dark: 0.12; }
 .at-c { left: 50%; translate: -50% 0; bottom: clamp(44px, 12vh, 150px); width: min(64rem, calc(100vw - 2 * var(--gutter))); justify-items: center; text-align: center; }
 /* Over the sand at noon (a light picked by hand on the beach): dark ink, no veil. In the
    page's own evening, and in any other light, the sand is dark enough for cream. */

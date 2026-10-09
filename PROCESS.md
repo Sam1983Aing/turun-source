@@ -4463,3 +4463,19 @@ the postcard move along with the wave ... for now just use the image we have alr
   sees the path's gravel without the rail: with the rail in view its wood would be under the
   line's last station. All ten were looked at in the page:
   `../demos/spread/backgrounds-postcard-two.jpg` and `-three.jpg`.
+- **The dark behind the notes in the walk has no edge now.** Sam, on "We leave at first
+  light": "I see the straight edges ... even though it's super subtle ... it bothers me". It
+  was not the dark patch. The heading carried the note's wide soft text shadow (30 px), and
+  its lines sit inside masks for their reveal, which cut that glow off square 0.1 to 0.25 em
+  out from the letters. Halving the patch behind that note earlier in the round is what
+  uncovered it. The heading has only the close shadow now. And the patch itself is no longer
+  an oval faded in three straight stretches (its corners, where a note's small lines are, got
+  almost nothing): it is the words' own block in the dark's colour, rounded, with a shadow of
+  the same colour round it as wide as its blur, so it is even across the words and fades as
+  a blur does (`--dark` 0.27, 0.22 on the beach note, 0.12 on the steps note, `--soft` 44 to
+  92 px). Looked at close at twice the pixel density, and on a phone.
+- **Two headlines on two lines**, as Sam set them: "Stay until / the light turns." and "Nobody
+  else / is here."
+- A prompt for a better picture under the last card, five compositions (shells, rocks,
+  rippled sand, a frangipani, a tide line), with what the wave needs kept fixed:
+  `../images/prompts/ending-surface-prompts.txt`.
