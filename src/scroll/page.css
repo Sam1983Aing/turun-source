@@ -438,8 +438,9 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
    further right (--x, its place in the line in pixels, set by title-options.js), so the band
    is in step from one letter to the next and reads as one light passing. And the sea's
    gradient under it slides down a little and back, so the letters go a shade lighter and
-   darker. Under the line, a soft shadow of it on the sand. */
-.hero .display { filter: drop-shadow(0 0.028em 0.03em rgba(22, 62, 82, 0.3)); }
+   darker. Under the line, a soft shadow of it on the sand (a little more of it since round
+   18: Sam, "add just a tiny bit for the shadow"). */
+.hero .display { filter: drop-shadow(0 0.034em 0.038em rgba(22, 62, 82, 0.42)); }
 .hero .display .ch { background-image: linear-gradient(100deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.34) 42%, rgba(255, 255, 255, 0.34) 58%, rgba(255, 255, 255, 0) 100%), var(--ink);
   background-size: 240px 100%, 100% 118%; background-repeat: no-repeat; background-position: -260px 0, 0 0;
   animation: title-light 11s linear infinite; animation-delay: calc(var(--x, 0) * 1.9ms + 2.5s); }
@@ -457,10 +458,13 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 /* "Scroll into the postcard": in the hand, a note on the sand under the card's lower left
    corner, written along its edge, with an arrow drawn in the same pen up into the picture.
    (It was under the button, a column away from the thing it points at.) */
-.cue { position: absolute; left: calc(var(--card-left, 50vw) - var(--gutter) + 5.4vw); top: calc(var(--card-bottom, 80vh) + 12px); display: flex; align-items: center; gap: 14px; margin: 0; white-space: nowrap; font: 400 2.34rem/1 var(--hand); color: #df7646; rotate: -6deg; transform-origin: 0 50%; }
-/* (In the headline's orange, graded the same way, the arrow with it: Sam's. It was the pen's blue.) */
+.cue { position: absolute; left: calc(var(--card-left, 50vw) - var(--gutter) + 5.4vw); top: calc(var(--card-bottom, 80vh) + 12px); display: flex; align-items: center; gap: 14px; margin: 0; white-space: nowrap; font: 400 2.34rem/1 var(--hand); color: #1c95ad; rotate: -6deg; transform-origin: 0 50%; }
+/* (In the sea's colours of "Most people stop at the", graded the same way, the arrow with it,
+   and the same soft shadow under the words. Round 17 had it in the headline's orange, which
+   Sam found "lacking contrast" on the sand. Before that it was the pen's blue.) */
 .cue > span { display: inline-block; padding: 0.4em 0.4em 0.5em; margin: -0.4em -0.4em -0.5em; color: transparent; -webkit-text-fill-color: transparent;
-  background: linear-gradient(180deg, #ee9254 14%, #de7444 54%, #c2532a 96%); -webkit-background-clip: text; background-clip: text; }
+  background: linear-gradient(180deg, #3cc4c9 12%, #1c95ad 50%, #0e5d7f 92%); -webkit-background-clip: text; background-clip: text;
+  filter: drop-shadow(0 0.03em 0.034em rgba(22, 62, 82, 0.36)); }
 .cue__arrow { flex: none; width: 66px; height: 29px; overflow: visible; fill: none; stroke: url(#cue-ink); stroke-width: 3.3; stroke-linecap: round; stroke-linejoin: round; animation: cue 2.8s ease-in-out infinite; }
 @keyframes cue { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(8px, -3px); } }
 
@@ -495,6 +499,10 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 .at-r { right: calc(var(--gutter) + 72px); top: 50%; translate: 0 -50%; width: min(24rem, 30vw); padding-left: 22px; border-left: 1px solid rgba(243, 239, 230, 0.5); }
 /* (On the left, half way up: over the open sea on the way down the steps.) */
 .at-l { left: var(--gutter); top: 50%; translate: 0 -50%; width: min(23rem, 27vw); padding-left: 22px; border-left: 1px solid rgba(243, 239, 230, 0.5); }
+/* (The dark behind it is less than half of what the other notes have: over the deep blue of
+   the sea here the words read without it. Sam, round 18: "remove at least fifty percent the
+   dark background behind it.") */
+.note.at-l::before { background: radial-gradient(closest-side, rgba(12, 11, 9, 0.2), rgba(12, 11, 9, 0.09) 55%, rgba(12, 11, 9, 0)); }
 .at-c { left: 50%; translate: -50% 0; bottom: clamp(44px, 12vh, 150px); width: min(64rem, calc(100vw - 2 * var(--gutter))); justify-items: center; text-align: center; }
 /* Over the sand at noon (a light picked by hand on the beach): dark ink, no veil. In the
    page's own evening, and in any other light, the sand is dark enough for cream. */
