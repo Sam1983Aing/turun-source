@@ -4451,3 +4451,15 @@ the postcard move along with the wave ... for now just use the image we have alr
   ring still for reduced motion. Looked at 1024 x 768, 1280 x 720, 1512 x 945, 1920 x 1080,
   2560 x 1080, 768 x 1024, 390 x 844, 375 x 667, 360 x 640. Arriving, leaving and coming back,
   with and without reduced motion: drawn, unwritten, drawn again each time.
+- **The spreads lie on surfaces of their own.** Sam generated ten plates from the prompts
+  (five for each postcard) and picked: "the one with the handrail and the blue ribbon" for the
+  second (`walk-05.png`) and "the footstep" for the third (`beach-04.png`).
+  `tools/prepare-spread-sand.mjs` makes `assets/hero/sand-walk.jpg` and `sand-beach.jpg` from
+  them (the plates came back at 1586 x 992, not 3840 x 2400: doubled with Lanczos and
+  sharpened a little), `ASSETS.heroWalk` and `heroBeach` name them. In place: the card leans
+  on the post and its cord, the footprints run out from under the third card. The palm's
+  leaves hang over the third's sand as over the hero's, and not over the path (the right one
+  would cover the post). On a tall screen the page uses the middle of a plate, so a phone
+  sees the path's gravel without the rail: with the rail in view its wood would be under the
+  line's last station. All ten were looked at in the page:
+  `../demos/spread/backgrounds-postcard-two.jpg` and `-three.jpg`.

@@ -53,6 +53,18 @@
   **Same question as above before this ships publicly:** which product's image generator, and
   its terms.
 
+- `sand-walk.jpg` and `sand-beach.jpg`: what the second and third postcards lie on. Made by Sam
+  Aing on 8 October 2026 as `walk-05.png` (pale gravel of a cliff path, a wooden post and rail
+  lashed with blue cord along the right edge) and `beach-04.png` (fine sand, a line of bare
+  footprints in the lower left), two of ten plates in `../images/sand/`. His notes with the
+  prompts (`../images/prompts/postcard-surfaces-prompts.txt`) say: "Generated with built-in
+  imagegen. Requested: 3840 x 2400. Returned originals: 1586 x 992; no resizing applied."
+  Doubled in size, sharpened a little and converted to JPEG by
+  `node tools/prepare-spread-sand.mjs`, nothing else.
+
+  **Same question as above before these ship publicly:** which product's image generator, and
+  its terms.
+
 - `sand-end-tide.png`: not a picture to look at. A map made from `sand-end.jpg` by
   `node tools/prepare-ending-tide.mjs` (how far each point is from the painted water's edge,
   and where its foam is), for the wave at the ending. Nothing in it but what that picture has.

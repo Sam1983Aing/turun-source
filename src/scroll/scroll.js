@@ -353,8 +353,9 @@ export function startScroll({ params }) {
   // The sand under the card: a photograph (assets/hero/, generated for this page), laid in the
   // card's world by postcard.js. One for each place the card comes to rest, if there is one
   // (ASSETS.hero, heroWalk, heroBeach, heroEnd): palm shadows on pale sand for the hero, the
-  // tide's edge in evening light for the ending, and the two spreads lie on the hero's until
-  // they have surfaces of their own. postcard.js says which, as the card changes pose behind
+  // tide's edge in evening light for the ending, and for the spreads the cliff path's gravel
+  // with its wooden rail (the second postcard) and sand with footprints (the third): Sam's
+  // plates, his picks. postcard.js says which, as the card changes pose behind
   // the full-screen picture. (?under=walk:url,beach:url tries a picture under a spread without
   // adding it to the page.) The one in use is drawn into a
   // canvas at the photograph's own size, not set as a background: the browser draws a
@@ -379,7 +380,9 @@ export function startScroll({ params }) {
     const g = c.getContext('2d');
     g.imageSmoothingQuality = 'high';
     g.drawImage(img, sx, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
-    palm?.sandChanged(c, img === sands.day ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
+    // (The palm's leaves hang over sand: the hero's and the third postcard's. Not over the path
+    // under the second, where one would cover the post and its cord, and not at the ending.)
+    palm?.sandChanged(c, img === sands.day || img === sands.beach ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
     tide?.sandChanged(c, img === sands.end ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
   }
   const loadSand = (which, src) => new Promise((done) => {

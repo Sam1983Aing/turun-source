@@ -185,9 +185,12 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   turn inside the picture before it grows. From there to the first spread the camera moves
   slower than the scroll (`FIRST_LEG`).
 - **The sand** is a photograph: `assets/hero/sand-clean.jpg` (pale sand with nothing on it)
-  under the hero and the spreads, `assets/hero/sand-end.jpg` (the tide's edge in evening light)
-  under the ending. With the leaf below, they are the only pictures on the page the scene did
-  not draw.
+  under the hero, `assets/hero/sand-walk.jpg` (the cliff path's gravel, a wooden rail tied with
+  blue cord down its right edge) under the second postcard, `assets/hero/sand-beach.jpg` (sand
+  with a line of footprints) under the third, `assets/hero/sand-end.jpg` (the tide's edge in
+  evening light) under the ending. With the leaf below, they are the only pictures on the page
+  the scene did not draw. `tools/prepare-spread-sand.mjs` makes the two in the middle from
+  Sam's plates. `?under=walk:url,beach:url` tries another picture under a spread.
 - **The tide at the ending moves** (`tide.js`). The picture under the last card keeps its
   painted sea. Its foam is lifted off it (the only thing in it that is white in all three
   channels) and laid along the front of each wave, thin water is drawn between (the sand

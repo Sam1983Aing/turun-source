@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 4956991. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
+  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit d6d5a2f. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Turun · The walk down to Kelingking Beach</title>
@@ -95310,9 +95310,9 @@ const { decodeBake } = __m["src/terrain/bake-format.js"];
 // (hero, heroEnd: the photographs of sand the landing page's postcard lies on, at the top of
 // the page and at its end, v35. heroPalm, heroLeaf: the sand with no shadows in it and the
 // leaf's cut-out, for the live palm, which is what the page shows: `hero` is the photograph it
-// had before, behind ?sand=photo. heroWalk, heroBeach: surfaces of their own for the two
-// spreads, none yet, so they lie on the hero's.)
-const ASSETS = { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin', hero: 'assets/hero/sand.jpg', heroPalm: 'assets/hero/sand-clean.jpg', heroLeaf: 'assets/hero/palm-leaf.png', heroWalk: null, heroBeach: null, heroEnd: 'assets/hero/sand-end.jpg', heroTide: 'assets/hero/sand-end-tide.png', ...globalThis.__klAssets };
+// had before, behind ?sand=photo. heroWalk, heroBeach: what the two spreads' cards lie
+// on, Sam's plates: the cliff path with its rail, and sand with footprints.)
+const ASSETS = { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin', hero: 'assets/hero/sand.jpg', heroPalm: 'assets/hero/sand-clean.jpg', heroLeaf: 'assets/hero/palm-leaf.png', heroWalk: 'assets/hero/sand-walk.jpg', heroBeach: 'assets/hero/sand-beach.jpg', heroEnd: 'assets/hero/sand-end.jpg', heroTide: 'assets/hero/sand-end-tide.png', ...globalThis.__klAssets };
 
 // capture: a still for the tools (pixel ratio 1, 2048 terrain, the drawing buffer kept for
 // screenshots). keepBuffer: keep the drawing buffer without the rest (recording the scroll).
@@ -98400,8 +98400,9 @@ function startScroll({ params }) {
   // The sand under the card: a photograph (assets/hero/, generated for this page), laid in the
   // card's world by postcard.js. One for each place the card comes to rest, if there is one
   // (ASSETS.hero, heroWalk, heroBeach, heroEnd): palm shadows on pale sand for the hero, the
-  // tide's edge in evening light for the ending, and the two spreads lie on the hero's until
-  // they have surfaces of their own. postcard.js says which, as the card changes pose behind
+  // tide's edge in evening light for the ending, and for the spreads the cliff path's gravel
+  // with its wooden rail (the second postcard) and sand with footprints (the third): Sam's
+  // plates, his picks. postcard.js says which, as the card changes pose behind
   // the full-screen picture. (?under=walk:url,beach:url tries a picture under a spread without
   // adding it to the page.) The one in use is drawn into a
   // canvas at the photograph's own size, not set as a background: the browser draws a
@@ -98426,7 +98427,9 @@ function startScroll({ params }) {
     const g = c.getContext('2d');
     g.imageSmoothingQuality = 'high';
     g.drawImage(img, sx, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
-    palm?.sandChanged(c, img === sands.day ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
+    // (The palm's leaves hang over sand: the hero's and the third postcard's. Not over the path
+    // under the second, where one would cover the post and its cord, and not at the ending.)
+    palm?.sandChanged(c, img === sands.day || img === sands.beach ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
     tide?.sandChanged(c, img === sands.end ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
   }
   const loadSand = (which, src) => new Promise((done) => {
