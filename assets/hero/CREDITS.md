@@ -53,4 +53,8 @@
   **Same question as above before this ships publicly:** which product's image generator, and
   its terms.
 
+- `sand-end-tide.png`: not a picture to look at. A map made from `sand-end.jpg` by
+  `node tools/prepare-ending-tide.mjs` (how far each point is from the painted water's edge,
+  and where its foam is), for the wave at the ending. Nothing in it but what that picture has.
+
 These are the only pictures on the page that the scene did not draw.

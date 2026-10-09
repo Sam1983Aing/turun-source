@@ -4249,7 +4249,7 @@ from `file://` with no errors. The palm's script costs 0.2 to 0.4 ms a frame at 
 Not proven: the frame rate in a recording. Another project was rendering in Blender on this
 machine and every clip stuttered, the page without the palm as well.
 
-### Round 15: the opening (9 October)
+### Round 15: the opening (8 October)
 
 Sam's notes, in his order.
 
@@ -4310,7 +4310,7 @@ Not proven: the final clips' smoothness. Blender was rendering for another proje
 (637% of a core) and the long recordings came out at 27 to 35 frames a second. The short ones
 taken between its jobs were at 60.
 
-### Round 16: the water button, after the real one (9 October)
+### Round 16: the water button, after the real one (8 October)
 
 A correction first. In round 15 I wrote that ThreeUI's "Water Ripple" could not be read
 because its connector was not signed in. There are two ThreeUI connectors in this setup and
@@ -4338,7 +4338,7 @@ Checked at twice the density, at rest and after a press, in its three places (th
 third postcard, the card's back) and on a phone. The single file rebuilt and opened from
 `file://` with no errors.
 
-### Round 17: the first moment, light on the headline, and smaller things (9 October)
+### Round 17: the first moment, light on the headline, and smaller things (8 October)
 
 - **The sand is there from the first paint.** "It starts with like a blank color background.
   I want the beach sand background to appear right away." The sand was drawn by the script
@@ -4370,3 +4370,72 @@ variations of each are in `../images/prompts/postcard-surface-prompts.txt`: the 
 stair's own weathered wood under "The walk" (his idea), and clear shallow water over sand
 under "The beach".
 
+**The tide at the ending** (the last thing asked in round 17: "add water effect built in code
+and it will be like a wave coming in ... make it move behind the postcard, or if you can make
+the postcard move along with the wave ... for now just use the image we have already").
+
+- `src/scroll/tide.js`, a WebGL layer between the sand and the card, in the card's world, on
+  the sand's own transform. It reads the sand's canvas as a texture, so what it draws is the
+  photograph's own pixels at the photograph's own place.
+- **What is the picture's and what is written.** The painted sea stays where it is (shown
+  through, with a slight shimmer). The painted foam is lifted off the photograph by its
+  whiteness (the smallest of red, green and blue: sand and sunlit water are warm, foam is
+  not) and laid along the front of each wave. Between sea and foam the thin water is code:
+  the sand seen a little to one side, a pale veil, the net of light (the buttons' working
+  out), wet sand's darker tone under it. Where the painted foam was, the sand is taken from
+  0.34 of the picture's height further down.
+- **The map.** `tools/prepare-ending-tide.mjs` finds the water (from the corner up to the
+  last of the foam's band, along the wave's way), and writes `assets/hero/sand-end-tide.png`,
+  640 x 400: red the signed distance to the edge (finely, 0.08 of the height each way), green
+  the foam's band blurred wide (where the painted water must not be shown as it is), blue the
+  band blurred a little (where white is foam and not a glint). It prints the wave's way
+  (0.6829, 0.7305) and the edge's place along it (0.3989), which `tide.js` has as constants.
+- **A wave is one number**: how far its front has come past the painted edge. A point is
+  under it if the point that far back along the way is under the painted water, and its foam
+  is the photograph's at that point. Off the picture, that point is folded back in along the
+  front, so the foam goes on past where the painted foam ended. Each wave's front has its own
+  shape (three sines along the front, scaled by how far it has come).
+- **How it moves.** Up as a thing thrown up a slope (2.4 to 2.8 s), back 1.9 times as slowly,
+  the water alone: the foam stays near where it stopped and thins. Wet sand to a clear line
+  there, drying from the line back over 5.5 s. A wave every 7.6 s, six sizes in turn (0.08 to
+  0.30 of the picture's height), two alive at once. The net of light is carried with the sheet.
+- **The card.** `postcard.js` has `float({ x, y, rz, z })`, laid on both faces and the shadow.
+  The water's reach past the card's nearest corner drives it through a spring: up to 5 px up,
+  1.3% of its width along the way, half a degree. Not while the form has the focus.
+- **When it runs.** One frame as the ending's sand first shows (the first wave standing at
+  the painted edge, so it looks like the picture), then only while the card is at rest. The
+  scene is not being drawn then.
+- **Looked at and changed.** The net first came out as large soft squares, then (finer, with
+  a sharper falloff) as thin straight lines like wire: six plane waves make straight
+  caustics. Bending the coordinates slowly, a softer falloff and a darker floor made it
+  water. The wet sand was a soft dark shape like a shadow: now lighter, with a clear line.
+- **From the disk** the sand's canvas is tainted and cannot be a texture: the tide stands
+  down with a warning and the still picture stays. (`kelingking.html` opened by a double
+  click: checked, no wave, no error.)
+
+### Round 18: the hero's small notes, the spreads' headlines, three layouts (8 October)
+
+- **A little more shadow under the headline** ("add just a tiny bit"): the drop shadow from
+  0.3 to 0.42 and a little further down.
+- **"Scroll into the postcard" in the sea's colours** ("use the same color as 'most people
+  stop at', because right now it is lacking contrast"), its arrow's gradient with it, and the
+  same soft shadow. It was orange for one round.
+- **Less dark behind "We leave at first light"** ("remove at least fifty percent the dark
+  background behind it"): `.note.at-l::before` at 0.2 and 0.09 where the other notes have 0.5
+  and 0.22. Looked at `tau` 1.2, 1.32 and 1.45.
+- **The spreads' headlines are the hero's** ("make sure the color fits what we have from the
+  hero section ... apply the same kind of animation on the headline"): `spreads.js` splits
+  them with `titleOption('write')`, so they are written letter by letter and the stroke
+  under the word is drawn last, and `page.css` gives `.sp__head .ch` the same gradients, light
+  and shadow as `.hero .display .ch`. The lines rising out of masks are gone.
+- **Three layouts for a spread's words**, recorded for Sam (`../demos/spread/`), behind
+  `?spread=`: `ledger` (the rows numbered, the fact large and first, its name small at the
+  end), `figures` (three large serif figures, a word under each, one sentence), `line` (the
+  walk as a staircase that draws itself with a dot walking down to the ridge, the beach as
+  the day's arc with its sun). One file, `src/scroll/spread-options.js`. `spreads.js` brings
+  in whatever is marked `data-sp-in` (fades up) and `data-sp-draw` (its `--d` goes 0 to 1).
+  All six clips at 60 frames a second, longest gap 60 ms.
+- Surfaces for postcard two, asked again as "rocky stairs, rocks, path, or wood handrails":
+  five materials, one prompt each, in `../images/prompts/postcard-surface-prompts.txt`.
+- Rounds 15 to 17 were dated 9 October in these notes. They were made on the 8th (the
+  commits say so). Corrected.

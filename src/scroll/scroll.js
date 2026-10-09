@@ -50,6 +50,7 @@ import { walkLine } from '../trail/route.js';
 import { buildDescent, makePace, STOPS } from './path.js';
 import { createPostcard } from './postcard.js';
 import { createSpreads, spreadCaptions } from './spreads.js';
+import { spreadOption } from './spread-options.js';
 
 gsap.registerPlugin(SplitText);
 
@@ -627,7 +628,9 @@ export function startScroll({ params }) {
     } });
   }
   const places = { walk: () => page.screensAt(1), boat: () => page.screensAt(4.97), reserve: () => page.screens };
-  const spreads = BARE ? null : createSpreads({ reduced, off: LINE_OFF, onReserve: () => travel(places.reserve()) });
+  // (?spread=ledger, figures or line: three ways to set a spread's words, for Sam to compare.)
+  if (!BARE) spreadOption(params.get('spread'));
+  const spreads = BARE ? null : createSpreads({ reduced, SplitText, onReserve: () => travel(places.reserve()) });
   document.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', (e) => {
     e.preventDefault();
     travel(places[el.dataset.go]());

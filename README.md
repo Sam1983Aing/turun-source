@@ -188,6 +188,15 @@ the tools (`src/debug.js`), which `src/main.js` picks from the URL.
   under the hero and the spreads, `assets/hero/sand-end.jpg` (the tide's edge in evening light)
   under the ending. With the leaf below, they are the only pictures on the page the scene did
   not draw.
+- **The tide at the ending moves** (`tide.js`). The picture under the last card keeps its
+  painted sea. Its foam is lifted off it (the only thing in it that is white in all three
+  channels) and laid along the front of each wave, thin water is drawn between (the sand
+  seen through it, the net of light), and the sand a wave leaves is wet and dries. The larger
+  waves reach under the card and take it a little way. `tools/prepare-ending-tide.mjs` makes
+  the map the shader reads (`assets/hero/sand-end-tide.png`: how far each point is from the
+  painted water's edge). Run it again if the ending's picture changes, and copy the numbers it
+  prints into `tide.js`. `?tide=0` is the still picture. Opened from the disk (the single
+  file), the browser will not let the picture into a shader and the still stays.
 - **The palm over it is alive** (`palm.js`). The sand has no shadows in it. The page casts
   them: palm fronds drawn by the script (a rib that curls, leaflets that each flutter to their
   own beat), small and stretched so they are soft, multiplied over the sand and over the

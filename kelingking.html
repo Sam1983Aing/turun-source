@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 0274050. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
+  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 69790df. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Turun · The walk down to Kelingking Beach</title>
@@ -342,10 +342,11 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 .sp--beach .sp__text { left: calc(var(--c-right, 50vw) + 3.5vw); right: var(--gutter); }
 .sp__label { display: flex; align-items: baseline; gap: 16px; color: rgba(20, 18, 14, 0.74); }
 .sp__label b { color: var(--ink); }
-/* (Pen-blue ink, written a little uphill, as the hero's line is.) */
-.sp__head { font-size: clamp(2.6rem, 0.5rem + 5.5vw, 7.2rem); color: var(--pen); margin: 0.04em 0; transform: rotate(-2.5deg); transform-origin: 0 60%; }
-.sp__head em { color: var(--accent-deep); }
-.sp__mask { display: block; clip-path: inset(-0.45em -0.5em -0.5em -0.5em); }
+/* (Written a little uphill, as the hero's line is, and in its colours: the sea's and the
+   lighter orange, letter by letter, further down with the hero's. It was the pen's dark blue.) */
+.sp__head { font-size: clamp(2.6rem, 0.5rem + 5.5vw, 7.2rem); color: #1c95ad; margin: 0.04em 0; transform: rotate(-2.5deg); transform-origin: 0 60%; }
+.sp__head em { color: #df7646; }
+.sp__mask { display: block; }
 .sp__ln { display: block; white-space: nowrap; }
 /* The rule draws itself across under the headline. */
 .sp__rule { display: block; height: 1px; background: var(--accent-deep); transform-origin: 0 50%; }
@@ -443,10 +444,10 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
    outside their boxes, and a background stops at the box, so each box is padded out and
    pulled back in by as much: nothing moves, and the swashes get their colour. The gradient's
    stops are set for that padded box so the letters take the same part of it as the name does. */
-.hero .display .ch, .hero .display .line { --ink: linear-gradient(180deg, #3cc4c9 8%, #1c95ad 58%, #0e5d7f 116%);
+.hero .display .ch, .hero .display .line, .sp__head .ch { --ink: linear-gradient(180deg, #3cc4c9 8%, #1c95ad 58%, #0e5d7f 116%);
   padding: 0.5em 0.55em 0.6em; margin: -0.5em -0.55em -0.6em; color: transparent; -webkit-text-fill-color: transparent;
   background: var(--ink); -webkit-background-clip: text; background-clip: text; }
-.hero .display em .ch { --ink: linear-gradient(180deg, #f6a968 8%, #e5804c 58%, #cb5d30 116%); }
+.hero .display em .ch, .sp__head em .ch { --ink: linear-gradient(180deg, #f6a968 8%, #e5804c 58%, #cb5d30 116%); }
 .hero .display .line em { color: #df7646; -webkit-text-fill-color: #df7646; }
 /* Light on the line (Sam: "add some kind of lighting on the headline, moving the gradient
    slowly", "very subtle"). Two things, both in the letters' own background. A soft band of
@@ -455,9 +456,10 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
    further right (--x, its place in the line in pixels, set by title-options.js), so the band
    is in step from one letter to the next and reads as one light passing. And the sea's
    gradient under it slides down a little and back, so the letters go a shade lighter and
-   darker. Under the line, a soft shadow of it on the sand. */
-.hero .display { filter: drop-shadow(0 0.028em 0.03em rgba(22, 62, 82, 0.3)); }
-.hero .display .ch { background-image: linear-gradient(100deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.34) 42%, rgba(255, 255, 255, 0.34) 58%, rgba(255, 255, 255, 0) 100%), var(--ink);
+   darker. Under the line, a soft shadow of it on the sand (a little more of it since round
+   18: Sam, "add just a tiny bit for the shadow"). */
+.hero .display, .sp__head { filter: drop-shadow(0 0.034em 0.038em rgba(22, 62, 82, 0.42)); }
+.hero .display .ch, .sp__head .ch { background-image: linear-gradient(100deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.34) 42%, rgba(255, 255, 255, 0.34) 58%, rgba(255, 255, 255, 0) 100%), var(--ink);
   background-size: 240px 100%, 100% 118%; background-repeat: no-repeat; background-position: -260px 0, 0 0;
   animation: title-light 11s linear infinite; animation-delay: calc(var(--x, 0) * 1.9ms + 2.5s); }
 @keyframes title-light {
@@ -466,18 +468,21 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
   50% { background-position: 1240px 0, 0 100%; }
   100% { background-position: 1240px 0, 0 0; }
 }
-.hero .display em::after { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 40 4 110 3 197 7' fill='none' stroke='%23df7646' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M30 13.5 C 80 9 140 8.5 186 11' fill='none' stroke='%23df7646' stroke-width='1.6' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+.hero .display em::after, .sp__head em::after { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 40 4 110 3 197 7' fill='none' stroke='%23df7646' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M30 13.5 C 80 9 140 8.5 186 11' fill='none' stroke='%23df7646' stroke-width='1.6' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
 /* (The stroke under the word can be drawn: a clip opened from the left, --u from 0 to 1.) */
-.hero .display em::after { clip-path: inset(-30% calc((1 - var(--u, 1)) * 100%) -30% -6%); }
+.hero .display em::after, .sp__head em::after { clip-path: inset(-30% calc((1 - var(--u, 1)) * 100%) -30% -6%); }
 .hero .body { color: rgba(20, 18, 14, 0.82); max-width: 29rem; }
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 30px; margin-top: 6px; }
 /* "Scroll into the postcard": in the hand, a note on the sand under the card's lower left
    corner, written along its edge, with an arrow drawn in the same pen up into the picture.
    (It was under the button, a column away from the thing it points at.) */
-.cue { position: absolute; left: calc(var(--card-left, 50vw) - var(--gutter) + 5.4vw); top: calc(var(--card-bottom, 80vh) + 12px); display: flex; align-items: center; gap: 14px; margin: 0; white-space: nowrap; font: 400 2.34rem/1 var(--hand); color: #df7646; rotate: -6deg; transform-origin: 0 50%; }
-/* (In the headline's orange, graded the same way, the arrow with it: Sam's. It was the pen's blue.) */
+.cue { position: absolute; left: calc(var(--card-left, 50vw) - var(--gutter) + 5.4vw); top: calc(var(--card-bottom, 80vh) + 12px); display: flex; align-items: center; gap: 14px; margin: 0; white-space: nowrap; font: 400 2.34rem/1 var(--hand); color: #1c95ad; rotate: -6deg; transform-origin: 0 50%; }
+/* (In the sea's colours of "Most people stop at the", graded the same way, the arrow with it,
+   and the same soft shadow under the words. Round 17 had it in the headline's orange, which
+   Sam found "lacking contrast" on the sand. Before that it was the pen's blue.) */
 .cue > span { display: inline-block; padding: 0.4em 0.4em 0.5em; margin: -0.4em -0.4em -0.5em; color: transparent; -webkit-text-fill-color: transparent;
-  background: linear-gradient(180deg, #ee9254 14%, #de7444 54%, #c2532a 96%); -webkit-background-clip: text; background-clip: text; }
+  background: linear-gradient(180deg, #3cc4c9 12%, #1c95ad 50%, #0e5d7f 92%); -webkit-background-clip: text; background-clip: text;
+  filter: drop-shadow(0 0.03em 0.034em rgba(22, 62, 82, 0.36)); }
 .cue__arrow { flex: none; width: 66px; height: 29px; overflow: visible; fill: none; stroke: url(#cue-ink); stroke-width: 3.3; stroke-linecap: round; stroke-linejoin: round; animation: cue 2.8s ease-in-out infinite; }
 @keyframes cue { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(8px, -3px); } }
 
@@ -512,6 +517,10 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 .at-r { right: calc(var(--gutter) + 72px); top: 50%; translate: 0 -50%; width: min(24rem, 30vw); padding-left: 22px; border-left: 1px solid rgba(243, 239, 230, 0.5); }
 /* (On the left, half way up: over the open sea on the way down the steps.) */
 .at-l { left: var(--gutter); top: 50%; translate: 0 -50%; width: min(23rem, 27vw); padding-left: 22px; border-left: 1px solid rgba(243, 239, 230, 0.5); }
+/* (The dark behind it is less than half of what the other notes have: over the deep blue of
+   the sea here the words read without it. Sam, round 18: "remove at least fifty percent the
+   dark background behind it.") */
+.note.at-l::before { background: radial-gradient(closest-side, rgba(12, 11, 9, 0.2), rgba(12, 11, 9, 0.09) 55%, rgba(12, 11, 9, 0)); }
 .at-c { left: 50%; translate: -50% 0; bottom: clamp(44px, 12vh, 150px); width: min(64rem, calc(100vw - 2 * var(--gutter))); justify-items: center; text-align: center; }
 /* Over the sand at noon (a light picked by hand on the beach): dark ink, no veil. In the
    page's own evening, and in any other light, the sand is dark enough for cream. */
@@ -756,7 +765,7 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
         <div class="hero__actions">
           <a class="button" href="#reserve" data-go="reserve">Reserve a morning</a>
         </div>
-        <p class="cue"><span>Scroll<span class="wide-only"> into the postcard</span></span><svg class="cue__arrow" viewBox="0 0 92 40" aria-hidden="true"><defs><linearGradient id="cue-ink" x1="0" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0.1" stop-color="#ee9254"/><stop offset="0.55" stop-color="#de7444"/><stop offset="1" stop-color="#c2532a"/></linearGradient></defs><path d="M4 31 C 26 37, 56 31, 85 10"/><path d="M67 8 L86 9 L78 27"/></svg></p>
+        <p class="cue"><span>Scroll<span class="wide-only"> into the postcard</span></span><svg class="cue__arrow" viewBox="0 0 92 40" aria-hidden="true"><defs><linearGradient id="cue-ink" x1="0" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0.1" stop-color="#3cc4c9"/><stop offset="0.5" stop-color="#1c95ad"/><stop offset="1" stop-color="#0e5d7f"/></linearGradient></defs><path d="M4 31 C 26 37, 56 31, 85 10"/><path d="M67 8 L86 9 L78 27"/></svg></p>
       </section>
 
       <section class="note note--xl at-bl" id="walk" data-tau="0.972,1.03">
@@ -95303,7 +95312,7 @@ const { decodeBake } = __m["src/terrain/bake-format.js"];
 // leaf's cut-out, for the live palm, which is what the page shows: `hero` is the photograph it
 // had before, behind ?sand=photo. heroWalk, heroBeach: surfaces of their own for the two
 // spreads, none yet, so they lie on the hero's.)
-const ASSETS = { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin', hero: 'assets/hero/sand.jpg', heroPalm: 'assets/hero/sand-clean.jpg', heroLeaf: 'assets/hero/palm-leaf.png', heroWalk: null, heroBeach: null, heroEnd: 'assets/hero/sand-end.jpg', ...globalThis.__klAssets };
+const ASSETS = { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin', hero: 'assets/hero/sand.jpg', heroPalm: 'assets/hero/sand-clean.jpg', heroLeaf: 'assets/hero/palm-leaf.png', heroWalk: null, heroBeach: null, heroEnd: 'assets/hero/sand-end.jpg', heroTide: 'assets/hero/sand-end-tide.png', ...globalThis.__klAssets };
 
 // capture: a still for the tools (pixel ratio 1, 2048 terrain, the drawing buffer kept for
 // screenshots). keepBuffer: keep the drawing buffer without the rest (recording the scroll).
@@ -96269,6 +96278,352 @@ function createPalm({ reduced = false, plate = null, leaf = null } = {}) {
 
 return { "createPalm": createPalm };
 })();
+// src/scroll/tide.js
+__m["src/scroll/tide.js"] = (function () {
+"use strict";
+// The tide at the ending (v35 round 17).
+//
+// The last card lies on a photograph of sand with the sea's edge painted into its top left
+// corner: a still. Sam: "you can add like water effect ... it will like wave coming in ... make
+// it move behind the postcard or if you can make the postcard move along with the wave ... for
+// now just use the image we have already." So the picture stays, and its own water is made to
+// move.
+//
+// What is the picture's and what is written here:
+//
+//   the sea          the painted water, where it is: left alone but for a shimmer.
+//   the foam         the painted foam, lifted off the picture (it is the only thing in it that
+//                    is white in all three channels) and laid along the front of each wave.
+//                    Nothing written by hand looks as much like foam as that does. Where the
+//                    front is longer than the painted foam was, the foam is folded back along
+//                    it at the picture's edge.
+//   the thin water   between the sea and the foam, the sheet a wave pushes up the sand. This is
+//                    code: the sand seen through it a little to one side (the surface's slope
+//                    bends the view), a veil of the sky's colour that thickens behind the front,
+//                    and the net of light on its floor (the same working out as the water in the
+//                    buttons: one over how much a small patch of light has been squeezed). The
+//                    net is carried along with the sheet.
+//   the wet sand     what a wave leaves: the same sand darker, drying from its far edge back.
+//
+// A map made by tools/prepare-ending-tide.mjs says how far any point is from the painted
+// water's edge. A wave is then one number, how far its front has come past that edge, and a
+// point is under it if the point that far back along the wave's way was under the painted
+// water. Each wave's front is its own shape (it runs further in some places than others).
+//
+// A wave comes in fast and slows to a stop, the way a thing thrown up a slope does. Then its
+// water runs back, slowly at first, and its foam does not: it stays where the wave stopped and
+// goes thin. The next one arrives over the last of it. They are not all the same size, and
+// only the larger reach under the card: it is lifted a little, pushed and turned, and settles
+// back (unless someone is writing on it).
+//
+// Two waves at most are alive at once. It runs only while the last card is at rest, and where
+// the picture cannot be read into a shader (a file opened from the disk) the still stays.
+
+const clamp01 = (v) => Math.min(1, Math.max(0, v));
+const smooth = (a, b, v) => { const t = clamp01((v - a) / (b - a)); return t * t * (3 - 2 * t); };
+
+// From tools/prepare-ending-tide.mjs: the wave's way across the picture and the painted edge's
+// place along it (in heights of the picture, x right and y down), and what the map's red spans.
+const WAY = [0.6829, 0.7305], EDGE = 0.3989, NEAR = 0.08;
+// How far past the painted edge each wave comes (heights of the picture), in turn.
+const SIZES = [0.15, 0.3, 0.1, 0.23, 0.08, 0.27];
+const BEAT = 7.6;          // seconds from one wave to the next
+const LEAD = 1.1;          // a wave is seen coming for this long before it is at the edge
+const DRY = 5.5;           // the sand it wetted is dry this long after its water is back
+
+const VERT = 'attribute vec2 p; varying vec2 v; void main() { v = vec2(p.x * 0.5 + 0.5, 0.5 - p.y * 0.5); gl_Position = vec4(p, 0.0, 1.0); }';
+// P the sand's photograph as the page has drawn it. M the map. C the part of the photograph
+// that is drawn (left, top, width, height in heights of the picture). A0, B0: a wave (how far
+// its foam has come, how much of the foam has gone, how far its water reaches, its shape).
+// A1, B1: the sand it has left (how wet, how far in it has dried). U: the time, how far the
+// sheet has carried its light, and beyond what distance from the painted edge nothing is drawn.
+const FRAG = `
+precision highp float;
+uniform sampler2D P, M;
+uniform vec4 C, A0, A1, B0, B1;
+uniform vec3 U;
+varying vec2 v;
+const vec2 N = vec2(${WAY[0]}, ${WAY[1]}), W = vec2(${WAY[1]}, -${WAY[0]});
+const float P0 = ${EDGE}, NEAR = ${NEAR}, WIDE = 1.6;
+
+vec3 pic(vec2 m) { return texture2D(P, (m - C.xy) / C.zw).rgb; }
+vec3 chart(vec2 m) { return texture2D(M, clamp(vec2(m.x / WIDE, m.y), 0.0, 1.0)).rgb; }
+// How far m is from the painted water's edge (less than nothing: in the water). The map knows
+// it finely near the edge. Far from it the edge is as good as its straight line.
+float edge(vec3 k, vec2 m) {
+  float fine = (k.r * 255.0 - 128.0) / 127.0 * NEAR;
+  return mix(fine, dot(m, N) - P0, smoothstep(0.7, 0.96, abs(fine) / NEAR));
+}
+// A wave's front runs further in some places than in others.
+float lobes(float q, float s) { return 0.2 * sin(q * 4.7 + s) + 0.12 * sin(q * 10.9 + s * 1.7 + 1.0) + 0.06 * sin(q * 23.0 + s * 2.3 + 2.0); }
+// The point s back along the wave's way from m. If that is off the picture, it is folded back
+// in along the front (so the foam goes on past where the painted foam ended).
+vec2 behind(vec2 m, float q, float s) {
+  float p = dot(m, N) - s;
+  float lo = max((C.x - N.x * p) / N.y, (N.y * p - C.y - C.w) / N.x) + 0.004;
+  float hi = min((N.y * p - C.y) / N.x, (C.x + C.z - N.x * p) / N.y) - 0.004;
+  float r = q < lo ? 2.0 * lo - q : (q > hi ? 2.0 * hi - q : q);
+  return N * p + W * clamp(r, min(lo, hi), max(lo, hi));
+}
+void wave(vec2 m, float q, vec4 a, vec4 b, inout float water, inout float wet, inout vec4 foam) {
+  float k = 1.0 + lobes(q, a.w);
+  vec2 ms = behind(m, q, a.x * k);
+  vec3 ck = chart(ms);
+  float ds = edge(ck, ms), dw = ds;
+  // (Running back, the water has left its foam behind.)
+  if (a.z < a.x - 0.0004) { vec2 mw = behind(m, q, a.z * k); dw = edge(chart(mw), mw); }
+  water = min(water, dw);
+  // (Wet up to a clear line a little past where the foam stopped, and wetter nearer the water.)
+  wet = max(wet, b.x * smoothstep(b.y - 0.008, b.y + 0.008, -ds) * (0.72 + 0.28 * smoothstep(0.0, 0.16, -ds - b.y)));
+  if (a.y < 0.999 && ck.b > 0.02) {
+    vec3 ph = pic(ms);
+    float white = min(ph.r, min(ph.g, ph.b));
+    float al = smoothstep(mix(0.6, 0.9, a.y), mix(0.82, 1.0, a.y), white) * smoothstep(0.04, 0.4, ck.b) * (1.0 - a.y * a.y);
+    float both = al + foam.a * (1.0 - al);
+    foam = vec4(mix(foam.rgb, ph, al / max(both, 0.0001)), both);
+  }
+}
+// One wave of the thin water's surface, going along d: what it adds to the surface's curvature
+// (xx, yy, xy) and to its slope.
+void ripple(vec2 x, vec2 d, float k, float w, float ph, inout vec3 c, inout vec2 g) {
+  float a = dot(d, x) * k + w * U.x + ph;
+  c -= sin(a) * vec3(d.x * d.x, d.y * d.y, d.x * d.y);
+  g += cos(a) * d / k;
+}
+void main() {
+  vec2 m = C.xy + v * C.zw;
+  vec3 k0 = chart(m);
+  float d0 = edge(k0, m);
+  if (d0 > U.z) { gl_FragColor = vec4(0.0); return; }
+  float q = dot(m, W), water = d0, wet = 0.0;
+  vec4 foam = vec4(0.0);
+  wave(m, q, A0, A1, water, wet, foam);
+  wave(m, q, B0, B1, water, wet, foam);
+  float cover = 1.0 - smoothstep(0.002, 0.016, water), h = max(-water, 0.0);
+
+  // The surface, carried along with the sheet.
+  vec2 x = (m - N * U.y * 0.7) * 96.0;
+  // (Bent a little, slowly: six straight waves alone draw a net of straight lines.)
+  x += 1.5 * vec2(sin(x.y * 0.23 + U.x * 0.21) + 0.5 * sin(x.x * 0.41 - U.x * 0.13), sin(x.x * 0.19 - U.x * 0.17) + 0.5 * sin(x.y * 0.37 + U.x * 0.11));
+  vec3 c = vec3(0.0); vec2 g = vec2(0.0);
+  ripple(x, vec2(0.955, 0.296), 1.0, 0.9, 0.0, c, g); ripple(x, vec2(0.315, 0.949), 1.6, -1.2, 1.3, c, g);
+  ripple(x, vec2(-0.737, 0.675), 2.3, 1.0, 2.1, c, g); ripple(x, vec2(-0.897, -0.443), 1.3, -0.7, 4.0, c, g);
+  ripple(x, vec2(-0.211, -0.978), 2.9, 1.4, 0.7, c, g); ripple(x, vec2(0.776, -0.631), 1.9, 0.8, 5.2, c, g);
+  c *= 0.5;
+  float net = pow(min(0.2 / (abs((1.0 + c.x) * (1.0 + c.y) - c.z * c.z) + 0.14), 1.0), 1.5);
+
+  // Thin water: the sand under it, seen a little to one side. (Where the painted foam was,
+  // the sand is taken from further down the picture.)
+  float kd = 1.0 - exp(-h / 0.055);
+  vec2 bend = g * 0.0019 * kd;
+  vec3 sand = pic(m + bend);
+  if (d0 < 0.06) sand = mix(pic(m + vec2(0.0, 0.34) + bend), sand, smoothstep(0.03, 0.06, d0));
+  // (Sand under water is wet sand: darker. Over it the sky's veil, the surface's own faces
+  // lit from the top left, and the net.)
+  vec3 thin = mix(sand * mix(vec3(1.0), vec3(0.87, 0.875, 0.85), kd), vec3(0.775, 0.845, 0.865), 0.12 * kd);
+  thin *= 1.0 - dot(g, vec2(0.6, 0.8)) * 0.035 * kd;
+  thin *= 1.0 + (net - 0.22) * 0.38 * kd;
+  // The sea as it was painted, where it was painted and there was no foam.
+  float own = (1.0 - smoothstep(-0.034, -0.012, d0)) * (1.0 - smoothstep(0.03, 0.32, k0.g));
+  vec3 col = thin;
+  if (own > 0.001) col = mix(thin, pic(m + g * 0.0011) * (1.0 + (net - 0.2) * 0.06), own);
+  // Sand the water has left.
+  float a = max(cover, smoothstep(0.0, 0.1, wet));
+  if (cover < 0.999) col = mix(pic(m) * mix(vec3(1.0), vec3(0.83, 0.805, 0.765), wet), col, cover);
+  col = mix(col, foam.rgb, foam.a);
+  a = max(a, foam.a);
+  gl_FragColor = vec4(col * a, a);
+}`;
+
+// map: the picture made by tools/prepare-ending-tide.mjs.
+function createTide({ reduced = false, map = null } = {}) {
+  if (reduced || !map) return null;
+  const cv = document.createElement('canvas');
+  cv.className = 'fx fx-tide';
+  cv.setAttribute('aria-hidden', 'true');
+  cv.style.display = 'none';
+  let host = null, gl = null, u = null, tex = null, failed = false;
+  let crop = null, fresh = false, placed = '', clock = 0, shown = false, drawn = false, tall = false;
+  // The card on the water: how far it has been taken (0 to about 1), and how fast that changes.
+  const card = { at: 0, v: 0, near: null, key: '' };
+  const chart = new Image();
+  let chartReady = false, chartUp = false;
+  chart.onload = () => { chartReady = true; };
+  chart.onerror = () => { failed = true; };
+  chart.src = map;
+
+  function start() {
+    gl = cv.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false });
+    if (!gl) { failed = true; return; }
+    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+    const prog = gl.createProgram();
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG)); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+    gl.useProgram(prog);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, 'p');
+    gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    u = Object.fromEntries(['P', 'M', 'C', 'A0', 'A1', 'B0', 'B1', 'U'].map((n) => [n, gl.getUniformLocation(prog, n)]));
+    tex = [0, 1].map((i) => {
+      const t = gl.createTexture();
+      gl.activeTexture(gl.TEXTURE0 + i);
+      gl.bindTexture(gl.TEXTURE_2D, t);
+      for (const [k, val] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, val);
+      return t;
+    });
+    gl.uniform1i(u.P, 0); gl.uniform1i(u.M, 1);
+    gl.clearColor(0, 0, 0, 0);
+  }
+  // The photograph and the map, into the shader. (A picture from the disk, or one too large
+  // for this machine, cannot go: then there is no tide, and the still is what it was.)
+  function upload() {
+    const ground = host.ground;
+    if (Math.max(ground.width, ground.height) > gl.getParameter(gl.MAX_TEXTURE_SIZE)) throw new Error('the sand is larger than a texture can be here');
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, ground);
+    if (!chartUp) { gl.activeTexture(gl.TEXTURE1); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, chart); chartUp = true; }
+    fresh = false;
+  }
+  function size() {
+    const w = host.ground.clientWidth, h = host.ground.clientHeight;
+    if (!w || !h) return false;
+    // (As fine as the screen, up to four and a half million pixels of it.)
+    const k = Math.min(Math.min(devicePixelRatio || 1, 2) * 1.08, Math.sqrt(4.5e6 / (w * h)));
+    const cw = Math.round(w * k), ch = Math.round(h * k);
+    if (cv.width !== cw || cv.height !== ch) { cv.width = cw; cv.height = ch; drawn = false; }
+    tall = w / h < 0.85;
+    return true;
+  }
+
+  // A wave, t seconds after its front was at the painted edge (it is seen coming before that).
+  // Up the sand as a thing thrown up a slope: fast, slowing to a stop. Back down slowly, the
+  // foam left where it stopped and thinning, the sand behind it wet and then drying.
+  function waveAt(k, t) {
+    const A = SIZES[k % SIZES.length] * (tall ? 0.92 : 1), up = 2.1 + 2.2 * A, down = up * 1.9, speed = (2 * A) / up;
+    let foam, gone, water;
+    if (t < 0) { foam = water = speed * t; gone = 1 - smooth(-LEAD, -0.35, t); }
+    else if (t < up) { const x = t / up; foam = water = A * (1 - (1 - x) * (1 - x)); gone = 0; }
+    else {
+      const y = clamp01((t - up) / down);
+      foam = A * (1 - 0.08 * smooth(0, 1, y));
+      water = A * (1 - Math.pow(y, 1.7));
+      gone = smooth(0.06, 0.78, y);
+    }
+    const end = up + down + DRY;
+    const wet = t < 0 ? 0 : 1 - smooth(up + down * 0.85, end, t);
+    const dried = (A * 1.45 + 0.05) * smooth(up + down * 0.45, end, t) - 0.014;
+    return { A, foam, gone, water, wet, dried, seed: 1.3 + k * 2.4, alive: t > -LEAD && t < end };
+  }
+  // The two that can be alive at `clock`: the one whose beat this is, and the one before it.
+  // (Before the clock has started there is only the first, standing at the painted edge.)
+  function waves() {
+    const k = Math.max(0, Math.floor((clock + LEAD) / BEAT));
+    const now = waveAt(k, clock - k * BEAT), was = k > 0 ? waveAt(k - 1, clock - (k - 1) * BEAT) : null;
+    return [now, was && was.alive ? was : null];
+  }
+
+  function draw() {
+    if (!size()) return;
+    if (fresh) upload();
+    // (The one before first: the newer wave's foam lies over the older's.)
+    const [now, was] = waves(), ws = [was, now], off = [-9, 1, -9, 0];
+    gl.viewport(0, 0, cv.width, cv.height);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform4f(u.C, crop.sx / crop.ih, crop.sy / crop.ih, crop.sw / crop.ih, crop.sh / crop.ih);
+    let carried = 0, reach = 0.06;
+    ['A', 'B'].forEach((name, i) => {
+      const w = ws[i];
+      gl.uniform4fv(u[`${name}0`], w ? [w.foam, w.gone, w.water, w.seed] : off);
+      gl.uniform4fv(u[`${name}1`], w ? [w.wet, w.dried, 0, 0] : [0, 9, 0, 0]);
+      if (w) { carried = Math.max(carried, w.water); reach = Math.max(reach, w.foam * 1.4 + 0.07); }
+    });
+    gl.uniform3f(u.U, clock, carried, reach);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    drawn = true;
+  }
+
+  // The card's nearest corner to the sea, along the wave's way: where the water first meets it.
+  function cardNear() {
+    const key = `${placed}|${host.ground.clientWidth}x${host.ground.clientHeight}`;
+    if (key === card.key) return card.near;
+    card.key = key;
+    const b = host.post.box('end'), g = host.ground.getBoundingClientRect();
+    if (!b || !g.width || !crop) return (card.near = null);
+    let near = Infinity;
+    for (const [sx, sy] of [[b.left, b.top], [b.right, b.top], [b.left, b.bottom], [b.right, b.bottom]]) {
+      const mx = (crop.sx + ((sx - g.left) / g.width) * crop.sw) / crop.ih, my = (crop.sy + ((sy - g.top) / g.height) * crop.sh) / crop.ih;
+      near = Math.min(near, mx * WAY[0] + my * WAY[1]);
+    }
+    return (card.near = { p: near, width: b.right - b.left });
+  }
+  // The card is taken by the water under it: lifted, pushed along the wave's way and turned a
+  // little, on a spring so that it follows late and settles. Not while someone is writing on it.
+  function floatCard(dt, running) {
+    let want = 0;
+    const near = running ? cardNear() : null;
+    if (near && !host.post.back.contains(document.activeElement)) {
+      const reach = Math.max(0, ...waves().map((w) => (w ? w.water : 0)));
+      want = Math.min(1.15, Math.max(0, EDGE + reach - Math.max(EDGE, near.p)) / 0.22);
+    }
+    const K = 11, D = 3.6;
+    for (let left = Math.min(dt, 0.1); left > 0; left -= 1 / 120) {
+      const s = Math.min(left, 1 / 120);
+      card.v += (K * (want - card.at) - D * card.v) * s;
+      card.at += card.v * s;
+    }
+    if (Math.abs(card.at) < 0.0005 && Math.abs(card.v) < 0.0005 && want === 0) card.at = card.v = 0;
+    const far = (near?.width ?? host.post.L?.vw ?? 1000) * 0.013 * card.at, bob = Math.sin(clock * 2.1) * 0.12 * clamp01(card.at * 3);
+    host.post.float({ x: WAY[0] * far, y: WAY[1] * far, rz: -0.55 * card.at + bob * 0.5, z: 5 * card.at + 7 * bob * card.at });
+  }
+
+  return {
+    mount({ ground, post }) {
+      host = { ground, post };
+      ground.after(cv);
+    },
+    // scroll.js has drawn the sand's canvas again. crop: the part of the ending's photograph
+    // that is on it, or null when the canvas holds another picture.
+    sandChanged(ground, part) {
+      crop = part;
+      fresh = !!part;
+      drawn = false;
+      card.key = '';
+    },
+    tick(dt, cam) {
+      if (!host || failed) return;
+      const on = !!crop && chartReady && host.post.state.pose === 'end';
+      if (on !== shown) { shown = on; cv.style.display = on ? '' : 'none'; if (!on) { card.at = card.v = 0; host.post.float(null); } }
+      if (!on) return;
+      const tf = host.ground.style.transform;
+      if (tf !== placed) { placed = tf; cv.style.transform = tf; }
+      if (cam.up >= 0.999) return;
+      try {
+        if (!gl) start();
+        if (failed) return;
+        // At rest the waves run. On the way down to rest, and back up, the water stands as it was.
+        const running = cam.up < 0.03;
+        if (running) clock += dt;
+        if (running || !drawn || fresh) draw();
+        floatCard(dt, running);
+      } catch (e) {
+        console.warn('the tide did not start: the still picture stays', e);
+        failed = true;
+        cv.style.display = 'none';
+        host.post.float(null);
+      }
+    },
+    // (For the checks: the clock, and a wave at a given second of it.)
+    get clock() { return clock; },
+    set clock(t) { clock = t; drawn = false; },
+    waveAt,
+  };
+}
+
+return { "createTide": createTide };
+})();
 // src/scroll/title-options.js
 __m["src/scroll/title-options.js"] = (function () {
 "use strict";
@@ -96336,6 +96691,8 @@ function titleOption(name, { gsap, SplitText, reduced = false } = {}) {
       t.add(rest);
       t.set(h, { opacity: 1 });
     },
+    // (Unwritten, at once: before it is written again.)
+    rest() { rest(); gsap.set(h, { opacity: 1 }); },
   };
 }
 
@@ -97152,6 +97509,10 @@ function createPostcard({ reduced = false, captions = {}, onPose = null } = {}) 
   // and shadows, and `hidden` before it is let go.
   const REST = { z: 0, x: 0, y: 0, rx: 0, ry: 0, rz: 0, a: 1, over: false, hidden: false };
   const fall = { ...REST };
+  // The card on water, at the ending (tide.js): pushed and turned a little by a wave under it,
+  // and lifted. Screen pixels and degrees, on both its faces and its shadow.
+  const AFLOAT = { x: 0, y: 0, rz: 0, z: 0 };
+  const afloat = { ...AFLOAT };
   const state = { pose: 'hero', up: 0, flip: 0, settle: 1 };
 
   function layout() {
@@ -97232,7 +97593,7 @@ function createPostcard({ reduced = false, captions = {}, onPose = null } = {}) 
     // draws every frame under it).
     const f = 1 - smooth(0.02, 0.24, raw);
     const flip = state.flip;
-    const key = state.pose + [e, f, flip, state.settle, tilt.x, tilt.y, tilt.nx, fall.z, fall.x, fall.y, fall.rx, fall.ry, fall.rz, fall.a, +fall.over, +fall.hidden].map((n) => n.toFixed(4)).join();
+    const key = state.pose + [e, f, flip, state.settle, tilt.x, tilt.y, tilt.nx, fall.z, fall.x, fall.y, fall.rx, fall.ry, fall.rz, fall.a, +fall.over, +fall.hidden, afloat.x, afloat.y, afloat.rz, afloat.z].map((n) => n.toFixed(4)).join();
     if (key === last) return;
     last = key;
     table.classList.toggle('is-full', full);
@@ -97291,25 +97652,26 @@ function createPostcard({ reduced = false, captions = {}, onPose = null } = {}) 
     // other when the card is edge-on and neither can be seen.
     const up = Math.sin(Math.PI * flip), turned = flip > 0.5;
     // Screen pixels off the sand: picked up to turn over, or falling onto it.
-    const high = LIFT * (cw + 2 * b) * s * up + fall.z;
+    const high = LIFT * (cw + 2 * b) * s * up + fall.z + afloat.z;
     // (Falling: where it is over the sand, and, as the eye is over the middle of the screen
     // and not over the card, how much further out from the middle it is seen for its height.
     // Both in the world's own turned and scaled space.)
     const inWorld = (px, py) => { const r = (P.rz * m * Math.PI) / 180; return [(px * Math.cos(r) + py * Math.sin(r)) / s, (-px * Math.sin(r) + py * Math.cos(r)) / s]; };
     const near = EYE / Math.max(EYE - fall.z, EYE * 0.2) - 1;
-    const [ox, oy] = inWorld(fall.x + (P.x - 0.5) * vw * near, fall.y + (P.y - 0.5) * vh * near), [gx, gy] = inWorld(fall.x, fall.y);
-    const moved = fall.z || fall.x || fall.y || fall.rx || fall.ry || fall.rz;
-    const hand = `rotateZ(${(TWIST * up + fall.rz).toFixed(3)}deg) rotateX(${(tilt.x + TIP * up + fall.rx).toFixed(3)}deg)`;
+    const px = fall.x + afloat.x, py = fall.y + afloat.y, turn = fall.rz + afloat.rz;
+    const [ox, oy] = inWorld(px + (P.x - 0.5) * vw * near, py + (P.y - 0.5) * vh * near), [gx, gy] = inWorld(px, py);
+    const moved = fall.z || px || py || fall.rx || fall.ry || turn || afloat.z;
+    const hand = `rotateZ(${(TWIST * up + turn).toFixed(3)}deg) rotateX(${(tilt.x + TIP * up + fall.rx).toFixed(3)}deg)`;
     flipEl.style.visibility = turned ? 'hidden' : 'visible';
     flipEl.style.transform = (flip > 0 || tilt.x || tilt.y || moved)
-      ? `${moved ? `translate(${ox.toFixed(1)}px, ${oy.toFixed(1)}px) ` : ''}perspective(${(EYE / s).toFixed(0)}px) translateZ(${(high / s).toFixed(1)}px) ${hand} rotateY(${(tilt.y + 180 * flip + fall.ry).toFixed(3)}deg)`
+      ? `${moved ? `translate(${ox.toFixed(2)}px, ${oy.toFixed(2)}px) ` : ''}perspective(${(EYE / s).toFixed(0)}px) translateZ(${(high / s).toFixed(1)}px) ${hand} rotateY(${(tilt.y + 180 * flip + fall.ry).toFixed(3)}deg)`
       : 'none';
     // (Hidden by its opacity: its parts set their own visibility, which a hidden parent would not override.)
     card.style.opacity = fall.hidden ? '0' : '';
     card.style.zIndex = fall.over ? '2' : '';
     flipEl.style.opacity = fall.a < 1 ? fall.a.toFixed(3) : '';
     back.style.visibility = turned ? 'visible' : 'hidden';
-    if (turned) back.style.transform = `translate(-50%, -50%) rotate(${L.P.end.rz}deg) perspective(${EYE}px) translateZ(${high.toFixed(1)}px) ${hand} rotateY(${(180 * flip - 180).toFixed(3)}deg)`;
+    if (turned) back.style.transform = `translate(-50%, -50%) translate(${afloat.x.toFixed(2)}px, ${afloat.y.toFixed(2)}px) rotate(${L.P.end.rz}deg) perspective(${EYE}px) translateZ(${high.toFixed(1)}px) ${hand} rotateY(${(180 * flip - 180).toFixed(3)}deg)`;
     const dark = (SHADE * Math.pow(up, 1.3)).toFixed(3);
     shade.style.opacity = turned ? '0' : dark;
     back.style.setProperty('--shade', turned ? dark : '0');
@@ -97318,7 +97680,7 @@ function createPostcard({ reduced = false, captions = {}, onPose = null } = {}) 
     // falling card it is where the card is over the sand, turned and foreshortened with it,
     // further off and fainter and softer the higher the card is, and closes in as it lands.
     const away = (high / s) * 0.62, lean = Math.cos((fall.ry * Math.PI) / 180), nod = Math.cos((fall.rx * Math.PI) / 180);
-    shadow.style.transform = `translate(${(gx + away).toFixed(1)}px, ${(gy + away * 0.42).toFixed(1)}px) rotate(${fall.rz.toFixed(3)}deg) scale(${(sx * lean * Math.max(Math.abs(Math.cos(Math.PI * flip)), 0.07)).toFixed(5)}, ${(sy * nod).toFixed(5)})`;
+    shadow.style.transform = `translate(${(gx + away).toFixed(2)}px, ${(gy + away * 0.42).toFixed(2)}px) rotate(${turn.toFixed(3)}deg) scale(${(sx * lean * Math.max(Math.abs(Math.cos(Math.PI * flip)), 0.07)).toFixed(5)}, ${(sy * nod).toFixed(5)})`;
     shadow.style.opacity = ((1 - 0.45 * up) * fall.a / (1 + fall.z / 520)).toFixed(3);
     // (And goes soft: a thing held off the ground has no sharp shadow. Only while it turns or
     // falls, when nothing else on the page is being drawn.)
@@ -97352,6 +97714,8 @@ function createPostcard({ reduced = false, captions = {}, onPose = null } = {}) 
     // The card off the sand (see `fall` above): drop({ hidden: true }) before it is let go,
     // drop({ z, x, y, rx, ry, rz, a, over }) as it falls, drop(null) at rest.
     drop(v) { Object.assign(fall, REST, v); last = ''; apply(); },
+    // The card on water: float({ x, y, rz, z }), float(null) on dry sand.
+    float(v) { Object.assign(afloat, AFLOAT, v); },
     // The card's paper on the screen, as it lies.
     get rect() { return paper.getBoundingClientRect(); },
     get L() { return L; },
@@ -97375,45 +97739,60 @@ __m["src/scroll/spreads.js"] = (function () {
 // (SPREADS). This is only the words: they come in as the card lands, on GSAP's clock like
 // every other reveal on the page, and go as it lifts. The first is on the left of its card,
 // the second on the right (page.css, .sp).
+//
+// Their headlines are the hero's again (round 18, Sam: "make sure the color fits what we have
+// from the hero section ... apply the same kind of animation on the headline"): the sea's
+// colours and the lighter orange, letter by letter, written in the order a hand would make
+// them, the stroke under the word drawn last, and the light that crosses the line now and
+// then (title-options.js writes them, page.css colours them). They rose out of masks in the
+// pen's dark blue before.
 
 const { gsap } = __m["global:gsap"];
+const { titleOption } = __m["src/scroll/title-options.js"];
 
 const EASE = 'expo.out';
 // The words come in once the landing card is this near to rest (0 at rest, 1 full screen), and
 // go as soon as it has lifted this far: the card grows over where they are.
 const NEAR = 0.1, LIFTED = 0.03;
 
-// off: how far a line has to move to be out of its mask, in percent of its own height.
-function createSpreads({ reduced = false, off = 235, onReserve } = {}) {
+// SplitText: GSAP's, for the headlines' letters.
+function createSpreads({ reduced = false, onReserve, SplitText = null } = {}) {
   const list = [...document.querySelectorAll('.sp[data-hold]')].map((node) => {
     node.querySelectorAll('a[href="#reserve"]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); onReserve?.(); }));
     const q = (sel) => [...node.querySelectorAll(sel)];
-    const s = { id: node.dataset.hold, node, on: false, tl: null, up: 1, rising: false, lines: q('.sp__ln'), rule: q('.sp__rule'), small: q('.sp__label, .sp__rows div, .sp__price') };
+    // (small: what fades up, in the page's order. draw: what is drawn, a line or a rule, by its
+    // own --d going from 0 to 1. spread-options.js adds to both.)
+    const title = SplitText ? titleOption('write', { gsap, SplitText }) : null;
+    title?.split(node.querySelector('.sp__head'));
+    const s = { id: node.dataset.hold, node, on: false, tl: null, up: 1, rising: false, title, rule: q('.sp__rule'), small: q('.sp__label, .sp__rows div, .sp__price, [data-sp-in]'), draw: q('[data-sp-draw]') };
     node.inert = true;
     rest(s);
     return s;
   });
 
-  // Before the words come in: the lines under their masks, the rule undrawn.
+  // Before the words come in: the headline unwritten, the rule undrawn.
   function rest(s) {
-    gsap.set(s.lines, { yPercent: off });
+    s.title?.rest();
     gsap.set(s.rule, { scaleX: 0, opacity: 1 });
     gsap.set(s.small, { opacity: 0, y: 12 });
+    if (s.draw.length) gsap.set(s.draw, { '--d': 0, opacity: 1 });
   }
   function show(s) {
     s.tl?.kill();
     rest(s);
-    const d = reduced ? 0 : 1.1, t = (s.tl = gsap.timeline());
+    const d = 1.1, t = (s.tl = gsap.timeline());
     t.set(s.node, { visibility: 'visible' });
-    t.to(s.lines, { yPercent: 0, duration: d, ease: EASE, stagger: 0.09 }, 0);
-    t.to(s.rule, { scaleX: 1, duration: d * 1.3, ease: EASE }, reduced ? 0 : 0.25);
-    t.to(s.small, { opacity: 1, y: 0, duration: d * 0.9, ease: EASE, stagger: 0.07 }, reduced ? 0 : 0.3);
+    s.title?.show(t, 0);
+    t.to(s.rule, { scaleX: 1, duration: d * 1.3, ease: EASE }, 0.25);
+    t.to(s.small, { opacity: 1, y: 0, duration: d * 0.9, ease: EASE, stagger: 0.07 }, 0.3);
+    if (s.draw.length) t.to(s.draw, { '--d': 1, duration: 1.7, ease: 'power2.inOut', stagger: 0.14 }, 0.55);
+    if (reduced) t.progress(1);
   }
   function hide(s) {
     s.tl?.kill();
     const d = reduced ? 0 : 0.4, t = (s.tl = gsap.timeline());
-    t.to(s.lines, { yPercent: -off, duration: d, ease: EASE, stagger: 0.04 }, 0);
-    t.to([...s.rule, ...s.small], { opacity: 0, duration: d * 0.7, ease: EASE }, 0);
+    s.title?.hide(t);
+    t.to([...s.rule, ...s.small, ...s.draw], { opacity: 0, duration: d * 0.7, ease: EASE }, 0);
     t.set(s.node, { visibility: 'hidden' });
   }
 
@@ -97449,6 +97828,186 @@ function spreadCaptions() {
 }
 
 return { "createSpreads": createSpreads, "spreadCaptions": spreadCaptions };
+})();
+// src/scroll/spread-options.js
+__m["src/scroll/spread-options.js"] = (function () {
+"use strict";
+// Three ways to set the words beside a spread's card (round 18, 8 October 2026). Sam, looking
+// at "Six walkers. One guide.": "you can enhance the layout a little bit. It's just how the
+// text is presented. Right now it feels a little bit average. Something that is super clean
+// to read, but it feels a little bit more premium ... this is just first iteration layout."
+// Built for him to compare, behind a switch. Without the switch the page is as it was.
+//
+//   ?spread=ledger    01 Ledger     the three rows, numbered, what matters first and large,
+//                                   its name small at the far end of the line
+//   ?spread=figures   02 Figures    the facts as three large figures side by side, a word
+//                                   under each, and one sentence below
+//   ?spread=line      03 The Line   the walk drawn: a staircase from the railing down to the
+//                                   sand that draws itself, a dot walking down it to where
+//                                   this card is. For the beach, the day's arc and its sun.
+//
+// All three take away the long terracotta rule. The headline is the page's in every one.
+// What they add is marked for spreads.js, which brings the words in: data-sp-in fades up in
+// its turn, data-sp-draw is drawn (its --d goes from 0 to 1).
+//
+// When Sam has chosen: the one he keeps moves into index.html and page.css, and this file
+// and its hook in scroll.js go.
+
+const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+
+// What each spread says, cut the way the figures and the line need it.
+const SAY = {
+  walk: {
+    figures: [['06:10', '', 'Leaves', 'from the railing'], ['150', 'm', 'Down', 'about 400 steps'], ['50', 'min', 'On the steps', 'railing to sand']],
+    line: 'You carry water. We carry the rest.',
+    stations: [['06:10', 'The railing', '150 m'], ['You are here', 'The ridge', '93 m'], ['07:00', 'The sand', '0 m']],
+    under: 'About 400 steps, fifty minutes. You carry water. We carry the rest.',
+  },
+  beach: {
+    figures: [['07:10', '', 'Breakfast', 'on the sand'], ['All day', '', 'Shade', 'under the overhang, and nobody else'], ['17:40', '', 'The jukung', 'round the head and home']],
+    line: null,
+    stations: [['07:10', 'Breakfast on the sand'], ['All day', 'Shade under the overhang, and nobody else'], ['17:40', 'The jukung, round the head and home']],
+    under: null,
+  },
+};
+
+// The walk as a line: a short level at the railing, twenty-four steps down, a short level of
+// sand. And how far along it the ridge is (93 m of the 150: a little over a third of the way).
+function stairs() {
+  const N = 24, run = (594 - 40 - 40) / N, drop = 130 / N;
+  let d = 'M6 30 h34';
+  for (let i = 0; i < N; i++) d += ` h${run.toFixed(2)} v${drop.toFixed(2)}`;
+  d += ' h40';
+  const at = ((150 - 93) / 150) * N, len = 34 + N * (run + drop) + 40;
+  return { d, ridge: [40 + at * run, 30 + at * drop], share: (34 + at * (run + drop)) / len };
+}
+const ARC = 'M10 168 Q300 -70 590 168';
+
+function figures(node, say) {
+  const wrap = el('div', 'spf');
+  for (const [fig, unit, label, note] of say.figures) {
+    const cell = el('div', 'spf__cell');
+    cell.dataset.spIn = '';
+    cell.append(el('div', 'spf__fig', `${fig}${unit ? `<small>${unit}</small>` : ''}`), el('div', 'spf__label', label), el('div', 'spf__note', note));
+    wrap.append(cell);
+  }
+  node.querySelector('.sp__head').after(wrap);
+  if (say.line) { const p = el('p', 'spf__line', say.line); p.dataset.spIn = ''; wrap.after(p); }
+}
+
+function line(node, say, id) {
+  const wrap = el('div', `spl spl--${id}`);
+  wrap.dataset.spDraw = '';
+  const s = stairs(), path = id === 'walk' ? s.d : ARC, share = id === 'walk' ? s.share : 0.5;
+  const dots = id === 'walk' ? [[6, 30], s.ridge, [594, 160]] : [[10, 168], [300, 49], [590, 168]];
+  const level = id === 'walk' ? 160 : 168;
+  wrap.style.setProperty('--share', share.toFixed(4));
+  wrap.innerHTML = `<svg viewBox="0 0 600 200" aria-hidden="true">
+    <defs><linearGradient id="spl-ink-${id}" x1="0" y1="0" x2="600" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2bb3bf"/><stop offset="1" stop-color="#0e5d7f"/></linearGradient></defs>
+    <path class="spl__sea" d="M0 ${level} H600"/>
+    <path class="spl__path" d="${path}" pathLength="1" stroke="url(#spl-ink-${id})"/>
+    ${id === 'walk' ? `<path class="spl__tick" d="M6 38 V78"/><path class="spl__tick" d="M594 152 V126"/>` : ''}
+    ${dots.map(([x, y], i) => `<circle class="spl__dot${i === 1 ? ' spl__dot--here' : ''}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${i === 1 ? 4.4 : 3.6}"/>`).join('')}
+    <g class="spl__walker" style="offset-path: path('${path}')"><circle class="spl__halo" r="11"/><circle r="5.2"/></g>
+  </svg>`;
+  say.stations.forEach(([a, b, c], i) => {
+    const st = el('div', `spl__st spl__st--${i}`, id === 'walk'
+      ? (i === 1 ? `<i>${a}</i><b>${b}</b><span>${c}</span>` : `<b>${a}</b><span>${b}, ${c}</span>`)
+      : `<b>${a}</b><span>${b}</span>`);
+    st.dataset.spIn = '';
+    wrap.append(st);
+  });
+  node.querySelector('.sp__head').after(wrap);
+  if (say.under) { const p = el('p', 'spf__line', say.under); p.dataset.spIn = ''; wrap.after(p); }
+}
+
+const CSS = `
+html[class*="sp-opt-"] .sp__rule { display: none; }
+
+/* 01 Ledger */
+html.sp-opt-ledger .sp__rows { counter-reset: row; margin-top: 4px; border-top: 1px solid rgba(20, 18, 14, 0.24); }
+html.sp-opt-ledger .sp__rows div { counter-increment: row; grid-template-columns: 2.9rem 1fr auto; padding: 17px 0 16px; border-bottom: 1px solid rgba(20, 18, 14, 0.24); }
+html.sp-opt-ledger .sp__rows div::before { content: "0" counter(row); font: 500 11.5px/1 var(--type); letter-spacing: 0.16em; font-variant-numeric: tabular-nums; color: #cb5d30; }
+html.sp-opt-ledger .sp__rows dd { order: 1; font: 400 clamp(1.2rem, 1rem + 0.62vw, 1.56rem)/1.24 var(--type); letter-spacing: -0.008em; color: var(--ink); }
+html.sp-opt-ledger .sp__rows dt { order: 2; padding-left: 22px; text-align: right; font-size: 10.5px; color: rgba(20, 18, 14, 0.58); }
+
+/* 02 Figures (and the sentence under 03) */
+html.sp-opt-figures .sp__rows, html.sp-opt-line .sp__rows { display: none; }
+.spf { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 8px; }
+.spf__cell { display: grid; align-content: start; gap: 10px; padding: 2px 0 2px 24px; border-left: 1px solid rgba(20, 18, 14, 0.22); }
+.spf__cell:first-child { padding-left: 0; border-left: 0; }
+.spf__fig { font: 400 clamp(2.6rem, 1.2rem + 2.5vw, 4.1rem)/0.9 var(--serif); letter-spacing: -0.022em; color: var(--ink); white-space: nowrap; }
+.spf__fig small { margin-left: 0.34em; font: 500 0.27em/1 var(--type); letter-spacing: 0.18em; text-transform: uppercase; color: rgba(20, 18, 14, 0.72); }
+.spf__label { margin-top: 4px; font: 500 11px/1.2 var(--type); letter-spacing: 0.2em; text-transform: uppercase; color: #cb5d30; }
+.spf__note { padding-right: 14px; font: 400 1.02rem/1.36 var(--type); color: rgba(20, 18, 14, 0.8); text-wrap: balance; }
+.spf__line { margin: 4px 0 0; padding-top: 17px; border-top: 1px solid rgba(20, 18, 14, 0.22); font: 400 1.12rem/1.4 var(--type); color: rgba(20, 18, 14, 0.86); }
+
+/* 03 The Line */
+.spl { position: relative; margin-top: 6px; --d: 1; }
+.spl svg { display: block; width: 100%; height: auto; overflow: visible; }
+.spl__sea { fill: none; stroke: rgba(20, 18, 14, 0.36); stroke-width: 1; stroke-dasharray: 1 6; stroke-linecap: round; }
+.spl__path { fill: none; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--d)); }
+.spl__tick { fill: none; stroke: rgba(20, 18, 14, 0.4); stroke-width: 1; opacity: var(--d); }
+.spl__dot { fill: #f7efe0; stroke: #12708c; stroke-width: 1.6; opacity: calc(var(--d) * 3); }
+.spl__dot--here { stroke: #cb5d30; }
+.spl__walker { offset-rotate: 0deg; offset-distance: calc(var(--d) * var(--share) * 100%); fill: #e5804c; opacity: calc(var(--d) * 6); }
+.spl__halo { fill: #e5804c; opacity: 0.26; transform-box: fill-box; transform-origin: center; animation: spl-halo 2.6s ease-in-out infinite; }
+@keyframes spl-halo { 0%, 100% { transform: scale(0.7); opacity: 0.3; } 50% { transform: scale(1.25); opacity: 0.08; } }
+.spl__st { position: absolute; display: grid; align-content: start; gap: 5px; }
+.spl__st b { font: 500 clamp(1.2rem, 1rem + 0.5vw, 1.5rem)/1 var(--type); letter-spacing: -0.005em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.spl__st span { font: 500 10.5px/1.35 var(--type); letter-spacing: 0.18em; text-transform: uppercase; color: rgba(20, 18, 14, 0.7); }
+.spl__st i { font: 500 10.5px/1 var(--type); font-style: normal; letter-spacing: 0.2em; text-transform: uppercase; color: #cb5d30; }
+.spl--walk .spl__st--0 { left: 0; top: 43%; }
+.spl--walk .spl__st--1 { left: 43%; top: 9%; }
+.spl--walk .spl__st--2 { right: 0; bottom: 40%; text-align: right; }
+.spl--beach .spl__st span { font: 400 0.98rem/1.32 var(--type); letter-spacing: 0; text-transform: none; color: rgba(20, 18, 14, 0.8); text-wrap: balance; }
+/* (The day's two ends are written under the ends of its arc, and "all day" inside it.) */
+.spl--beach { display: grid; grid-template-columns: 1fr 1fr; }
+.spl--beach svg { grid-column: 1 / -1; }
+.spl--beach .spl__st--0, .spl--beach .spl__st--2 { position: static; max-width: 82%; margin-top: -16px; }
+.spl--beach .spl__st--2 { justify-self: end; text-align: right; }
+.spl--beach .spl__st--1 { left: 27%; width: 46%; top: 0; padding-top: 12.4%; text-align: center; }
+
+@media (max-aspect-ratio: 85/100) {
+  html.sp-opt-ledger .sp__rows div { grid-template-columns: 2.1rem 1fr auto; padding: 10px 0 9px; }
+  html.sp-opt-ledger .sp__rows dd { font-size: 1.08rem; }
+  html.sp-opt-ledger .sp__rows dt { padding-left: 12px; font-size: 9.5px; letter-spacing: 0.16em; }
+  .spf { margin-top: 2px; }
+  .spf__cell { gap: 6px; padding-left: 11px; }
+  .spf__fig { font-size: 2.05rem; }
+  .spf__label { margin-top: 2px; font-size: 9.5px; letter-spacing: 0.16em; }
+  .spf__note { padding-right: 6px; font-size: 0.84rem; line-height: 1.3; }
+  .spf__line { margin-top: 0; padding-top: 10px; font-size: 0.98rem; }
+  /* (No room to write on the drawing: its three stations stand in a row under it.) */
+  .spl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 10px; margin-top: 0; }
+  .spl svg { grid-column: 1 / -1; }
+  .spl .spl__st { position: static; max-width: none; width: auto; margin-top: 0; padding-top: 0; justify-self: stretch; text-align: left; align-content: start; }
+  .spl .spl__st--1 { text-align: center; }
+  .spl .spl__st--2 { text-align: right; }
+  .spl__st b { font-size: 1.08rem; }
+  .spl__st span, .spl--beach .spl__st span { font-size: 9px; letter-spacing: 0.12em; }
+  .spl--beach .spl__st span { font-size: 0.8rem; letter-spacing: 0; }
+  .spl__tick { display: none; }
+}
+`;
+
+// name: 'ledger', 'figures' or 'line'. Run before the spreads are made (createSpreads reads
+// what this adds).
+function spreadOption(name) {
+  if (!['ledger', 'figures', 'line'].includes(name)) return;
+  document.documentElement.classList.add(`sp-opt-${name}`);
+  const style = el('style');
+  style.textContent = CSS;
+  document.head.append(style);
+  if (name === 'ledger') return;
+  for (const node of document.querySelectorAll('.sp[data-hold]')) {
+    const say = SAY[node.dataset.hold];
+    if (!say) continue;
+    if (name === 'figures') figures(node, say); else line(node, say, node.dataset.hold);
+  }
+}
+
+return { "spreadOption": spreadOption };
 })();
 // src/scroll/scroll.js
 __m["src/scroll/scroll.js"] = (function () {
@@ -97495,6 +98054,7 @@ const Lenis = __m["global:lenis"]["default"];
 const { createApp, ASSETS } = __m["src/app.js"];
 const { createDrop } = __m["src/scroll/drop.js"];
 const { createPalm } = __m["src/scroll/palm.js"];
+const { createTide } = __m["src/scroll/tide.js"];
 const { titleOption } = __m["src/scroll/title-options.js"];
 const { waterButtons } = __m["src/scroll/water-button.js"];
 const { buildPanel } = __m["src/debug.js"];
@@ -97504,6 +98064,7 @@ const { walkLine } = __m["src/trail/route.js"];
 const { buildDescent, makePace, STOPS } = __m["src/scroll/path.js"];
 const { createPostcard } = __m["src/scroll/postcard.js"];
 const { createSpreads, spreadCaptions } = __m["src/scroll/spreads.js"];
+const { spreadOption } = __m["src/scroll/spread-options.js"];
 
 gsap.registerPlugin(SplitText);
 
@@ -97613,6 +98174,9 @@ function startScroll({ params }) {
   // photograph the page had before, with its shadows in it and nothing moving.
   const palm = BARE || params.get('sand') === 'photo' ? null : createPalm({ reduced, plate: params.get('plate') ?? ASSETS.heroPalm, leaf: ASSETS.heroLeaf });
   palm?.mount({ ground: post.ground, card: $('.card'), post });
+  // And at the ending the sea in the sand's top corner comes in and goes out (tide.js). ?tide=0: the still.
+  const tide = BARE || params.get('tide') === '0' ? null : createTide({ reduced, map: ASSETS.heroTide });
+  tide?.mount({ ground: post.ground, post });
   if (!BARE) waterButtons({ reduced });
   // Frames owed (the picture stands still at rest, so frames are only drawn when asked; two,
   // as the haze settles over a frame).
@@ -97830,6 +98394,7 @@ function startScroll({ params }) {
     g.imageSmoothingQuality = 'high';
     g.drawImage(img, sx, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
     palm?.sandChanged(c, img === sands.day ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
+    tide?.sandChanged(c, img === sands.end ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
   }
   const loadSand = (which, src) => new Promise((done) => {
     const img = new Image();
@@ -98077,7 +98642,9 @@ function startScroll({ params }) {
     } });
   }
   const places = { walk: () => page.screensAt(1), boat: () => page.screensAt(4.97), reserve: () => page.screens };
-  const spreads = BARE ? null : createSpreads({ reduced, off: LINE_OFF, onReserve: () => travel(places.reserve()) });
+  // (?spread=ledger, figures or line: three ways to set a spread's words, for Sam to compare.)
+  if (!BARE) spreadOption(params.get('spread'));
+  const spreads = BARE ? null : createSpreads({ reduced, SplitText, onReserve: () => travel(places.reserve()) });
   document.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', (e) => {
     e.preventDefault();
     travel(places[el.dataset.go]());
@@ -98421,6 +98988,7 @@ function startScroll({ params }) {
     updateStory();
     updateWords();
     updateFrame();
+    tide?.tick(dt, cam);
     post.tick(dt);
     palm?.tick(dt, cam);
     // (At rest the picture is a picture: no frame is drawn until something in it changes.)
@@ -98435,7 +99003,7 @@ function startScroll({ params }) {
     }
   }
 
-  const api = { palm, pace: page, path: pace, get descent() { return descent; }, cam, look, resetLook, pinLook, chooseLighting, post, travel };
+  const api = { palm, tide, pace: page, path: pace, get descent() { return descent; }, cam, look, resetLook, pinLook, chooseLighting, post, travel };
   if (RECORD) {
     // Frame by frame, on the recorder's clock: GSAP's own clock stops and is stepped with it.
     gsap.ticker.remove(gsap.updateRoot);

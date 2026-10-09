@@ -325,10 +325,11 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 .sp--beach .sp__text { left: calc(var(--c-right, 50vw) + 3.5vw); right: var(--gutter); }
 .sp__label { display: flex; align-items: baseline; gap: 16px; color: rgba(20, 18, 14, 0.74); }
 .sp__label b { color: var(--ink); }
-/* (Pen-blue ink, written a little uphill, as the hero's line is.) */
-.sp__head { font-size: clamp(2.6rem, 0.5rem + 5.5vw, 7.2rem); color: var(--pen); margin: 0.04em 0; transform: rotate(-2.5deg); transform-origin: 0 60%; }
-.sp__head em { color: var(--accent-deep); }
-.sp__mask { display: block; clip-path: inset(-0.45em -0.5em -0.5em -0.5em); }
+/* (Written a little uphill, as the hero's line is, and in its colours: the sea's and the
+   lighter orange, letter by letter, further down with the hero's. It was the pen's dark blue.) */
+.sp__head { font-size: clamp(2.6rem, 0.5rem + 5.5vw, 7.2rem); color: #1c95ad; margin: 0.04em 0; transform: rotate(-2.5deg); transform-origin: 0 60%; }
+.sp__head em { color: #df7646; }
+.sp__mask { display: block; }
 .sp__ln { display: block; white-space: nowrap; }
 /* The rule draws itself across under the headline. */
 .sp__rule { display: block; height: 1px; background: var(--accent-deep); transform-origin: 0 50%; }
@@ -426,10 +427,10 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
    outside their boxes, and a background stops at the box, so each box is padded out and
    pulled back in by as much: nothing moves, and the swashes get their colour. The gradient's
    stops are set for that padded box so the letters take the same part of it as the name does. */
-.hero .display .ch, .hero .display .line { --ink: linear-gradient(180deg, #3cc4c9 8%, #1c95ad 58%, #0e5d7f 116%);
+.hero .display .ch, .hero .display .line, .sp__head .ch { --ink: linear-gradient(180deg, #3cc4c9 8%, #1c95ad 58%, #0e5d7f 116%);
   padding: 0.5em 0.55em 0.6em; margin: -0.5em -0.55em -0.6em; color: transparent; -webkit-text-fill-color: transparent;
   background: var(--ink); -webkit-background-clip: text; background-clip: text; }
-.hero .display em .ch { --ink: linear-gradient(180deg, #f6a968 8%, #e5804c 58%, #cb5d30 116%); }
+.hero .display em .ch, .sp__head em .ch { --ink: linear-gradient(180deg, #f6a968 8%, #e5804c 58%, #cb5d30 116%); }
 .hero .display .line em { color: #df7646; -webkit-text-fill-color: #df7646; }
 /* Light on the line (Sam: "add some kind of lighting on the headline, moving the gradient
    slowly", "very subtle"). Two things, both in the letters' own background. A soft band of
@@ -440,8 +441,8 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
    gradient under it slides down a little and back, so the letters go a shade lighter and
    darker. Under the line, a soft shadow of it on the sand (a little more of it since round
    18: Sam, "add just a tiny bit for the shadow"). */
-.hero .display { filter: drop-shadow(0 0.034em 0.038em rgba(22, 62, 82, 0.42)); }
-.hero .display .ch { background-image: linear-gradient(100deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.34) 42%, rgba(255, 255, 255, 0.34) 58%, rgba(255, 255, 255, 0) 100%), var(--ink);
+.hero .display, .sp__head { filter: drop-shadow(0 0.034em 0.038em rgba(22, 62, 82, 0.42)); }
+.hero .display .ch, .sp__head .ch { background-image: linear-gradient(100deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.34) 42%, rgba(255, 255, 255, 0.34) 58%, rgba(255, 255, 255, 0) 100%), var(--ink);
   background-size: 240px 100%, 100% 118%; background-repeat: no-repeat; background-position: -260px 0, 0 0;
   animation: title-light 11s linear infinite; animation-delay: calc(var(--x, 0) * 1.9ms + 2.5s); }
 @keyframes title-light {
@@ -450,9 +451,9 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
   50% { background-position: 1240px 0, 0 100%; }
   100% { background-position: 1240px 0, 0 0; }
 }
-.hero .display em::after { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 40 4 110 3 197 7' fill='none' stroke='%23df7646' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M30 13.5 C 80 9 140 8.5 186 11' fill='none' stroke='%23df7646' stroke-width='1.6' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+.hero .display em::after, .sp__head em::after { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 40 4 110 3 197 7' fill='none' stroke='%23df7646' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M30 13.5 C 80 9 140 8.5 186 11' fill='none' stroke='%23df7646' stroke-width='1.6' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
 /* (The stroke under the word can be drawn: a clip opened from the left, --u from 0 to 1.) */
-.hero .display em::after { clip-path: inset(-30% calc((1 - var(--u, 1)) * 100%) -30% -6%); }
+.hero .display em::after, .sp__head em::after { clip-path: inset(-30% calc((1 - var(--u, 1)) * 100%) -30% -6%); }
 .hero .body { color: rgba(20, 18, 14, 0.82); max-width: 29rem; }
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 30px; margin-top: 6px; }
 /* "Scroll into the postcard": in the hand, a note on the sand under the card's lower left

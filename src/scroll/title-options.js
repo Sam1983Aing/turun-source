@@ -62,5 +62,7 @@ export function titleOption(name, { gsap, SplitText, reduced = false } = {}) {
       t.add(rest);
       t.set(h, { opacity: 1 });
     },
+    // (Unwritten, at once: before it is written again.)
+    rest() { rest(); gsap.set(h, { opacity: 1 }); },
   };
 }

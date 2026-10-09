@@ -158,7 +158,7 @@ are already in `vendor/fonts/` for the standalone file).
   placed freely. It hangs by its stem in both top corners now.
 - Still open from round 13: which headline animation.
 
-## Round 15 (9 October 2026: the opening)
+## Round 15 (8 October 2026: the opening)
 
 - The headline in the loader's sea gradient, and "railing" in a lighter orange to go with it.
 - The loader tighter, "clean and more premium, but keep it simple".
@@ -170,19 +170,29 @@ are already in `vendor/fonts/` for the standalone file).
 - Open: whether the other two handwritten headings take the gradient too. Which headline
   arrival (Written is in). The real ThreeUI component, if he signs the connector in.
 
-## Round 16 (9 October 2026: the water button, properly)
+## Round 16 (8 October 2026: the water button, properly)
 
 - ThreeUI's "Water Ripple" was looked at running in Sam's own Chrome (their source still was
   not read), and the page's button rebuilt after it: the sea with a net of light in a dark
   rim, no tiles, no glow.
 
-## Round 17 (9 October 2026)
+## Round 17 (8 October 2026)
 
 - The sand from the first moment, not a plain colour. A soft shadow under the headline and
   light moving over it, "very subtle". The button's rim less navy. The scroll cue in the
   orange. "We leave at first light" on the left.
 - Postcards two and three on surfaces of their own: prompts written (wood, shallow water).
 - The ending: a wave in code that comes in behind the card, and the card moving with it.
+
+## Round 18 (8 October 2026)
+
+- A tiny bit more shadow under the headline. "Scroll into the postcard" in the same colour as
+  "Most people stop at the" (the orange lacked contrast).
+- At least half of the dark behind "We leave at first light" removed.
+- The walk spread: the hero's colours and the same headline animation, and a layout that is
+  "super clean to read" but "a little bit more premium". Three layouts recorded to choose from.
+- Prompt ideas for the surface under postcard two: rocky stairs, rocks, path, wood handrails.
+- Open: which layout. Whether the wave's size, pace and the card's movement are right.
 
 ## Found by other versions
 
