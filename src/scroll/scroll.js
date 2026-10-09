@@ -40,6 +40,7 @@ import Lenis from 'lenis';
 import { createApp, ASSETS } from '../app.js';
 import { createDrop } from './drop.js';
 import { createPalm } from './palm.js';
+import { createTide } from './tide.js';
 import { titleOption } from './title-options.js';
 import { waterButtons } from './water-button.js';
 import { buildPanel } from '../debug.js';
@@ -158,6 +159,9 @@ export function startScroll({ params }) {
   // photograph the page had before, with its shadows in it and nothing moving.
   const palm = BARE || params.get('sand') === 'photo' ? null : createPalm({ reduced, plate: params.get('plate') ?? ASSETS.heroPalm, leaf: ASSETS.heroLeaf });
   palm?.mount({ ground: post.ground, card: $('.card'), post });
+  // And at the ending the sea in the sand's top corner comes in and goes out (tide.js). ?tide=0: the still.
+  const tide = BARE || params.get('tide') === '0' ? null : createTide({ reduced, map: ASSETS.heroTide });
+  tide?.mount({ ground: post.ground, post });
   if (!BARE) waterButtons({ reduced });
   // Frames owed (the picture stands still at rest, so frames are only drawn when asked; two,
   // as the haze settles over a frame).
@@ -375,6 +379,7 @@ export function startScroll({ params }) {
     g.imageSmoothingQuality = 'high';
     g.drawImage(img, sx, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
     palm?.sandChanged(c, img === sands.day ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
+    tide?.sandChanged(c, img === sands.end ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
   }
   const loadSand = (which, src) => new Promise((done) => {
     const img = new Image();
@@ -966,6 +971,7 @@ export function startScroll({ params }) {
     updateStory();
     updateWords();
     updateFrame();
+    tide?.tick(dt, cam);
     post.tick(dt);
     palm?.tick(dt, cam);
     // (At rest the picture is a picture: no frame is drawn until something in it changes.)
@@ -980,7 +986,7 @@ export function startScroll({ params }) {
     }
   }
 
-  const api = { palm, pace: page, path: pace, get descent() { return descent; }, cam, look, resetLook, pinLook, chooseLighting, post, travel };
+  const api = { palm, tide, pace: page, path: pace, get descent() { return descent; }, cam, look, resetLook, pinLook, chooseLighting, post, travel };
   if (RECORD) {
     // Frame by frame, on the recorder's clock: GSAP's own clock stops and is stepped with it.
     gsap.ticker.remove(gsap.updateRoot);

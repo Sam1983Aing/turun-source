@@ -79,6 +79,10 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
   // and shadows, and `hidden` before it is let go.
   const REST = { z: 0, x: 0, y: 0, rx: 0, ry: 0, rz: 0, a: 1, over: false, hidden: false };
   const fall = { ...REST };
+  // The card on water, at the ending (tide.js): pushed and turned a little by a wave under it,
+  // and lifted. Screen pixels and degrees, on both its faces and its shadow.
+  const AFLOAT = { x: 0, y: 0, rz: 0, z: 0 };
+  const afloat = { ...AFLOAT };
   const state = { pose: 'hero', up: 0, flip: 0, settle: 1 };
 
   function layout() {
@@ -159,7 +163,7 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
     // draws every frame under it).
     const f = 1 - smooth(0.02, 0.24, raw);
     const flip = state.flip;
-    const key = state.pose + [e, f, flip, state.settle, tilt.x, tilt.y, tilt.nx, fall.z, fall.x, fall.y, fall.rx, fall.ry, fall.rz, fall.a, +fall.over, +fall.hidden].map((n) => n.toFixed(4)).join();
+    const key = state.pose + [e, f, flip, state.settle, tilt.x, tilt.y, tilt.nx, fall.z, fall.x, fall.y, fall.rx, fall.ry, fall.rz, fall.a, +fall.over, +fall.hidden, afloat.x, afloat.y, afloat.rz, afloat.z].map((n) => n.toFixed(4)).join();
     if (key === last) return;
     last = key;
     table.classList.toggle('is-full', full);
@@ -218,25 +222,26 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
     // other when the card is edge-on and neither can be seen.
     const up = Math.sin(Math.PI * flip), turned = flip > 0.5;
     // Screen pixels off the sand: picked up to turn over, or falling onto it.
-    const high = LIFT * (cw + 2 * b) * s * up + fall.z;
+    const high = LIFT * (cw + 2 * b) * s * up + fall.z + afloat.z;
     // (Falling: where it is over the sand, and, as the eye is over the middle of the screen
     // and not over the card, how much further out from the middle it is seen for its height.
     // Both in the world's own turned and scaled space.)
     const inWorld = (px, py) => { const r = (P.rz * m * Math.PI) / 180; return [(px * Math.cos(r) + py * Math.sin(r)) / s, (-px * Math.sin(r) + py * Math.cos(r)) / s]; };
     const near = EYE / Math.max(EYE - fall.z, EYE * 0.2) - 1;
-    const [ox, oy] = inWorld(fall.x + (P.x - 0.5) * vw * near, fall.y + (P.y - 0.5) * vh * near), [gx, gy] = inWorld(fall.x, fall.y);
-    const moved = fall.z || fall.x || fall.y || fall.rx || fall.ry || fall.rz;
-    const hand = `rotateZ(${(TWIST * up + fall.rz).toFixed(3)}deg) rotateX(${(tilt.x + TIP * up + fall.rx).toFixed(3)}deg)`;
+    const px = fall.x + afloat.x, py = fall.y + afloat.y, turn = fall.rz + afloat.rz;
+    const [ox, oy] = inWorld(px + (P.x - 0.5) * vw * near, py + (P.y - 0.5) * vh * near), [gx, gy] = inWorld(px, py);
+    const moved = fall.z || px || py || fall.rx || fall.ry || turn || afloat.z;
+    const hand = `rotateZ(${(TWIST * up + turn).toFixed(3)}deg) rotateX(${(tilt.x + TIP * up + fall.rx).toFixed(3)}deg)`;
     flipEl.style.visibility = turned ? 'hidden' : 'visible';
     flipEl.style.transform = (flip > 0 || tilt.x || tilt.y || moved)
-      ? `${moved ? `translate(${ox.toFixed(1)}px, ${oy.toFixed(1)}px) ` : ''}perspective(${(EYE / s).toFixed(0)}px) translateZ(${(high / s).toFixed(1)}px) ${hand} rotateY(${(tilt.y + 180 * flip + fall.ry).toFixed(3)}deg)`
+      ? `${moved ? `translate(${ox.toFixed(2)}px, ${oy.toFixed(2)}px) ` : ''}perspective(${(EYE / s).toFixed(0)}px) translateZ(${(high / s).toFixed(1)}px) ${hand} rotateY(${(tilt.y + 180 * flip + fall.ry).toFixed(3)}deg)`
       : 'none';
     // (Hidden by its opacity: its parts set their own visibility, which a hidden parent would not override.)
     card.style.opacity = fall.hidden ? '0' : '';
     card.style.zIndex = fall.over ? '2' : '';
     flipEl.style.opacity = fall.a < 1 ? fall.a.toFixed(3) : '';
     back.style.visibility = turned ? 'visible' : 'hidden';
-    if (turned) back.style.transform = `translate(-50%, -50%) rotate(${L.P.end.rz}deg) perspective(${EYE}px) translateZ(${high.toFixed(1)}px) ${hand} rotateY(${(180 * flip - 180).toFixed(3)}deg)`;
+    if (turned) back.style.transform = `translate(-50%, -50%) translate(${afloat.x.toFixed(2)}px, ${afloat.y.toFixed(2)}px) rotate(${L.P.end.rz}deg) perspective(${EYE}px) translateZ(${high.toFixed(1)}px) ${hand} rotateY(${(180 * flip - 180).toFixed(3)}deg)`;
     const dark = (SHADE * Math.pow(up, 1.3)).toFixed(3);
     shade.style.opacity = turned ? '0' : dark;
     back.style.setProperty('--shade', turned ? dark : '0');
@@ -245,7 +250,7 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
     // falling card it is where the card is over the sand, turned and foreshortened with it,
     // further off and fainter and softer the higher the card is, and closes in as it lands.
     const away = (high / s) * 0.62, lean = Math.cos((fall.ry * Math.PI) / 180), nod = Math.cos((fall.rx * Math.PI) / 180);
-    shadow.style.transform = `translate(${(gx + away).toFixed(1)}px, ${(gy + away * 0.42).toFixed(1)}px) rotate(${fall.rz.toFixed(3)}deg) scale(${(sx * lean * Math.max(Math.abs(Math.cos(Math.PI * flip)), 0.07)).toFixed(5)}, ${(sy * nod).toFixed(5)})`;
+    shadow.style.transform = `translate(${(gx + away).toFixed(2)}px, ${(gy + away * 0.42).toFixed(2)}px) rotate(${turn.toFixed(3)}deg) scale(${(sx * lean * Math.max(Math.abs(Math.cos(Math.PI * flip)), 0.07)).toFixed(5)}, ${(sy * nod).toFixed(5)})`;
     shadow.style.opacity = ((1 - 0.45 * up) * fall.a / (1 + fall.z / 520)).toFixed(3);
     // (And goes soft: a thing held off the ground has no sharp shadow. Only while it turns or
     // falls, when nothing else on the page is being drawn.)
@@ -279,6 +284,8 @@ export function createPostcard({ reduced = false, captions = {}, onPose = null }
     // The card off the sand (see `fall` above): drop({ hidden: true }) before it is let go,
     // drop({ z, x, y, rx, ry, rz, a, over }) as it falls, drop(null) at rest.
     drop(v) { Object.assign(fall, REST, v); last = ''; apply(); },
+    // The card on water: float({ x, y, rz, z }), float(null) on dry sand.
+    float(v) { Object.assign(afloat, AFLOAT, v); },
     // The card's paper on the screen, as it lies.
     get rect() { return paper.getBoundingClientRect(); },
     get L() { return L; },

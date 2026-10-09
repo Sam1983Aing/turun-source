@@ -62,7 +62,7 @@ import { decodeBake } from './terrain/bake-format.js';
 // leaf's cut-out, for the live palm, which is what the page shows: `hero` is the photograph it
 // had before, behind ?sand=photo. heroWalk, heroBeach: surfaces of their own for the two
 // spreads, none yet, so they lie on the hero's.)
-export const ASSETS = { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin', hero: 'assets/hero/sand.jpg', heroPalm: 'assets/hero/sand-clean.jpg', heroLeaf: 'assets/hero/palm-leaf.png', heroWalk: null, heroBeach: null, heroEnd: 'assets/hero/sand-end.jpg', ...globalThis.__klAssets };
+export const ASSETS = { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin', hero: 'assets/hero/sand.jpg', heroPalm: 'assets/hero/sand-clean.jpg', heroLeaf: 'assets/hero/palm-leaf.png', heroWalk: null, heroBeach: null, heroEnd: 'assets/hero/sand-end.jpg', heroTide: 'assets/hero/sand-end-tide.png', ...globalThis.__klAssets };
 
 // capture: a still for the tools (pixel ratio 1, 2048 terrain, the drawing buffer kept for
 // screenshots). keepBuffer: keep the drawing buffer without the rest (recording the scroll).
