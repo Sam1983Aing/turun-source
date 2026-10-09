@@ -4439,3 +4439,15 @@ the postcard move along with the wave ... for now just use the image we have alr
   five materials, one prompt each, in `../images/prompts/postcard-surface-prompts.txt`.
 - Rounds 15 to 17 were dated 9 October in these notes. They were made on the 8th (the
   commits say so). Corrected.
+- **Sam picked The Line for the second postcard** ("for the second postcard, I'm using the
+  line"). `spreadOption()` now always sets the walk's spread that way, and `?spread=` only
+  sets the third postcard's, which is still open (he asked for the links, not a recording:
+  `?at=3.02&spread=ledger`, `figures`, `line`). Each layout is a class on its own spread
+  (`sp-is-line`), not on the page. Brought up for keeps: the drawing no wider than 700 px, in
+  a column under 500 px (a container query on `.sp__text`, so a narrow column on a wide screen
+  too) its three stations in a row under it with the drawing's empty margins taken back, a
+  smaller headline and tighter gaps on phones under 720 px high (at 360 x 640 the words ran
+  into the name above and the card below: now 81 to 349 px, between 53 and 364), the dot's
+  ring still for reduced motion. Looked at 1024 x 768, 1280 x 720, 1512 x 945, 1920 x 1080,
+  2560 x 1080, 768 x 1024, 390 x 844, 375 x 667, 360 x 640. Arriving, leaving and coming back,
+  with and without reduced motion: drawn, unwritten, drawn again each time.

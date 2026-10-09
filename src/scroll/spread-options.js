@@ -1,23 +1,28 @@
-// Three ways to set the words beside a spread's card (round 18, 8 October 2026). Sam, looking
-// at "Six walkers. One guide.": "you can enhance the layout a little bit. It's just how the
-// text is presented. Right now it feels a little bit average. Something that is super clean
-// to read, but it feels a little bit more premium ... this is just first iteration layout."
-// Built for him to compare, behind a switch. Without the switch the page is as it was.
+// How the words beside a spread's card are set (round 18, 8 October 2026). Sam, looking at
+// "Six walkers. One guide.": "you can enhance the layout a little bit. It's just how the text
+// is presented. Right now it feels a little bit average. Something that is super clean to
+// read, but it feels a little bit more premium ... this is just first iteration layout."
+// Three ways were built and recorded for him (../demos/spread/):
 //
-//   ?spread=ledger    01 Ledger     the three rows, numbered, what matters first and large,
-//                                   its name small at the far end of the line
-//   ?spread=figures   02 Figures    the facts as three large figures side by side, a word
-//                                   under each, and one sentence below
-//   ?spread=line      03 The Line   the walk drawn: a staircase from the railing down to the
-//                                   sand that draws itself, a dot walking down it to where
-//                                   this card is. For the beach, the day's arc and its sun.
+//   01 Ledger     the three rows, numbered, what matters first and large, its name small at
+//                 the far end of the line
+//   02 Figures    the facts as three large figures side by side, a word under each, and one
+//                 sentence below
+//   03 The Line   the walk drawn: a staircase from the railing down to the sand that draws
+//                 itself, a dot walking down it to where this card is. For the beach, the
+//                 day's arc and its sun.
+//
+// He chose The Line for the second postcard ("for the second postcard, I'm using the line"),
+// so the walk's spread has it, always. The third postcard's is still open: it keeps its first
+// layout (a rule and three rows) until he picks, and ?spread=ledger, ?spread=figures or
+// ?spread=line shows it in each of the three (the walk's does not change).
 //
 // All three take away the long terracotta rule. The headline is the page's in every one.
 // What they add is marked for spreads.js, which brings the words in: data-sp-in fades up in
 // its turn, data-sp-draw is drawn (its --d goes from 0 to 1).
 //
-// When Sam has chosen: the one he keeps moves into index.html and page.css, and this file
-// and its hook in scroll.js go.
+// When he has chosen for the third as well: what is kept moves into index.html and page.css,
+// and this file and its hook in scroll.js go.
 
 const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
 
@@ -88,17 +93,17 @@ function line(node, say, id) {
 }
 
 const CSS = `
-html[class*="sp-opt-"] .sp__rule { display: none; }
+.sp[class*="sp-is-"] .sp__rule { display: none; }
 
 /* 01 Ledger */
-html.sp-opt-ledger .sp__rows { counter-reset: row; margin-top: 4px; border-top: 1px solid rgba(20, 18, 14, 0.24); }
-html.sp-opt-ledger .sp__rows div { counter-increment: row; grid-template-columns: 2.9rem 1fr auto; padding: 17px 0 16px; border-bottom: 1px solid rgba(20, 18, 14, 0.24); }
-html.sp-opt-ledger .sp__rows div::before { content: "0" counter(row); font: 500 11.5px/1 var(--type); letter-spacing: 0.16em; font-variant-numeric: tabular-nums; color: #cb5d30; }
-html.sp-opt-ledger .sp__rows dd { order: 1; font: 400 clamp(1.2rem, 1rem + 0.62vw, 1.56rem)/1.24 var(--type); letter-spacing: -0.008em; color: var(--ink); }
-html.sp-opt-ledger .sp__rows dt { order: 2; padding-left: 22px; text-align: right; font-size: 10.5px; color: rgba(20, 18, 14, 0.58); }
+.sp-is-ledger .sp__rows { counter-reset: row; margin-top: 4px; border-top: 1px solid rgba(20, 18, 14, 0.24); }
+.sp-is-ledger .sp__rows div { counter-increment: row; grid-template-columns: 2.9rem 1fr auto; padding: 17px 0 16px; border-bottom: 1px solid rgba(20, 18, 14, 0.24); }
+.sp-is-ledger .sp__rows div::before { content: "0" counter(row); font: 500 11.5px/1 var(--type); letter-spacing: 0.16em; font-variant-numeric: tabular-nums; color: #cb5d30; }
+.sp-is-ledger .sp__rows dd { order: 1; font: 400 clamp(1.2rem, 1rem + 0.62vw, 1.56rem)/1.24 var(--type); letter-spacing: -0.008em; color: var(--ink); }
+.sp-is-ledger .sp__rows dt { order: 2; padding-left: 22px; text-align: right; font-size: 10.5px; color: rgba(20, 18, 14, 0.58); }
 
 /* 02 Figures (and the sentence under 03) */
-html.sp-opt-figures .sp__rows, html.sp-opt-line .sp__rows { display: none; }
+.sp-is-figures .sp__rows, .sp-is-line .sp__rows { display: none; }
 .spf { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 8px; }
 .spf__cell { display: grid; align-content: start; gap: 10px; padding: 2px 0 2px 24px; border-left: 1px solid rgba(20, 18, 14, 0.22); }
 .spf__cell:first-child { padding-left: 0; border-left: 0; }
@@ -109,7 +114,8 @@ html.sp-opt-figures .sp__rows, html.sp-opt-line .sp__rows { display: none; }
 .spf__line { margin: 4px 0 0; padding-top: 17px; border-top: 1px solid rgba(20, 18, 14, 0.22); font: 400 1.12rem/1.4 var(--type); color: rgba(20, 18, 14, 0.86); }
 
 /* 03 The Line */
-.spl { position: relative; margin-top: 6px; --d: 1; }
+.sp__text { container: sp / inline-size; }
+.spl { position: relative; margin-top: 6px; max-width: 700px; --d: 1; }
 .spl svg { display: block; width: 100%; height: auto; overflow: visible; }
 .spl__sea { fill: none; stroke: rgba(20, 18, 14, 0.36); stroke-width: 1; stroke-dasharray: 1 6; stroke-linecap: round; }
 .spl__path { fill: none; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--d)); }
@@ -119,6 +125,7 @@ html.sp-opt-figures .sp__rows, html.sp-opt-line .sp__rows { display: none; }
 .spl__walker { offset-rotate: 0deg; offset-distance: calc(var(--d) * var(--share) * 100%); fill: #e5804c; opacity: calc(var(--d) * 6); }
 .spl__halo { fill: #e5804c; opacity: 0.26; transform-box: fill-box; transform-origin: center; animation: spl-halo 2.6s ease-in-out infinite; }
 @keyframes spl-halo { 0%, 100% { transform: scale(0.7); opacity: 0.3; } 50% { transform: scale(1.25); opacity: 0.08; } }
+@media (prefers-reduced-motion: reduce) { .spl__halo { animation: none; } }
 .spl__st { position: absolute; display: grid; align-content: start; gap: 5px; }
 .spl__st b { font: 500 clamp(1.2rem, 1rem + 0.5vw, 1.5rem)/1 var(--type); letter-spacing: -0.005em; color: var(--ink); font-variant-numeric: tabular-nums; }
 .spl__st span { font: 500 10.5px/1.35 var(--type); letter-spacing: 0.18em; text-transform: uppercase; color: rgba(20, 18, 14, 0.7); }
@@ -135,9 +142,9 @@ html.sp-opt-figures .sp__rows, html.sp-opt-line .sp__rows { display: none; }
 .spl--beach .spl__st--1 { left: 27%; width: 46%; top: 0; padding-top: 12.4%; text-align: center; }
 
 @media (max-aspect-ratio: 85/100) {
-  html.sp-opt-ledger .sp__rows div { grid-template-columns: 2.1rem 1fr auto; padding: 10px 0 9px; }
-  html.sp-opt-ledger .sp__rows dd { font-size: 1.08rem; }
-  html.sp-opt-ledger .sp__rows dt { padding-left: 12px; font-size: 9.5px; letter-spacing: 0.16em; }
+  .sp-is-ledger .sp__rows div { grid-template-columns: 2.1rem 1fr auto; padding: 10px 0 9px; }
+  .sp-is-ledger .sp__rows dd { font-size: 1.08rem; }
+  .sp-is-ledger .sp__rows dt { padding-left: 12px; font-size: 9.5px; letter-spacing: 0.16em; }
   .spf { margin-top: 2px; }
   .spf__cell { gap: 6px; padding-left: 11px; }
   .spf__fig { font-size: 2.05rem; }
@@ -146,7 +153,29 @@ html.sp-opt-figures .sp__rows, html.sp-opt-line .sp__rows { display: none; }
   .spf__line { margin-top: 0; padding-top: 10px; font-size: 0.98rem; }
   /* (No room to write on the drawing: its three stations stand in a row under it.) */
   .spl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 10px; margin-top: 0; }
-  .spl svg { grid-column: 1 / -1; }
+  .spl svg { grid-column: 1 / -1; margin: -3.4% 0 -5.2%; }
+  .spl .spl__st { position: static; max-width: none; width: auto; margin-top: 0; padding-top: 0; justify-self: stretch; text-align: left; align-content: start; }
+  .spl .spl__st--1 { text-align: center; }
+  .spl .spl__st--2 { text-align: right; }
+  .spl__st b { font-size: 1.08rem; }
+  .spl__st span, .spl--beach .spl__st span { font-size: 9px; letter-spacing: 0.12em; }
+  .spl--beach .spl__st span { font-size: 0.8rem; letter-spacing: 0; }
+  .spl__tick { display: none; }
+}
+/* (A short phone: a little smaller all round, so the words stay between the name and the card.) */
+@media (max-aspect-ratio: 85/100) and (max-height: 720px) {
+  .sp-is-line .sp__text { gap: 7px; }
+  .sp-is-line .sp__head { font-size: clamp(2rem, 9.4vw, 3.4rem); }
+  .sp-is-line .spl { gap: 5px 10px; }
+  .sp-is-line .spl__st { gap: 3px; }
+  .sp-is-line .spl__st b { font-size: 1rem; }
+  .sp-is-line .spf__line { padding-top: 7px; font-size: 0.9rem; line-height: 1.32; }
+}
+/* (And in any column too narrow to write on the drawing, on a wide screen as well.) */
+@container sp (max-width: 500px) {
+  /* (No room to write on the drawing: its three stations stand in a row under it.) */
+  .spl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 10px; margin-top: 0; }
+  .spl svg { grid-column: 1 / -1; margin: -3.4% 0 -5.2%; }
   .spl .spl__st { position: static; max-width: none; width: auto; margin-top: 0; padding-top: 0; justify-self: stretch; text-align: left; align-content: start; }
   .spl .spl__st--1 { text-align: center; }
   .spl .spl__st--2 { text-align: right; }
@@ -157,18 +186,22 @@ html.sp-opt-figures .sp__rows, html.sp-opt-line .sp__rows { display: none; }
 }
 `;
 
-// name: 'ledger', 'figures' or 'line'. Run before the spreads are made (createSpreads reads
-// what this adds).
-export function spreadOption(name) {
-  if (!['ledger', 'figures', 'line'].includes(name)) return;
-  document.documentElement.classList.add(`sp-opt-${name}`);
+const lay = (node, name) => {
+  const say = SAY[node.dataset.hold];
+  if (!say) return;
+  node.classList.add(`sp-is-${name}`);
+  if (name === 'figures') figures(node, say); else if (name === 'line') line(node, say, node.dataset.hold);
+};
+
+// The walk's spread is set as The Line. third: how the third postcard's is set for a look,
+// 'ledger', 'figures' or 'line' (anything else: as it was). Run before the spreads are made
+// (createSpreads reads what this adds).
+export function spreadOption(third) {
   const style = el('style');
   style.textContent = CSS;
   document.head.append(style);
-  if (name === 'ledger') return;
   for (const node of document.querySelectorAll('.sp[data-hold]')) {
-    const say = SAY[node.dataset.hold];
-    if (!say) continue;
-    if (name === 'figures') figures(node, say); else line(node, say, node.dataset.hold);
+    if (node.dataset.hold === 'walk') lay(node, 'line');
+    else if (['ledger', 'figures', 'line'].includes(third)) lay(node, third);
   }
 }

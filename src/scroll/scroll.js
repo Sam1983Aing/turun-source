@@ -628,7 +628,8 @@ export function startScroll({ params }) {
     } });
   }
   const places = { walk: () => page.screensAt(1), boat: () => page.screensAt(4.97), reserve: () => page.screens };
-  // (?spread=ledger, figures or line: three ways to set a spread's words, for Sam to compare.)
+  // (The walk's spread is set as The Line, Sam's pick. ?spread=ledger, figures or line: the
+  // third postcard's in each of the three ways, until he picks for it too.)
   if (!BARE) spreadOption(params.get('spread'));
   const spreads = BARE ? null : createSpreads({ reduced, SplitText, onReserve: () => travel(places.reserve()) });
   document.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', (e) => {
