@@ -4479,3 +4479,7 @@ the postcard move along with the wave ... for now just use the image we have alr
 - A prompt for a better picture under the last card, five compositions (shells, rocks,
   rippled sand, a frangipani, a tide line), with what the wave needs kept fixed:
   `../images/prompts/ending-surface-prompts.txt`.
+- **"Scroll into the postcard" in the plain face** (Jost, the ink and size of the words under
+  the headline), its arrow smaller and still in the sea's colours. Sam: "that text is not
+  important enough to have the same creative writing font ... I will keep this font for only
+  headline." The hand is on headlines, the card's back and nowhere else on the sand screens.

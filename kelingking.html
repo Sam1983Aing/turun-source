@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 45f59d8. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
+  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit 1879fd7. Assets: https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/ -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Turun · The walk down to Kelingking Beach</title>
@@ -473,17 +473,15 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
 .hero .display em::after, .sp__head em::after { clip-path: inset(-30% calc((1 - var(--u, 1)) * 100%) -30% -6%); }
 .hero .body { color: rgba(20, 18, 14, 0.82); max-width: 29rem; }
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 30px; margin-top: 6px; }
-/* "Scroll into the postcard": in the hand, a note on the sand under the card's lower left
-   corner, written along its edge, with an arrow drawn in the same pen up into the picture.
-   (It was under the button, a column away from the thing it points at.) */
-.cue { position: absolute; left: calc(var(--card-left, 50vw) - var(--gutter) + 5.4vw); top: calc(var(--card-bottom, 80vh) + 12px); display: flex; align-items: center; gap: 14px; margin: 0; white-space: nowrap; font: 400 2.34rem/1 var(--hand); color: #1c95ad; rotate: -6deg; transform-origin: 0 50%; }
-/* (In the sea's colours of "Most people stop at the", graded the same way, the arrow with it,
-   and the same soft shadow under the words. Round 17 had it in the headline's orange, which
-   Sam found "lacking contrast" on the sand. Before that it was the pen's blue.) */
-.cue > span { display: inline-block; padding: 0.4em 0.4em 0.5em; margin: -0.4em -0.4em -0.5em; color: transparent; -webkit-text-fill-color: transparent;
-  background: linear-gradient(180deg, #3cc4c9 12%, #1c95ad 50%, #0e5d7f 92%); -webkit-background-clip: text; background-clip: text;
-  filter: drop-shadow(0 0.03em 0.034em rgba(22, 62, 82, 0.36)); }
-.cue__arrow { flex: none; width: 66px; height: 29px; overflow: visible; fill: none; stroke: url(#cue-ink); stroke-width: 3.3; stroke-linecap: round; stroke-linejoin: round; animation: cue 2.8s ease-in-out infinite; }
+/* "Scroll into the postcard": a small line on the sand under the card's lower left corner,
+   set along its edge, with an arrow drawn up into the picture. In the plain face and the ink of
+   the words under the headline: Sam, round 18, "that text is not important enough to have the
+   same creative writing font ... the same as the one we're using for the subtitle underneath
+   the headline". The hand is for headlines only. (It was in the hand: the pen's blue, then the
+   headline's orange, then the sea's colours. And under the button before that, a column away
+   from the thing it points at.) The arrow keeps the sea's colours. */
+.cue { position: absolute; left: calc(var(--card-left, 50vw) - var(--gutter) + 5.4vw); top: calc(var(--card-bottom, 80vh) + 20px); display: flex; align-items: center; gap: 14px; margin: 0; white-space: nowrap; font: 400 clamp(1.02rem, 0.95rem + 0.26vw, 1.16rem)/1 var(--type); color: rgba(20, 18, 14, 0.82); rotate: -6deg; transform-origin: 0 50%; }
+.cue__arrow { flex: none; width: 46px; height: 20px; overflow: visible; fill: none; stroke: url(#cue-ink); stroke-width: 3.6; stroke-linecap: round; stroke-linejoin: round; animation: cue 2.8s ease-in-out infinite; }
 @keyframes cue { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(8px, -3px); } }
 
 /* The notes on the way down: one thing each, each in its own place and at its own size. They
@@ -605,8 +603,8 @@ html.bare .loader__bar { background: rgba(243, 239, 230, 0.16); }
   .hero__actions { position: absolute; left: 0; right: 0; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 16px); margin: 0; justify-content: space-between; flex-wrap: nowrap; }
   .hero__actions .button { padding: 4px 4px 4px 18px; gap: 12px; }
   .button::after { width: 32px; height: 32px; }
-  .cue { left: auto; right: 4px; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 22px); font-size: 1.7rem; gap: 8px; rotate: -5deg; transform-origin: 100% 50%; }
-  .cue__arrow { width: 40px; height: 18px; rotate: 100deg; }
+  .cue { left: auto; right: 8px; top: calc(var(--card-bottom, 80vh) - max(18px, env(safe-area-inset-top)) - 54px + 26px); font-size: 1rem; gap: 8px; rotate: -5deg; transform-origin: 100% 50%; }
+  .cue__arrow { width: 34px; height: 15px; rotate: 100deg; }
   /* The back of the card stands upright: the message, then the lines to fill in. */
   .back__in { grid-template-columns: 1fr; grid-template-rows: auto 1fr; padding: 8.5cqh 7cqw 5cqh; row-gap: 3.4cqh; }
   .back__in::before { display: none; }
