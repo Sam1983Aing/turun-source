@@ -304,17 +304,17 @@ inside it. They are on the CDN, from the assets repo `Sam1983Aing/aura-assets`, 
 `kelingking/`, pinned to a tag so a copy of the file already out there never changes:
 
 ```
-https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.15.0/kelingking/terrain/terrain-1024.bin
-https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.15.0/kelingking/textures/<surface>_<color|normal|mask>.jpg
-https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.15.0/kelingking/hero/<picture>
+https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.16.0/kelingking/terrain/terrain-1024.bin
+https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.16.0/kelingking/textures/<surface>_<color|normal|mask>.jpg
+https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.16.0/kelingking/hero/<picture>
 ```
 
 (33 JPEGs: the eleven surfaces in `src/terrain/surfaces.js` and `src/trail/surfaces.js`, each
 with a colour, normal and mask map, plus `textures/CREDITS.md`. In `hero/`, seven pictures:
 `sand-clean.jpg`, `palm-leaf.png`, `sand-walk.jpg`, `sand-beach.jpg`, `sand-end.jpg`,
-`sand-end-sea.jpg`, `sand-end-tide.png`. The tag `kelingking-v3` points at the same commit as
-`1.15.0`. `1.11.0` / `kelingking-v2` are the scene alone (v34), `1.10.0` / `kelingking-v1` the
-terrain of v11 and v12.)
+`sand-end-sea.jpg`, `sand-end-tide.png` (since `1.15.0` / `kelingking-v3`). And `lib/three-r186.js`
+(since `1.16.0` / `kelingking-v4`, the tag the build uses now). `1.11.0` / `kelingking-v2` are the
+scene alone (v34), `1.10.0` / `kelingking-v1` the terrain of v11 and v12.)
 
 The pictures come from the CDN so that the file is the whole page with nothing beside it. It
 also lets the wave at the ending run in a file opened from the disk: a page may read a picture
@@ -327,8 +327,15 @@ shared series and `kelingking-vN`), push both tags, set `TAG` at the top of
 `tools/build-standalone.mjs`, and build. The build refuses to write a file whose assets on
 the CDN at `TAG` are not byte for byte the local ones.
 
-**For Aura** (or anywhere the page goes as one file): `node tools/build-site.mjs --aura` writes
-`../turun-aura.html`, the same single file compiled (minified, every comment gone, 1.6 MB).
+**For Aura**: `node tools/build-site.mjs --aura` writes `../turun-aura.html`, the page compiled
+(minified, every comment gone) as one file of 0.71 MB. Aura takes 1,048,576 bytes of HTML at
+most, and with its libraries inside the compiled page is 1.6 MB, so in this build they are
+loaded: GSAP, SplitText and Lenis from their npm builds on jsDelivr (the same bytes as
+`vendor/`, the build checks), and three.js from the assets repo as `lib/three-r186.js`, which
+is three.js's two modules in this build's own classic-script form, minified
+(`node tools/build-standalone.mjs --write-three-lib` makes `assets/lib/three-r186.js`, once per
+version of three.js). The page's own code stays in the file. Without a network that file has
+no libraries, and says so in its loader ("No connection: the 3D scene could not load").
 That is the one to upload: `kelingking.html` is the readable source in one file and stays
 private.
 

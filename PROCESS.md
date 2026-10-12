@@ -4635,3 +4635,16 @@ scene."
   errors, the four cards on their surfaces, the sea running at the ending. With the network
   cut: loads in 21 s on plain sand with the terrain generated, no errors. The public site's
   build still makes the same site (and `site/` was put back to what is live).
+- **Aura's limit.** Saving the file in Aura: "HTML size limit. The saved message is 1,603,982
+  bytes; the limit is 1,048,576 bytes." Of the 1.6 MB, three.js was 767 KB, GSAP with SplitText
+  and Lenis 97 KB, the page's own code 520 KB, the stylesheet with its fonts 161 KB. So for
+  Aura the libraries are loaded instead of carried (`build-standalone.mjs --libs=cdn`): the
+  three small ones from their npm builds on jsDelivr (byte for byte the files in `vendor/`),
+  three.js from the assets repo as `kelingking/lib/three-r186.js` (tags `1.16.0`,
+  `kelingking-v4`), made by `--write-three-lib`: its two modules as this build writes modules,
+  in one classic script that fills `window.__klm`, minified by Bun, 777,492 bytes, the same on
+  the CDN. The page's script takes the registry from the window and goes on. `turun-aura.html`
+  is 714,653 bytes, 333,923 under the limit. From `file://`: ready in 14.7 s, 46 fetches all
+  from jsDelivr, no errors, the sea running. With the network cut the loader says "No
+  connection: the 3D scene could not load" (it ran on plain sand before, with the libraries
+  inside). The readable single file and the public site's build are as they were.

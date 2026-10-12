@@ -45,7 +45,8 @@ const tmp = mkdtempSync(join(tmpdir(), 'turun-site-'));
 // The single-file build, made for this: with its pictures beside it for the site (the same
 // place as the page, so nothing is asked of another host), from the CDN for the one file.
 const single = join(tmp, 'single.html');
-execFileSync('node', ['tools/build-standalone.mjs', `--out=${single}`, ...(AURA ? [] : ['--hero=relative'])], { cwd: root, stdio: 'inherit' });
+// (For Aura the libraries come from the CDN too: a page there may be 1,048,576 bytes at most.)
+execFileSync('node', ['tools/build-standalone.mjs', `--out=${single}`, ...(AURA ? ['--libs=cdn'] : ['--hero=relative'])], { cwd: root, stdio: 'inherit' });
 const html = readFileSync(single, 'utf8');
 
 function squash(code, name) {
@@ -157,6 +158,9 @@ if (AURA) {
   const file = join(root, '..', 'turun-aura.html');
   writeFileSync(file, page);
   report('../turun-aura.html');
+  const LIMIT = 1048576, bytes = Buffer.byteLength(page);
+  console.log(`  ${bytes} bytes: ${bytes <= LIMIT ? `${LIMIT - bytes} under` : `${bytes - LIMIT} OVER`} Aura's limit of ${LIMIT}`);
+  if (bytes > LIMIT) process.exitCode = 1;
   process.exit();
 }
 

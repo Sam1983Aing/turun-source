@@ -20,9 +20,10 @@
 //
 // The assets repo: see README.md, "The standalone file".
 
-import { execSync } from 'node:child_process';
+import { execSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
@@ -32,7 +33,7 @@ const LOCAL = process.argv.includes('--local');
 
 // Bump after pushing new assets to the assets repo. A tag, never a branch: a file already out
 // in the world must not change because something was pushed later.
-export const TAG = '1.15.0';
+export const TAG = '1.16.0';
 const CDN = `https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@${TAG}/kelingking/`;
 const assetBase = process.argv.find((arg) => arg.startsWith('--asset-base='))?.slice(13);
 const BASE = LOCAL ? (assetBase ?? 'http://localhost:5290/assets/').replace(/\/?$/, '/') : CDN;
@@ -45,6 +46,21 @@ const BASE = LOCAL ? (assetBase ?? 'http://localhost:5290/assets/').replace(/\/?
 const HERO = { heroPalm: 'sand-clean.jpg', heroLeaf: 'palm-leaf.png', heroWalk: 'sand-walk.jpg', heroBeach: 'sand-beach.jpg', heroEnd: 'sand-end.jpg', heroSea: 'sand-end-sea.jpg', heroTide: 'sand-end-tide.png' };
 const HERO_BESIDE = process.argv.includes('--hero=relative');
 const ASSETS = { textures: `${BASE}textures/`, bake: `${BASE}terrain/terrain-1024.bin`, ...(HERO_BESIDE ? null : Object.fromEntries(Object.entries(HERO).map(([k, f]) => [k, `${BASE}hero/${f}`]))) };
+// The libraries from a CDN instead of inside the file (--libs=cdn), for where a page may only
+// be so large: Aura takes 1,048,576 bytes of HTML, and with everything inside it the compiled
+// page is 1.6 MB, 0.77 of it three.js. GSAP, SplitText and Lenis then come from their own npm
+// builds on jsDelivr (the same bytes as vendor/, checked below), and three.js from the assets
+// repo as lib/three-r186.js: its two modules in this build's own form (a registry of functions
+// in a classic script, as a file opened from the disk needs), minified. The local copy is
+// assets/lib/three-r186.js, made once by --write-three-lib (needs bun) and pushed with the
+// other assets. The page's own code stays in the file.
+const LIBS_CDN = process.argv.includes('--libs=cdn'), WRITE_LIB = process.argv.includes('--write-three-lib');
+const THREE_LIB = 'lib/three-r186.js';
+const NPM = {
+  'vendor/gsap.min.js': 'https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js',
+  'vendor/SplitText.min.js': 'https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/SplitText.min.js',
+  'vendor/lenis.min.js': 'https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js',
+};
 const outArg = process.argv.find((arg) => arg.startsWith('--out='))?.slice(6);
 const OUT = outArg ? resolve(outArg) : join(root, LOCAL ? 'kelingking-local.html' : 'kelingking.html');
 
@@ -57,7 +73,7 @@ const read = (p) => readFileSync(join(root, p), 'utf8');
 // the CDN: the bake must match the code, and every asset on the CDN at TAG must be the same bytes
 // as the local copy. If not, push the local assets under a new tag (README.md, "The standalone
 // file") and bump TAG. (--no-cdn-check skips the second part, to build with no network.)
-if (!LOCAL) {
+if (!LOCAL && !WRITE_LIB) {
   try { execSync('node tools/bake-terrain.mjs --check', { cwd: root, stdio: 'pipe' }); } catch (e) {
     throw new Error(`the terrain bake is out of date (${String(e.stdout).trim()}). Run node tools/bake-terrain.mjs, push the assets under a new tag and set TAG.`);
   }
@@ -66,6 +82,7 @@ if (!LOCAL) {
       ...readdirSync(join(root, 'assets/textures')).filter((f) => /\.(jpg|md)$/.test(f)).map((f) => `textures/${f}`),
       'terrain/terrain-1024.bin',
       ...(HERO_BESIDE ? [] : Object.values(HERO).map((f) => `hero/${f}`)),
+      ...(LIBS_CDN ? [THREE_LIB] : []),
     ];
     const sha = (buf) => createHash('sha256').update(buf).digest('hex');
     const stale = (await Promise.all(files.map(async (f) => {
@@ -75,6 +92,10 @@ if (!LOCAL) {
     }))).filter(Boolean);
     if (stale.length) throw new Error(`the CDN at ${TAG} does not have the local assets: ${stale.join(', ')}. Push them under a new tag and set TAG.`);
     console.log(`${files.length} assets on the CDN at ${TAG} match the local copies`);
+    if (LIBS_CDN) for (const [f, url] of Object.entries(NPM)) {
+      const res = await fetch(url);
+      if (!res.ok || sha(Buffer.from(await res.arrayBuffer())) !== sha(readFileSync(join(root, f)))) throw new Error(`${url} is not the same file as ${f}`);
+    }
   }
 }
 
@@ -161,7 +182,30 @@ function transform(file) {
   return `// ${file}\n__m[${key}] = (function () {\n"use strict";\n${src}\n${ret}\n})();`;
 }
 
-const code = ['var __m = {};', ...order.map(transform),
+// With the libraries on the CDN, the registry is the window's, shared by two scripts: three.js's
+// fills it first (from the CDN), the page's own goes on from there.
+const isThree = (file) => file.startsWith('vendor/three.');
+const SHARED = 'var __m = (window.__klm = window.__klm || {});';
+if (WRITE_LIB) {
+  const tmp = mkdtempSync(join(tmpdir(), 'three-lib-')), src = join(tmp, 'three.js'), out = join(tmp, 'three.min.js');
+  writeFileSync(src, `(function () {\n${SHARED}\n${order.filter(isThree).map(transform).join('\n')}\n})();`);
+  const r = spawnSync('bun', ['build', src, '--no-bundle', '--minify', '--target=browser', `--outfile=${out}`], { encoding: 'utf8' });
+  if (r.status !== 0) throw new Error(`bun could not minify three.js: ${r.stderr || r.stdout}`);
+  const lib = '/*! three.js r186, Copyright 2010-2026 Three.js Authors, SPDX-License-Identifier: MIT. As a classic script: window.__klm["vendor/three.module.js"] holds its exports. */\n' + readFileSync(out, 'utf8');
+  new vm.Script(lib, { filename: THREE_LIB });
+  mkdirSync(join(root, 'assets/lib'), { recursive: true });
+  writeFileSync(join(root, 'assets', THREE_LIB), lib);
+  rmSync(tmp, { recursive: true, force: true });
+  console.log(`assets/${THREE_LIB}: ${(lib.length / 1e6).toFixed(2)} MB. Push it to the assets repo as kelingking/${THREE_LIB}, under a new tag, and set TAG.`);
+  process.exit(0);
+}
+// (And if they did not come, no network, the page says so where it says what it is loading.)
+const NEED = `if (!__m["vendor/three.module.js"] || !window.gsap || !window.SplitText || !window.Lenis) {
+  var __what = document.querySelector(".loader__what");
+  if (__what) __what.textContent = "No connection: the 3D scene could not load";
+  throw new Error("the page's libraries did not load");
+}`;
+const code = [LIBS_CDN ? `${SHARED}\n${NEED}` : 'var __m = {};', ...order.filter((file) => !(LIBS_CDN && isThree(file))).map(transform),
   // The generator on the page, for app.js when the bake cannot be downloaded.
   'window.__klGenerate = __m["src/terrain/worker.js"].generateAll;',
   'document.documentElement.classList.contains("tool") || __m["src/scroll/scroll.js"].startScroll({ params: new URLSearchParams(location.search) });',
@@ -206,7 +250,7 @@ const libs = ['vendor/gsap.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min
 // (The first frame's script is a classic one already: it goes in as it is, where it stands.)
 swap('<script src="src/scroll/first.js"></script>', `<script>\n${read('src/scroll/first.js')}</script>`);
 swap('<script type="module" src="src/main.js"></script>',
-  `<script>\n${libs.join('\n')}\n</script>\n<script>\nwindow.__klAssets = ${JSON.stringify(ASSETS)};\n${code}\n</script>`);
+  `${LIBS_CDN ? [...Object.values(NPM), BASE + THREE_LIB].map((url) => `<script src="${url}"></script>`).join('\n') : `<script>\n${libs.join('\n')}\n</script>`}\n<script>\nwindow.__klAssets = ${JSON.stringify(ASSETS)};\n${code}\n</script>`);
 swap('<head>', `<head>\n  <!-- Kelingking, the standalone build (tools/build-standalone.mjs), from commit ${commit}. Assets: ${BASE} -->${linked.length ? `\n  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?${linked.map((f) => `family=${f}`).join('&')}&display=swap">` : ''}`);
 writeFileSync(OUT, html);
 
