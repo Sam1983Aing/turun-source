@@ -15,8 +15,13 @@
 // A website's code always reaches the visitor's browser, so this hides the explanation, not
 // the fact: what cannot be read here any more is how and why, which is what is taught.
 //
-//   node tools/build-site.mjs              builds kelingking.html first, then site/
-//   node tools/build-site.mjs --no-rebuild from the kelingking.html that is there
+//   node tools/build-site.mjs              site/ (the page and, beside it, its seven pictures)
+//   node tools/build-site.mjs --aura       ../turun-aura.html: the same compiled page as ONE file,
+//                                          for Aura. Its pictures come from the CDN with the
+//                                          textures and the terrain (the assets repo, pinned to
+//                                          the tag in tools/build-standalone.mjs), so there is
+//                                          nothing to carry beside it, and opened from the disk
+//                                          it runs whole, the wave at the ending too.
 //   needs bun (for the minifier) and a network (the single-file build checks the CDN)
 //
 // To publish: site/ is its own git repository (remote: Sam1983Aing/turun). Commit there and
@@ -35,9 +40,13 @@ const OUT = join(root, 'site');
 // the page had before, behind a switch.
 const PICTURES = ['sand-clean.jpg', 'palm-leaf.png', 'sand-walk.jpg', 'sand-beach.jpg', 'sand-end.jpg', 'sand-end-sea.jpg', 'sand-end-tide.png'];
 
-if (!process.argv.includes('--no-rebuild')) execFileSync('node', ['tools/build-standalone.mjs'], { cwd: root, stdio: 'inherit' });
-const html = readFileSync(join(root, 'kelingking.html'), 'utf8');
+const AURA = process.argv.includes('--aura');
 const tmp = mkdtempSync(join(tmpdir(), 'turun-site-'));
+// The single-file build, made for this: with its pictures beside it for the site (the same
+// place as the page, so nothing is asked of another host), from the CDN for the one file.
+const single = join(tmp, 'single.html');
+execFileSync('node', ['tools/build-standalone.mjs', `--out=${single}`, ...(AURA ? [] : ['--hero=relative'])], { cwd: root, stdio: 'inherit' });
+const html = readFileSync(single, 'utf8');
 
 function squash(code, name) {
   const src = join(tmp, `${name}.js`), out = join(tmp, `${name}.min.js`);
@@ -124,8 +133,32 @@ page = page.replace(/<script\b[\s\S]*?<\/script>|<style\b[\s\S]*?<\/style>/g, (m
   .replace(/\u0000(\d+)\u0000/g, (_, i) => kept[+i]);
 // (A library's pointer to its source map, which is not here.)
 page = page.replace(/^\/\/# sourceMappingURL=.*$/gm, '');
-page = page.replace('<head>', '<head>\n  <!-- Turun, guided descents: a concept page. Third-party notices are in NOTICE.txt. -->');
+page = page.replace('<head>', AURA
+  ? `<head>
+  <!-- Turun, guided descents: a concept page by Sam Aing. One file: its pictures, textures and terrain load from cdn.jsdelivr.net.
+       Includes three.js r186 (MIT, Copyright 2010-2026 Three.js Authors), GSAP 3.15 and SplitText (Copyright GreenSock, gsap.com/standard-license),
+       Lenis 1.3 (MIT, Copyright darkroom.engineering). Fonts: Instrument Serif, Vujahday Script, Jost (SIL OFL 1.1).
+       Textures: Poly Haven (CC0). Map data: Copyright OpenStreetMap contributors (ODbL). -->`
+  : '<head>\n  <!-- Turun, guided descents: a concept page. Third-party notices are in NOTICE.txt. -->');
 rmSync(tmp, { recursive: true, force: true });
+
+// What must not be in it, said out loud.
+const leaks = ['Sam:', "Sam's", 'Claude', 'PROCESS.md', 'CLAUDE.md', 'round 1', '(v35', 'v35 '].filter((w) => page.includes(w));
+const comments = (page.match(/^\s*\/\/.*$/gm) ?? []).length;
+const report = (what) => {
+  console.log(`${what}  ${(page.length / 1e6).toFixed(2)} MB (from ${(html.length / 1e6).toFixed(2)})  ${own} scripts minified, ${shaderLines} shader comments removed`);
+  console.log(`  lines that are still a comment: ${comments}   words that should not be there: ${leaks.length ? leaks.join(', ') : 'none'}`);
+  if (leaks.length) process.exitCode = 1;
+};
+if (AURA) {
+  // One file, beside the project (not in this repository): nothing of it is relative.
+  const left = [...page.matchAll(/(?:src|href)="(?!https?:|data:|#|mailto:)([^"]+)"/g)].map((m) => m[1]);
+  if (left.length) throw new Error(`the one file still points beside itself: ${left.join(', ')}`);
+  const file = join(root, '..', 'turun-aura.html');
+  writeFileSync(file, page);
+  report('../turun-aura.html');
+  process.exit();
+}
 
 // site/ keeps its own .git: everything else in it is made again.
 mkdirSync(OUT, { recursive: true });
@@ -176,11 +209,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 The pictures of sand, the palm leaf and everything else on the page: Sam Aing.
 `);
 
-// What must not be in it, said out loud.
-// (Not 'tools/': the scene's own code, public since v34, names one of its tools in a warning.)
-const leaks = ['Sam:', "Sam's", 'Claude', 'PROCESS.md', 'CLAUDE.md', 'round 1', '(v35', 'v35 '].filter((w) => page.includes(w));
-const comments = (page.match(/^\s*\/\/.*$/gm) ?? []).length;
-console.log(`site/index.html  ${(page.length / 1e6).toFixed(2)} MB (from ${(html.length / 1e6).toFixed(2)})  ${own} scripts minified, ${shaderLines} shader comments removed`);
-console.log(`  lines that are still a comment: ${comments}   words that should not be there: ${leaks.length ? leaks.join(', ') : 'none'}`);
+report('site/index.html');
 console.log(`  with it: ${PICTURES.length} pictures, README.md, NOTICE.txt, .nojekyll${existsSync(join(OUT, '.git')) ? '  (site/.git kept)' : ''}`);
-if (leaks.length) process.exitCode = 1;

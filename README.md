@@ -299,18 +299,38 @@ left out. The build refuses code it cannot rewrite (`export default`, `export *`
 top-level `await`) and compiles every script in the page as a classic script before it
 writes the file.
 
-The textures and the baked terrain are not inside it. They are on the CDN, from the assets
-repo `Sam1983Aing/aura-assets`, folder `kelingking/`, pinned to a tag so a copy of the file
-already out there never changes:
+The textures, the baked terrain and (since 1.15.0) the pictures under the postcards are not
+inside it. They are on the CDN, from the assets repo `Sam1983Aing/aura-assets`, folder
+`kelingking/`, pinned to a tag so a copy of the file already out there never changes:
 
 ```
-https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/terrain/terrain-1024.bin
-https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.11.0/kelingking/textures/<surface>_<color|normal|mask>.jpg
+https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.15.0/kelingking/terrain/terrain-1024.bin
+https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.15.0/kelingking/textures/<surface>_<color|normal|mask>.jpg
+https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.15.0/kelingking/hero/<picture>
 ```
 
 (33 JPEGs: the eleven surfaces in `src/terrain/surfaces.js` and `src/trail/surfaces.js`, each
-with a colour, normal and mask map, plus `textures/CREDITS.md`. The tag `kelingking-v2` points
-at the same commit. `1.10.0` / `kelingking-v1` hold the terrain of v11 and v12.)
+with a colour, normal and mask map, plus `textures/CREDITS.md`. In `hero/`, seven pictures:
+`sand-clean.jpg`, `palm-leaf.png`, `sand-walk.jpg`, `sand-beach.jpg`, `sand-end.jpg`,
+`sand-end-sea.jpg`, `sand-end-tide.png`. The tag `kelingking-v3` points at the same commit as
+`1.15.0`. `1.11.0` / `kelingking-v2` are the scene alone (v34), `1.10.0` / `kelingking-v1` the
+terrain of v11 and v12.)
+
+The pictures come from the CDN so that the file is the whole page with nothing beside it. It
+also lets the wave at the ending run in a file opened from the disk: a page may read a picture
+from a host that allows it (jsDelivr does), which it may not do with a file beside it. The
+page asks for such pictures with `crossOrigin` set (`scroll.js`, `tide.js`).
+
+**To change a picture or a texture:** put the new file in `assets/`, copy it into the assets
+repo under `kelingking/`, commit and push `main` there, tag it twice (the next number in the
+shared series and `kelingking-vN`), push both tags, set `TAG` at the top of
+`tools/build-standalone.mjs`, and build. The build refuses to write a file whose assets on
+the CDN at `TAG` are not byte for byte the local ones.
+
+**For Aura** (or anywhere the page goes as one file): `node tools/build-site.mjs --aura` writes
+`../turun-aura.html`, the same single file compiled (minified, every comment gone, 1.6 MB).
+That is the one to upload: `kelingking.html` is the readable source in one file and stays
+private.
 
 Without a network it still runs. The textures come out flat, each in its surface's own average
 colour, and the terrain is generated on the page itself, which freezes it for 5 to 8 s before
@@ -318,6 +338,8 @@ the loader lifts.
 
 ```bash
 node tools/build-standalone.mjs                 # kelingking.html, assets from the CDN
+node tools/build-site.mjs --aura                # ../turun-aura.html, the one compiled file for Aura
+node tools/test-standalone.mjs --file=../turun-aura.html            # and its test, from file://
 node tools/build-standalone.mjs --local         # kelingking-local.html, assets from localhost:5290
 node tools/test-standalone.mjs                  # open kelingking.html from file:// and photograph 4 stops
 node tools/test-standalone.mjs --offline        # the same with the network cut

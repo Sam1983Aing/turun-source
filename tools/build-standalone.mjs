@@ -32,12 +32,21 @@ const LOCAL = process.argv.includes('--local');
 
 // Bump after pushing new assets to the assets repo. A tag, never a branch: a file already out
 // in the world must not change because something was pushed later.
-export const TAG = '1.11.0';
+export const TAG = '1.15.0';
 const CDN = `https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@${TAG}/kelingking/`;
 const assetBase = process.argv.find((arg) => arg.startsWith('--asset-base='))?.slice(13);
 const BASE = LOCAL ? (assetBase ?? 'http://localhost:5290/assets/').replace(/\/?$/, '/') : CDN;
-const ASSETS = { textures: `${BASE}textures/`, bake: `${BASE}terrain/terrain-1024.bin` };
-const OUT = join(root, LOCAL ? 'kelingking-local.html' : 'kelingking.html');
+// The pictures the postcards lie on, and the palm's leaf (assets/hero/, what src/app.js calls
+// each). They come from the assets repo too, since 1.15.0: the file is then the whole page,
+// with nothing to carry beside it, which is what Aura and a double click both need. And a
+// picture from the CDN can be read by the page even when the page is a file on the disk, so
+// the wave at the ending runs there too (it could not, with the pictures beside the file).
+// --hero=relative leaves them beside the file, as assets/hero/ (the public site's build).
+const HERO = { heroPalm: 'sand-clean.jpg', heroLeaf: 'palm-leaf.png', heroWalk: 'sand-walk.jpg', heroBeach: 'sand-beach.jpg', heroEnd: 'sand-end.jpg', heroSea: 'sand-end-sea.jpg', heroTide: 'sand-end-tide.png' };
+const HERO_BESIDE = process.argv.includes('--hero=relative');
+const ASSETS = { textures: `${BASE}textures/`, bake: `${BASE}terrain/terrain-1024.bin`, ...(HERO_BESIDE ? null : Object.fromEntries(Object.entries(HERO).map(([k, f]) => [k, `${BASE}hero/${f}`]))) };
+const outArg = process.argv.find((arg) => arg.startsWith('--out='))?.slice(6);
+const OUT = outArg ? resolve(outArg) : join(root, LOCAL ? 'kelingking-local.html' : 'kelingking.html');
 
 const read = (p) => readFileSync(join(root, p), 'utf8');
 
@@ -56,6 +65,7 @@ if (!LOCAL) {
     const files = [
       ...readdirSync(join(root, 'assets/textures')).filter((f) => /\.(jpg|md)$/.test(f)).map((f) => `textures/${f}`),
       'terrain/terrain-1024.bin',
+      ...(HERO_BESIDE ? [] : Object.values(HERO).map((f) => `hero/${f}`)),
     ];
     const sha = (buf) => createHash('sha256').update(buf).digest('hex');
     const stale = (await Promise.all(files.map(async (f) => {
@@ -187,9 +197,10 @@ const swap = (from, to) => {
   html = html.replace(from, () => to);
 };
 html = html.replace(/\n\s*<link rel="preconnect"[^>]*>/g, '').replace(/\n\s*<link rel="stylesheet" href="https:\/\/fonts\.googleapis[^>]*>/, '');
-// (The stylesheet's own pictures are named from where it lies, two folders down: from the
-// single file they are next door.)
-swap('<link rel="stylesheet" href="src/scroll/page.css">', `<style>\n${fonts}\n${read('src/scroll/page.css').replaceAll('url(../../assets/', 'url(assets/')}</style>`);
+// (The stylesheet's own pictures are named from where it lies, two folders down: for the
+// single file they are on the CDN with the rest, or next door with --hero=relative.)
+swap('<link rel="stylesheet" href="src/scroll/page.css">', `<style>\n${fonts}\n${read('src/scroll/page.css').replaceAll('url(../../assets/', HERO_BESIDE ? 'url(assets/' : `url(${BASE}`)}</style>`);
+if (!HERO_BESIDE) swap('<link rel="preload" as="image" href="assets/hero/sand-clean.jpg">', `<link rel="preload" as="image" href="${BASE}hero/${HERO.heroPalm}">`);
 html = html.replace(/\n\s*<script type="importmap">[\s\S]*?<\/script>/, '');
 const libs = ['vendor/gsap.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js'].map((f) => read(f).replaceAll('</script', '<\\/script'));
 // (The first frame's script is a classic one already: it goes in as it is, where it stands.)

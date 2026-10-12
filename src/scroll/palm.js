@@ -223,6 +223,8 @@ export function createPalm({ reduced = false, plate = null, leaf = null } = {}) 
       };
       const img = new Image();
       img.alt = '';
+      // (No leaf, if its picture cannot be had: not a broken picture in the corner.)
+      img.onerror = () => { img.style.display = 'none'; };
       if (leaf) img.src = leaf;
       const top = part(img, 1), shadow = el('canvas'), under = part(shadow, 1.15);
       leafWrap.append(top.box); leafShadeWrap.append(under.box);

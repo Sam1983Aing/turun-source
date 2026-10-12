@@ -387,8 +387,13 @@ export function startScroll({ params }) {
     palm?.sandChanged(c, img === sands.day || img === sands.beach ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
     tide?.sandChanged(c, img === sands.end ? { sx, sy: (ih - sh) / 2, sw, sh, iw, ih } : null);
   }
+  // (A picture from another place, the CDN of the single file, is asked for with leave to read
+  // it: or the canvas it is drawn on could not be read again, and the tide and the gust both
+  // read the sand. One from beside the page is asked for plainly, as a file opened from the
+  // disk can only be.)
   const loadSand = (which, src) => new Promise((done) => {
     const img = new Image();
+    if (new URL(src, location.href).origin !== location.origin) img.crossOrigin = 'anonymous';
     img.onload = () => { (img.decode?.() ?? Promise.resolve()).catch(() => {}).then(() => { sands[which] = img; drawSand(); done(); }); };
     img.onerror = () => { console.warn(`the sand (${which}) did not load: ${which === 'day' ? 'plain sand' : 'the hero\'s'} instead`); done(); };
     img.src = src;

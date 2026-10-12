@@ -4611,3 +4611,27 @@ Sam's notes, with four screenshots.
   Everything that belongs to the water is now placed on the water (a coordinate that goes up
   the sand and back with the front), so it travels with it. Recorded again:
   `../demos/tide/`.
+
+### The one file, for Aura (11 October)
+
+Sam: "can you build a standalone file for Aura? That includes the landing page and the 3D
+scene."
+
+- `kelingking.html` was one file plus a folder: the seven pictures under the postcards were
+  beside it (`assets/hero/`). They are in the assets repo now (`aura-assets`, `kelingking/hero/`,
+  tags `1.15.0` and `kelingking-v3`, each checked on jsDelivr: 200, the local byte count, and
+  it allows other origins to read them). `tools/build-standalone.mjs` points the page's
+  `ASSETS`, the stylesheet's first-paint sand and the preload at them (`--hero=relative`
+  keeps them beside the file, for the public site's build).
+- The page asks for a picture from another origin with `crossOrigin = 'anonymous'`
+  (`scroll.js` for the sand, `tide.js` for the sea and its map). So the sand's canvas can still
+  be read, and **the wave runs in a file opened from the disk**, which it could not with the
+  pictures beside the file. A picture beside the page is asked for plainly, as before.
+- `node tools/build-site.mjs --aura` writes `../turun-aura.html`: that single file compiled
+  as the public site is (minified, comments and shader comments gone), 1.60 MB, with the
+  third-party notices in a comment at its head. Sam's rule holds: what leaves this folder is
+  the compiled page.
+- Tested from `file://`: ready in 11.9 s, all 42 fetches from `cdn.jsdelivr.net`, no console
+  errors, the four cards on their surfaces, the sea running at the ending. With the network
+  cut: loads in 21 s on plain sand with the terrain generated, no errors. The public site's
+  build still makes the same site (and `site/` was put back to what is live).

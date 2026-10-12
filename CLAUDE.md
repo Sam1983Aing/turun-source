@@ -24,6 +24,10 @@ test `site/` from a server (not as localhost: there the page looks for the terra
 and, not finding them, generates the terrain), then commit and push inside `site/`, at Sam's
 word each time. Then check the live page, and that `/PROCESS.md` and `/src/...` are 404 there.
 
+**One file, for Aura or to hand to someone**: `node tools/build-site.mjs --aura` writes
+`../turun-aura.html` (compiled, pictures from the CDN). Never give out `kelingking.html`: it is
+the same page with every comment and note in it.
+
 - `012 Nusa Penida` is the remote `scene`, to bring a scene fix over (`git fetch scene`, then
   cherry-pick). Nothing is ever pushed there from here.
 - This repo is the page: code, assets, the single file. One folder up are the things that

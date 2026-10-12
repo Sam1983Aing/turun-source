@@ -214,7 +214,9 @@ export function createTide({ reduced = false, sea = null, map = null } = {}) {
   let crop = null, fresh = false, placed = '', clock = 0, shown = false, drawn = false, tall = false, sent = false;
   // The card on the water: how far it has been taken (0 to about 1), and how fast that changes.
   const card = { at: 0, v: 0, near: null, key: '' };
-  const pics = [sea, map].map((src) => { const img = new Image(); img.onerror = () => { failed = true; }; img.src = src; return img; });
+  // (From another place than the page's, the CDN of the single file, they are asked for with
+  // leave to read them: a shader may not be given a picture it has no leave to read.)
+  const pics = [sea, map].map((src) => { const img = new Image(); if (new URL(src, location.href).origin !== location.origin) img.crossOrigin = 'anonymous'; img.onerror = () => { failed = true; }; img.src = src; return img; });
   const ready = () => pics.every((i) => i.complete && i.naturalWidth > 0);
 
   function start() {
