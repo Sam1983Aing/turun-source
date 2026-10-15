@@ -333,10 +333,11 @@ https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.17.0/kelingking/textures/<
 https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.17.0/kelingking/hero/<picture>
 ```
 
-(33 JPEGs: the eleven surfaces in `src/terrain/surfaces.js` and `src/trail/surfaces.js`, each
-with a colour, normal and mask map, plus `textures/CREDITS.md`. In `hero/`, seven pictures:
-`sand-clean.jpg`, `palm-leaf.png`, `sand-walk.jpg`, `sand-beach.jpg`, `sand-end.jpg`,
-`sand-end-sea.jpg`, `sand-end-tide.png` (since `1.15.0` / `kelingking-v3`). And `lib/three-r186.js`
+(33 WebP files: the eleven surfaces in `src/terrain/surfaces.js` and `src/trail/surfaces.js`,
+each with a colour, normal and mask map, plus `textures/CREDITS.md`. In `hero/`, seven
+pictures: `sand-clean.webp`, `palm-leaf.webp`, `sand-walk.webp`, `sand-beach.webp`,
+`sand-end.webp`, `sand-end-sea.webp`, `sand-end-tide.png`. The JPEG and PNG of the same names
+are the masters, and what the older tags load (the pictures since `1.15.0` / `kelingking-v3`). And `lib/three-r186.js`
 (since `1.16.0` / `kelingking-v4`). Since `1.17.0` / `kelingking-v5`, the tag the build uses now, the
 textures and the pictures are WebP and the terrain file is 10.1 MB (see "What a visitor
 downloads" below). `1.11.0` / `kelingking-v2` are the
