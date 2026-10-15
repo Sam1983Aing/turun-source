@@ -4685,3 +4685,8 @@ we need to optimize without losing too much quality", then chose "about 21 MB, n
 - To go further, each step costs something visible or seconds of loading: colour maps at 1024
   px (textures to about 7.9 MB), the sand plates at 2560 px wide (to about 2.2 MB), fewer plants
   or a coarser mesh in the terrain file.
+- **Published** at Sam's word ("publish it to the live site"): `site/` rebuilt, tested from the
+  Mac's network address, pushed. Live: the page identical to `site/index.html`, the WebP
+  pictures served, the old JPEGs and every source path 404, 28.05 MB downloaded with an empty
+  cache, ready in 12.7 s, the sea running, no console errors.
+
