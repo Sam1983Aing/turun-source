@@ -25,6 +25,19 @@ const CODECS = {
   // Plants: x, height, z, scale, yaw, species, variant, tint (scatter.js). Positions to a few
   // millimetres, the rest to 16 bits over their range; species and variant come back exact.
   'plants.data': { c: 'q16', planes: 8, round: [5, 6] },
+  // The path's two surfaces (v35, 15 October: they were raw, 2 MB of the file): packed as the
+  // terrain's mesh is. Positions to a few millimetres, normals to a degree, the index exact, and
+  // the per-vertex path coordinates (along, across, ...) and wear to 16 bits over their range.
+  'trail.meshes.dirt.position': { c: 'q16', planes: 3 },
+  'trail.meshes.dirt.normal': { c: 'oct8' },
+  'trail.meshes.dirt.index': { c: 'd32' },
+  'trail.meshes.dirt.trail': { c: 'q16', planes: 4 },
+  'trail.meshes.dirt.wear': { c: 'q16', planes: 1 },
+  'trail.meshes.concrete.position': { c: 'q16', planes: 3 },
+  'trail.meshes.concrete.normal': { c: 'oct8' },
+  'trail.meshes.concrete.index': { c: 'd32' },
+  'trail.meshes.concrete.trail': { c: 'q16', planes: 4 },
+  'trail.meshes.concrete.wear': { c: 'q16', planes: 1 },
 };
 
 const MAGIC = 0x31424c4b;   // "KLB1"

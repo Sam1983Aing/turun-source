@@ -226,7 +226,7 @@ const smooth01 = (a, b, x) => { const t = Math.min(Math.max((x - a) / (b - a), 0
 
 // RGBA8: the unit direction pointing offshore (R, G, from -1..1 packed to 0..255), so the
 // shader knows which way each bit of coast faces without sampling around it.
-function shoreDirection(shore, N) {
+export function shoreDirection(shore, N) {
   const out = new Uint8Array(N * N * 4);
   const r = 3;
   for (let j = 0; j < N; j++) {
@@ -246,6 +246,17 @@ function shoreDirection(shore, N) {
   return out;
 }
 
+// The terrain file (tools/bake-terrain.mjs) leaves out what the page can rebuild from the rest of
+// it in a few milliseconds, since everyone who opens the page downloads that file (v35, 15
+// October: it was 13.6 MB): the terrain's normal map, from the heights (22 ms), which comes
+// back with no byte more than one step off. (The offshore directions were tried too, from the
+// distance to the shore that the water texture carries as a half float: where the shore is
+// far, that rounding turned them by up to half a circle. They stay in the file, 0.4 MB.)
+export function restoreBaked(data) {
+  if (!data.normals) data.normals = normalMap(data.heights, data.N, data.cell);
+  return data;
+}
+
 const f32 = new Float32Array(1);
 const u32 = new Uint32Array(f32.buffer);
 function toHalf(v) {
@@ -261,7 +272,7 @@ function toHalf(v) {
 
 // Normals in three.js space (x east, y up, z south). For a surface (x, h(x, y), -y) the
 // normal is (-dh/dx, 1, dh/dy).
-function normalMap(H, N, cell) {
+export function normalMap(H, N, cell) {
   const out = new Uint8Array(N * N * 4);
   for (let j = 0; j < N; j++) {
     const jm = Math.max(0, j - 1), jp = Math.min(N - 1, j + 1);

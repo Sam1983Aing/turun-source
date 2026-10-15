@@ -4648,3 +4648,40 @@ scene."
   from jsDelivr, no errors, the sea running. With the network cut the loader says "No
   connection: the 3D scene could not load" (it ran on plain sand before, with the libraries
   inside). The readable single file and the public site's build are as they were.
+
+### Round 22: what the page weighs (15 October)
+
+Meng, in Sam's community, measured the pages people had shared: Turun 43 MB, where "max is
+5mb for the entire site". Sam: "analyze the file size of my 3D scene and the landing page ...
+we need to optimize without losing too much quality", then chose "about 21 MB, no visible loss".
+
+- **Measured** (empty cache, every download): textures 24.3 MB (colour maps 14.3 at 2048 px,
+  normals 5.3, masks 4.7), the terrain file 13.6, the postcards' pictures 6.4, everything else
+  under 1. About 45 MB.
+- **Found on the way:** jsDelivr was serving the terrain file at `1.16.0` (the tag of the file
+  on Aura) as 199 bytes, GitHub's "429: Too Many Requests" kept as the file with status 200 for
+  a year. The page then made the terrain itself: 143 s to ready in the test. Purged (one
+  request), and the CDN serves the real file again. CLAUDE.md has the trap.
+- **WebP** for every texture and picture, at the same sizes (`tools/prepare-webp.mjs`, from
+  the masters): textures 24.3 → 13.6 MB, pictures 6.4 → 3.8. Tried at a higher quality first
+  (17.7 MB of textures); the renders differed so little (49 to 55 dB, and an eight-times
+  difference picture nearly black) that the lower setting was tried, and it was as close.
+- **The terrain file**, 13.6 → 10.1 MB, by what it leaves out and how it packs the rest:
+  - timed in node, step by step: heightfield 3.5 s, mesh 5.0, plants 3.9, normal map 0.02,
+    water 0.07, offshore directions 0.04, coast 0.17, breakers 0.04, path 0.39. The mesh and
+    the plants are 70% of the file and cannot be rebuilt on the page without seconds of
+    freeze, so they stay. (The estimate given to Sam, about 3 MB, had assumed they could go.)
+  - the normal map is left out and rebuilt by the page from the heights (`restoreBaked`): no
+    byte more than one step off. The offshore directions were tried the same way, from the
+    distance to the shore that the water texture carries as a half float, and came back turned
+    by up to half a circle where the shore is far: they stay in the file (0.4 MB).
+  - the path's meshes were raw: now packed as the terrain's mesh is (positions to 0.7 mm,
+    normals octahedral, the index delta coded), 2 MB less.
+- **Result:** 28.5 MB, ready in 11.4 s from the disk, no console errors, the sea running.
+  Renders at eight places against the old ones: 48 to 55 dB. Assets at `aura-assets@1.17.0`
+  (`kelingking-v5`), all 43 files checked byte for byte on the CDN. `turun-aura.html` rebuilt
+  (0.72 MB). The live site is untouched (it still loads `1.11.0`, about 45 MB) until Sam says
+  to publish.
+- To go further, each step costs something visible or seconds of loading: colour maps at 1024
+  px (textures to about 7.9 MB), the sand plates at 2560 px wide (to about 2.2 MB), fewer plants
+  or a coarser mesh in the terrain file.

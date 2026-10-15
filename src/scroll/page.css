@@ -106,7 +106,7 @@ html.scroll .ground { position: absolute; inset: 0; width: 100%; height: 100%; t
      about the size and place the script will give it. (Sam: "I want the beach sand background
      to appear right away, not a solid color." It was the table's plain sand colour until the
      script had loaded, laid the page out and drawn the sand, and then a fade.) */
-  background: url(../../assets/hero/sand-clean.jpg) center / cover no-repeat, #ecd6b0 url("data:image/jpeg;base64,/9j//gAQTGF2YzYyLjI4LjEwMgD/2wBDAAgSEhUSFRgYGBgYGB0bHR4eHh0dHR0eHh4gICAmJiYgICAeHiAgJCQmJikqKScnJicqKi0tLTY2MzM/P0FNTV3/xABYAAADAQEBAAAAAAAAAAAAAAAAAgMBBwQBAQEBAAAAAAAAAAAAAAAAAAABBRABAAMBAQEBAAAAAAAAAAAAAAERgXEhkaERAQAAAAAAAAAAAAAAAAAAAAD/wAARCAAZACgDASIAAhEAAxEA/9oADAMBAAIRAxEAPwDrN9NcpM+sloKiyegFGp6NUILReqEUmDpZJALfg1ksVH//2Q==") center / cover no-repeat;
+  background: url(../../assets/hero/sand-clean.webp) center / cover no-repeat, #ecd6b0 url("data:image/jpeg;base64,/9j//gAQTGF2YzYyLjI4LjEwMgD/2wBDAAgSEhUSFRgYGBgYGB0bHR4eHh0dHR0eHh4gICAmJiYgICAeHiAgJCQmJikqKScnJicqKi0tLTY2MzM/P0FNTV3/xABYAAADAQEBAAAAAAAAAAAAAAAAAgMBBwQBAQEBAAAAAAAAAAAAAAAAAAABBRABAAMBAQEBAAAAAAAAAAAAAAERgXEhkaERAQAAAAAAAAAAAAAAAAAAAAD/wAARCAAZACgDASIAAhEAAxEA/9oADAMBAAIRAxEAPwDrN9NcpM+sloKiyegFGp6NUILReqEUmDpZJALfg1ksVH//2Q==") center / cover no-repeat;
   transform: translate(-1.2%, 0.2%) scale(1.137); }
 @media (max-aspect-ratio: 85/100) { html.scroll .ground { transform: translate(0, -0.9%) scale(1.128); } }
 /* (And the card is not: it is let go above the sand when the page is ready. postcard.js marks

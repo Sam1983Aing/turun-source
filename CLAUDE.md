@@ -61,6 +61,14 @@ goes live without Sam saying so.
   generating it. After changing the terrain, the path, the plants' scatter or the layout, run
   `node tools/bake-terrain.mjs`. On localhost the page notices a stale bake (a warning in the
   console) and generates instead, so nothing breaks, but it loads 8 s slower until you rebake.
+- **jsDelivr can keep a GitHub error as the file, for a year.** At `aura-assets@1.16.0` the
+  terrain file came back as 199 bytes, GitHub's "429: Too Many Requests", served with status
+  200 and `immutable`: the page then generates the terrain itself and takes minutes. After
+  pushing assets under a new tag, fetch every one and compare its bytes with the local copy
+  (not only the status), and later too if a page is slow. A wrong one is fixed by
+  `https://purge.jsdelivr.net/gh/Sam1983Aing/aura-assets@<tag>/kelingking/<file>`.
+- **After changing a texture or a sand plate,** `node tools/prepare-webp.mjs`: the page loads
+  the WebP copies, not the JPEG and PNG masters beside them.
 - **When a page never becomes ready,** `capture.mjs` prints its console. Read that before
   guessing.
 - **Scripted find-and-replace edits:** assert the old text is there exactly once, or the edit

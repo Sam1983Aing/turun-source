@@ -56,6 +56,10 @@ const { generateAll } = await import(join(root, 'src/terrain/worker.js'));
 const [msg] = generateAll({ id: 1, layout, N: 1024, M: 1025 });
 const genMs = performance.now() - t0;
 msg.bake = { sourceHash, layoutHash, sources: files, made: new Date().toISOString().slice(0, 10) };
+// (Not in the file: what the page rebuilds from the rest in a few milliseconds, restoreBaked in
+// worker.js. Kept here for the check below.)
+const left = { normals: msg.normals };
+delete msg.normals;
 const { encodeBake, decodeBake } = await import(join(root, 'src/terrain/bake-format.js'));
 const packed = encodeBake(msg);
 const gz = gzipSync(packed, { level: 9 });
@@ -66,4 +70,12 @@ const back = decodeBake(gunzipSync(gz));
 const worst = (a, b) => { let w = 0; for (let i = 0; i < a.length; i++) w = Math.max(w, Math.abs(a[i] - b[i])); return w; };
 console.log(`generated in ${(genMs / 1000).toFixed(1)} s; ${(packed.length / 1e6).toFixed(1)} MB packed, ${(gz.length / 1e6).toFixed(2)} MB gzipped: ${relative(root, out)}`);
 console.log(`round trip, largest error: mesh positions ${worst(msg.mesh.positions, back.mesh.positions).toFixed(4)} m, heights ${worst(msg.heights, back.heights).toFixed(4)} m, index ${worst(msg.mesh.index, back.mesh.index)}, plants' species ${worst(msg.plants.data.filter((_, i) => i % 8 === 5), back.plants.data.filter((_, i) => i % 8 === 5))}, water ${worst(msg.water, back.water)}`);
+{
+  const { restoreBaked } = await import(join(root, 'src/terrain/worker.js'));
+  const again = restoreBaked(back);
+  const off = (a, b) => { let n = 0, w = 0; for (let i = 0; i < a.length; i++) { const d = Math.abs(a[i] - b[i]); if (d) { n++; w = Math.max(w, d); } } return `${n} of ${a.length} bytes differ, by ${w} at most`; };
+  console.log(`rebuilt by the page: normal map ${off(left.normals, again.normals)}`);
+  const trailErr = ['dirt', 'concrete'].map((k) => `${k} positions ${worst(msg.trail.meshes[k].position, back.trail.meshes[k].position).toFixed(4)} m, along ${worst(msg.trail.meshes[k].trail, back.trail.meshes[k].trail).toFixed(4)}`).join('; ');
+  console.log(`the path, largest error: ${trailErr}`);
+}
 console.log(`sources (${files.length}): ${files.join(', ')}`);

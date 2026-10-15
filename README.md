@@ -288,6 +288,30 @@ rolled round its yard, a storm lantern over the stern.
 `?boat=0` leaves it all out, `?boat=east,north[,heading]` moors it somewhere else, `?moor=0`
 leaves out the post and line, `?moor=east,north` stands the post somewhere else.
 
+## What a visitor downloads
+
+28.5 MB, measured with an empty cache (15 October 2026; it was about 45 MB):
+
+| Part | Size |
+| --- | --- |
+| Textures: 33 WebP files, colour 2048 px, normal and mask 1024 px | 13.6 MB |
+| The terrain file (`assets/terrain/terrain-1024.bin`) | 10.1 MB |
+| The postcards' pictures, WebP (the sea's map stays a PNG) | 3.8 MB |
+| The page, three.js, GSAP, Lenis, fonts | under 1 MB |
+
+- **The pictures** are WebP copies of JPEG and PNG masters that stay beside them:
+  `node tools/prepare-webp.mjs` makes them again (cwebp; colour 78, normal and mask 86 with
+  sharp colour conversion, the sand plates 80, the leaf 90 with its transparency). Rerun it
+  after changing a texture or a plate. Rendered against the JPEGs at eight places, the
+  difference is 48 to 55 dB.
+- **The terrain file** holds what the generator makes, packed (`src/terrain/bake-format.js`).
+  It leaves out the terrain's normal map, which the page rebuilds from the heights in 22 ms
+  (`restoreBaked` in `src/terrain/worker.js`), and packs the path's two meshes as the terrain's
+  mesh is (they were raw). What is left cannot be rebuilt quickly: the mesh takes 5 s to make
+  and the plants 4 s.
+- To see it: open the page with the browser's cache off and read the network panel, or
+  `performance.getEntriesByType('resource')`.
+
 ## The standalone file
 
 `kelingking.html` is the whole page in one file you can double-click. Browsers refuse ES
@@ -304,16 +328,18 @@ inside it. They are on the CDN, from the assets repo `Sam1983Aing/aura-assets`, 
 `kelingking/`, pinned to a tag so a copy of the file already out there never changes:
 
 ```
-https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.16.0/kelingking/terrain/terrain-1024.bin
-https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.16.0/kelingking/textures/<surface>_<color|normal|mask>.jpg
-https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.16.0/kelingking/hero/<picture>
+https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.17.0/kelingking/terrain/terrain-1024.bin
+https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.17.0/kelingking/textures/<surface>_<color|normal|mask>.webp
+https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@1.17.0/kelingking/hero/<picture>
 ```
 
 (33 JPEGs: the eleven surfaces in `src/terrain/surfaces.js` and `src/trail/surfaces.js`, each
 with a colour, normal and mask map, plus `textures/CREDITS.md`. In `hero/`, seven pictures:
 `sand-clean.jpg`, `palm-leaf.png`, `sand-walk.jpg`, `sand-beach.jpg`, `sand-end.jpg`,
 `sand-end-sea.jpg`, `sand-end-tide.png` (since `1.15.0` / `kelingking-v3`). And `lib/three-r186.js`
-(since `1.16.0` / `kelingking-v4`, the tag the build uses now). `1.11.0` / `kelingking-v2` are the
+(since `1.16.0` / `kelingking-v4`). Since `1.17.0` / `kelingking-v5`, the tag the build uses now, the
+textures and the pictures are WebP and the terrain file is 10.1 MB (see "What a visitor
+downloads" below). `1.11.0` / `kelingking-v2` are the
 scene alone (v34), `1.10.0` / `kelingking-v1` the terrain of v11 and v12.)
 
 The pictures come from the CDN so that the file is the whole page with nothing beside it. It

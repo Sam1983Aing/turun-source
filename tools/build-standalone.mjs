@@ -33,7 +33,7 @@ const LOCAL = process.argv.includes('--local');
 
 // Bump after pushing new assets to the assets repo. A tag, never a branch: a file already out
 // in the world must not change because something was pushed later.
-export const TAG = '1.16.0';
+export const TAG = '1.17.0';
 const CDN = `https://cdn.jsdelivr.net/gh/Sam1983Aing/aura-assets@${TAG}/kelingking/`;
 const assetBase = process.argv.find((arg) => arg.startsWith('--asset-base='))?.slice(13);
 const BASE = LOCAL ? (assetBase ?? 'http://localhost:5290/assets/').replace(/\/?$/, '/') : CDN;
@@ -43,7 +43,7 @@ const BASE = LOCAL ? (assetBase ?? 'http://localhost:5290/assets/').replace(/\/?
 // picture from the CDN can be read by the page even when the page is a file on the disk, so
 // the wave at the ending runs there too (it could not, with the pictures beside the file).
 // --hero=relative leaves them beside the file, as assets/hero/ (the public site's build).
-const HERO = { heroPalm: 'sand-clean.jpg', heroLeaf: 'palm-leaf.png', heroWalk: 'sand-walk.jpg', heroBeach: 'sand-beach.jpg', heroEnd: 'sand-end.jpg', heroSea: 'sand-end-sea.jpg', heroTide: 'sand-end-tide.png' };
+const HERO = { heroPalm: 'sand-clean.webp', heroLeaf: 'palm-leaf.webp', heroWalk: 'sand-walk.webp', heroBeach: 'sand-beach.webp', heroEnd: 'sand-end.webp', heroSea: 'sand-end-sea.webp', heroTide: 'sand-end-tide.png' };
 const HERO_BESIDE = process.argv.includes('--hero=relative');
 const ASSETS = { textures: `${BASE}textures/`, bake: `${BASE}terrain/terrain-1024.bin`, ...(HERO_BESIDE ? null : Object.fromEntries(Object.entries(HERO).map(([k, f]) => [k, `${BASE}hero/${f}`]))) };
 // The libraries from a CDN instead of inside the file (--libs=cdn), for where a page may only
@@ -79,7 +79,7 @@ if (!LOCAL && !WRITE_LIB) {
   }
   if (!process.argv.includes('--no-cdn-check')) {
     const files = [
-      ...readdirSync(join(root, 'assets/textures')).filter((f) => /\.(jpg|md)$/.test(f)).map((f) => `textures/${f}`),
+      ...readdirSync(join(root, 'assets/textures')).filter((f) => /\.(webp|md)$/.test(f)).map((f) => `textures/${f}`),
       'terrain/terrain-1024.bin',
       ...(HERO_BESIDE ? [] : Object.values(HERO).map((f) => `hero/${f}`)),
       ...(LIBS_CDN ? [THREE_LIB] : []),
@@ -244,7 +244,7 @@ html = html.replace(/\n\s*<link rel="preconnect"[^>]*>/g, '').replace(/\n\s*<lin
 // (The stylesheet's own pictures are named from where it lies, two folders down: for the
 // single file they are on the CDN with the rest, or next door with --hero=relative.)
 swap('<link rel="stylesheet" href="src/scroll/page.css">', `<style>\n${fonts}\n${read('src/scroll/page.css').replaceAll('url(../../assets/', HERO_BESIDE ? 'url(assets/' : `url(${BASE}`)}</style>`);
-if (!HERO_BESIDE) swap('<link rel="preload" as="image" href="assets/hero/sand-clean.jpg">', `<link rel="preload" as="image" href="${BASE}hero/${HERO.heroPalm}">`);
+if (!HERO_BESIDE) swap('<link rel="preload" as="image" type="image/webp" href="assets/hero/sand-clean.webp">', `<link rel="preload" as="image" type="image/webp" href="${BASE}hero/${HERO.heroPalm}">`);
 html = html.replace(/\n\s*<script type="importmap">[\s\S]*?<\/script>/, '');
 const libs = ['vendor/gsap.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js'].map((f) => read(f).replaceAll('</script', '<\\/script'));
 // (The first frame's script is a classic one already: it goes in as it is, where it stands.)

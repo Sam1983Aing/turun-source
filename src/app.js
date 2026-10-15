@@ -54,6 +54,7 @@ import { SPECIES } from './veg/scatter.js';
 import { createTrail } from './trail/trail.js';
 import { createJukung } from './boat/jukung.js';
 import { decodeBake } from './terrain/bake-format.js';
+import { restoreBaked } from './terrain/worker.js';
 
 // Where the assets are (v11): next to the page, or, in the standalone build, on the CDN it sets
 // in globalThis.__klAssets ({ textures, bake }).
@@ -62,7 +63,7 @@ import { decodeBake } from './terrain/bake-format.js';
 // leaf's cut-out, for the live palm, which is what the page shows: `hero` is the photograph it
 // had before, behind ?sand=photo. heroWalk, heroBeach: what the two spreads' cards lie
 // on, Sam's plates: the cliff path with its rail, and clear shallow water over sand.)
-export const ASSETS = { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin', hero: 'assets/hero/sand.jpg', heroPalm: 'assets/hero/sand-clean.jpg', heroLeaf: 'assets/hero/palm-leaf.png', heroWalk: 'assets/hero/sand-walk.jpg', heroBeach: 'assets/hero/sand-beach.jpg', heroEnd: 'assets/hero/sand-end.jpg', heroSea: 'assets/hero/sand-end-sea.jpg', heroTide: 'assets/hero/sand-end-tide.png', ...globalThis.__klAssets };
+export const ASSETS = { textures: 'assets/textures/', bake: 'assets/terrain/terrain-1024.bin', hero: 'assets/hero/sand.jpg', heroPalm: 'assets/hero/sand-clean.webp', heroLeaf: 'assets/hero/palm-leaf.webp', heroWalk: 'assets/hero/sand-walk.webp', heroBeach: 'assets/hero/sand-beach.webp', heroEnd: 'assets/hero/sand-end.webp', heroSea: 'assets/hero/sand-end-sea.webp', heroTide: 'assets/hero/sand-end-tide.png', ...globalThis.__klAssets };
 
 // capture: a still for the tools (pixel ratio 1, 2048 terrain, the drawing buffer kept for
 // screenshots). keepBuffer: keep the drawing buffer without the rest (recording the scroll).
@@ -314,7 +315,8 @@ export function createApp({ params, capture = false, keepBuffer = false, maxPixe
         if (data.bake.sourceHash !== await hex(data.bake.sources.map((f, i) => f + '\n' + texts[i]).join('\n'))) throw new Error('the terrain code has changed since the bake (node tools/bake-terrain.mjs)');
       }
     }
-    return data;
+    // (What the file leaves out, rebuilt here in a few milliseconds: worker.js.)
+    return restoreBaked(data);
   }
   function receive(data) {
     if (data.id !== genId) return;

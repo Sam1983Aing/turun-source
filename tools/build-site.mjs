@@ -38,7 +38,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(root, 'site');
 // The pictures the page lays under its cards (assets/hero/). Not sand.jpg: that is the sand
 // the page had before, behind a switch.
-const PICTURES = ['sand-clean.jpg', 'palm-leaf.png', 'sand-walk.jpg', 'sand-beach.jpg', 'sand-end.jpg', 'sand-end-sea.jpg', 'sand-end-tide.png'];
+const PICTURES = ['sand-clean.webp', 'palm-leaf.webp', 'sand-walk.webp', 'sand-beach.webp', 'sand-end.webp', 'sand-end-sea.webp', 'sand-end-tide.png'];
 
 const AURA = process.argv.includes('--aura');
 const tmp = mkdtempSync(join(tmpdir(), 'turun-site-'));
