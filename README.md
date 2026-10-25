@@ -363,8 +363,8 @@ is three.js's two modules in this build's own classic-script form, minified
 (`node tools/build-standalone.mjs --write-three-lib` makes `assets/lib/three-r186.js`, once per
 version of three.js). The page's own code stays in the file. Without a network that file has
 no libraries, and says so in its loader ("No connection: the 3D scene could not load").
-That is the one to upload: `kelingking.html` is the readable source in one file and stays
-private.
+That is the one to upload: `kelingking.html` is the readable source in one file, for reading,
+not for uploading.
 
 Without a network it still runs. The textures come out flat, each in its surface's own average
 colour, and the terrain is generated on the page itself, which freezes it for 5 to 8 s before

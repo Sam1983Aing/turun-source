@@ -4589,8 +4589,10 @@ Sam's notes, with four screenshots.
   align, and make sure the spacing is clean". On a narrow screen the bar loses its "Light"
   label so all four choices fit (21 to 340 px of 390, 20 to 339 of 360). An old phone rule
   that took the chips' padding away is gone.
-- **The pencilled address** is `maya.ellison@gmail.com`, as Sam gave it (it was
+- **The pencilled address** became a real-looking Gmail address, as Sam gave it (it was
   `maya@example.com`, which reads as a form's default). A placeholder only: nothing is sent.
+  On 24 October 2026, before this repository went public, it went back to `maya@example.com`,
+  in case the Gmail address belongs to someone real.
 - **The wave, from "a five" towards "at least an eight"** ("I like the concept of the wave
   coming but it doesn't feel realistic yet ... a better water movement"). What was wrong, by
   looking at it against the photograph it borrows from: the sheet was milky and paler than the
